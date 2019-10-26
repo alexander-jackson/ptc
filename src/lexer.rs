@@ -43,7 +43,7 @@ impl<'input> Lexer<'input> {
             }
         }
 
-        &self.input[start..self.index-1]
+        &self.input[start..self.index - 1]
     }
 
     fn update_lookahead(&mut self) {
@@ -64,20 +64,22 @@ impl<'input> Iterator for Lexer<'input> {
             if c.1.is_alphabetic() {
                 let ident = self.read_identifier();
                 return Some(Ok((0, Tok::Identifier { name: ident }, 0)));
-            }
-            else if c.1 == '=' {
+            } else if c.1 == '=' {
                 self.update_lookahead();
                 return Some(Ok((0, Tok::Assign, 0)));
-            }
-            else if c.1 == ';' {
+            } else if c.1 == ';' {
                 self.update_lookahead();
                 return Some(Ok((0, Tok::SemiColon, 0)));
-            }
-            else if c.1.is_digit(10) {
+            } else if c.1.is_digit(10) {
                 self.update_lookahead();
-                return Some(Ok((0, Tok::Integer { value: c.1.to_digit(10).unwrap() }, 0)));
-            }
-            else {
+                return Some(Ok((
+                    0,
+                    Tok::Integer {
+                        value: c.1.to_digit(10).unwrap(),
+                    },
+                    0,
+                )));
+            } else {
                 self.update_lookahead();
                 continue;
             }

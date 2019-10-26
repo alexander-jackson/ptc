@@ -28,11 +28,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let filename = match args.filename {
         Some(f) => f,
-        None => panic!("Please enter a filename using the --filename argument.")
+        None => panic!("Please enter a filename using the --filename argument."),
     };
 
-    let program_code: String = fs::read_to_string(&filename)
-        .expect("Failed to read the file.");
+    let program_code: String = fs::read_to_string(&filename).expect("Failed to read the file.");
 
     let ast = parse(&program_code).expect("Failed to parse the given program");
     dbg!(&ast);
