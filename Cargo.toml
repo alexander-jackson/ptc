@@ -10,3 +10,4 @@ version = "0.17.2"
 [dependencies]
 lalrpop-util = "0.17.2"
 regex = "1"
+pico-args = "0.3.0"

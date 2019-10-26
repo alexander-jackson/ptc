@@ -1,5 +1,4 @@
 use std::fs;
-use std::env;
 
 #[macro_use]
 extern crate lalrpop_util;
@@ -9,28 +8,34 @@ pub mod lexer;
 
 lalrpop_mod!(pub parser);
 
-fn compile(input: &str) -> Result<ast::Program, String> {
+struct Args {
+    filename: Option<String>,
+}
+
+fn parse(input: &str) -> Result<ast::Program, String> {
     match parser::ProgramParser::new().parse(lexer::Lexer::new(input)) {
         Ok(s) => Ok(ast::Program::new(s)),
         Err(e) => Err(format!("{:?}", e)),
     }
 }
 
-fn main() {
-    let mut source = String::new();
-    match env::args().nth(1) {
-        Some(filename) => {
-            source = fs::read_to_string(&filename)
-                .expect("Failed to open the file and read it.");
-        }
-        None => { (); }
-    }
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut args = pico_args::Arguments::from_env();
 
-    if source.is_empty() {
-        println!("Empty file");
-        return;
-    }
+    let args = Args {
+        filename: args.opt_value_from_str("--filename")?,
+    };
 
-    let ast = compile(&source).expect("OH NO");
+    let filename = match args.filename {
+        Some(f) => f,
+        None => panic!("Please enter a filename using the --filename argument.")
+    };
+
+    let program_code: String = fs::read_to_string(&filename)
+        .expect("Failed to read the file.");
+
+    let ast = parse(&program_code).expect("Failed to parse the given program");
     dbg!(&ast);
+
+    Ok(())
 }
