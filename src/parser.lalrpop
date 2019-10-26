@@ -1,0 +1,49 @@
+use lexer;
+use ast;
+
+grammar<'input>;
+
+Semi<T>: Vec<T> = {
+    <v:(<T> ";")*> <e:T?> => match e {
+        None => v,
+        Some(e) => {
+            let mut v = v;
+            v.push(e);
+            v
+        }
+    }
+};
+
+pub Program = Semi<Statement>;
+
+Statement: ast::Stmt<'input> = {
+    Identifier Assign Number => ast::Stmt::Statement(<>),
+};
+
+Identifier: ast::Identifier<'input> = {
+    "identifier" => ast::identifier(<>),
+};
+
+Integer: ast::Number = <i: Integer> => i;
+
+Assign: ast::Operator = {
+    "=" => ast::Operator::Assign,
+};
+
+Number: ast::Number = {
+    "integer" => ast::number(<>),
+};
+
+extern {
+    type Location = usize;
+    type Error = lexer::LexicalError;
+
+    enum lexer::Tok<'input> {
+        "identifier" => lexer::Tok::Identifier { name: <&'input str> },
+        "=" => lexer::Tok::Assign,
+        "integer" => lexer::Tok::Integer { value: <u32> },
+        ";" => lexer::Tok::SemiColon,
+    }
+}
+
+// vim: ft=rust
