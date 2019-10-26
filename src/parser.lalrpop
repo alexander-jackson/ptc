@@ -14,7 +14,9 @@ Semi<T>: Vec<T> = {
     }
 };
 
-pub Program = Semi<Statement>;
+pub Program: ast::Program<'input> = {
+    <stmts: Semi<Statement>> => ast::Program { stmts },
+};
 
 Statement: ast::Stmt<'input> = {
     Identifier Assign Number => ast::Stmt::Statement(<>),
