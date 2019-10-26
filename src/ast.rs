@@ -1,26 +1,26 @@
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Stmt<'input> {
     Statement(Identifier<'input>, Operator, Number),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Identifier<'input> {
     Name { name: &'input str },
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Operator {
     Assign,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Number {
     Integer { value: u32 },
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Program<'input> {
-    stmts: Vec<Stmt<'input>>,
+    pub stmts: Vec<Stmt<'input>>,
 }
 
 impl<'input> Program<'input> {
