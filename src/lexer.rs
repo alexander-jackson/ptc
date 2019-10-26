@@ -46,6 +46,20 @@ impl<'input> Lexer<'input> {
         &self.input[start..self.index - 1]
     }
 
+    fn read_integer(&mut self) -> &'input str {
+        let start: usize = self.index - 1;
+
+        while let Some((_i, c)) = self.lookahead {
+            if c.is_digit(10) {
+                self.update_lookahead();
+            } else {
+                break;
+            }
+        }
+
+        &self.input[start..self.index - 1]
+    }
+
     fn update_lookahead(&mut self) {
         self.lookahead = self.chars.next();
         self.index += 1;
@@ -71,14 +85,8 @@ impl<'input> Iterator for Lexer<'input> {
                 self.update_lookahead();
                 return Some(Ok((0, Tok::SemiColon, 0)));
             } else if c.1.is_digit(10) {
-                self.update_lookahead();
-                return Some(Ok((
-                    0,
-                    Tok::Integer {
-                        value: c.1.to_digit(10).unwrap(),
-                    },
-                    0,
-                )));
+                let value: u32 = self.read_integer().parse().unwrap();
+                return Some(Ok((0, Tok::Integer { value: value }, 0)));
             } else {
                 self.update_lookahead();
                 continue;
