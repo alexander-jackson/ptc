@@ -70,17 +70,17 @@ impl<'input> Iterator for Lexer<'input> {
             self.update_lookahead();
         }
 
-        while let Some(c) = self.lookahead {
-            if c.1.is_alphabetic() {
+        while let Some((_i, c)) = self.lookahead {
+            if c.is_alphabetic() {
                 let ident = self.read_identifier();
                 return Some(Ok((0, Tok::Identifier { name: ident }, 0)));
-            } else if c.1 == '=' {
+            } else if c == '=' {
                 self.update_lookahead();
                 return Some(Ok((0, Tok::Assign, 0)));
-            } else if c.1 == ';' {
+            } else if c == ';' {
                 self.update_lookahead();
                 return Some(Ok((0, Tok::SemiColon, 0)));
-            } else if c.1.is_digit(10) {
+            } else if c.is_digit(10) {
                 let value: u32 = self.read_integer().parse().unwrap();
                 return Some(Ok((0, Tok::Integer { value: value }, 0)));
             } else {
