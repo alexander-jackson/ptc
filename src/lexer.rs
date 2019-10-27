@@ -32,11 +32,13 @@ impl<'input> Lexer<'input> {
         }
     }
 
-    fn read_identifier(&mut self) -> &'input str {
+    fn read_while<F>(&mut self, mut pred: F) -> &'input str
+    where F: FnMut(char) -> bool,
+    {
         let start: usize = self.index - 1;
 
         while let Some((_i, c)) = self.lookahead {
-            if c.is_alphabetic() {
+            if pred(c) {
                 self.update_lookahead();
             } else {
                 break;
@@ -46,18 +48,12 @@ impl<'input> Lexer<'input> {
         &self.input[start..self.index - 1]
     }
 
+    fn read_identifier(&mut self) -> &'input str {
+        self.read_while(|c| c.is_alphabetic())
+    }
+
     fn read_integer(&mut self) -> &'input str {
-        let start: usize = self.index - 1;
-
-        while let Some((_i, c)) = self.lookahead {
-            if c.is_digit(10) {
-                self.update_lookahead();
-            } else {
-                break;
-            }
-        }
-
-        &self.input[start..self.index - 1]
+        self.read_while(|c| c.is_digit(10))
     }
 
     fn update_lookahead(&mut self) {
