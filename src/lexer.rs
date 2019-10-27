@@ -49,7 +49,7 @@ impl<'input> Lexer<'input> {
     }
 
     fn read_identifier(&mut self) -> &'input str {
-        self.read_while(|c| c.is_alphabetic())
+        self.read_while(|c| c.is_alphabetic() || c == '_')
     }
 
     fn read_integer(&mut self) -> &'input str {

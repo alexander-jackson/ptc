@@ -37,6 +37,29 @@ fn ignore_whitespace_test() {
 }
 
 #[test]
+fn allow_underscores_in_identifiers_test() {
+    let input: &str = r#"
+    longer_name = 3;
+    "#;
+
+    let ast = parser::ProgramParser::new()
+        .parse(lexer::Lexer::new(input))
+        .unwrap();
+
+    let expected_ast = ast::Program {
+        stmts: vec![
+            ast::Stmt::Statement(
+                ast::Identifier::Name { name: "longer_name" },
+                ast::Operator::Assign,
+                ast::Number::Integer { value: 3 },
+            ),
+        ],
+    };
+
+    assert_eq!(&ast, &expected_ast);
+}
+
+#[test]
 fn parse_integers_test() {
     let input: &str = r#"
     name = 40;
