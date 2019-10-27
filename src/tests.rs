@@ -5,6 +5,8 @@ fn ignore_whitespace_test() {
     let input: &str = r#"
     name =    4;
         base = 3;
+
+    newline = 1;
     "#;
 
     let ast = parser::ProgramParser::new()
@@ -22,6 +24,11 @@ fn ignore_whitespace_test() {
                 ast::Identifier::Name { name: "base" },
                 ast::Operator::Assign,
                 ast::Number::Integer { value: 3 },
+            ),
+            ast::Stmt::Statement(
+                ast::Identifier::Name { name: "newline" },
+                ast::Operator::Assign,
+                ast::Number::Integer { value: 1 },
             ),
         ],
     };
