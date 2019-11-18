@@ -112,3 +112,14 @@ fn parse_bracketed_expression_test() {
 
     assert!(ast.is_ok());
 }
+
+#[test]
+fn parse_identifier_expression_test() {
+    let input: &str = r#"var = var_one + var_two;
+    "#;
+
+    let ast = parser::ProgramParser::new()
+        .parse(lexer::Lexer::new(input));
+
+    assert!(ast.is_ok());
+}
