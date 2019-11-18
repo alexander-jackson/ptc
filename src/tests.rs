@@ -93,3 +93,15 @@ fn parse_integers_test() {
 
     assert_eq!(&ast, &expected_ast);
 }
+
+#[test]
+fn parse_expressions_test() {
+    let input: &str = r#"
+    var = 1 / 1 * 1 + 1 - 1;
+    "#;
+
+    let ast = parser::ProgramParser::new()
+        .parse(lexer::Lexer::new(input));
+
+    assert!(ast.is_ok());
+}
