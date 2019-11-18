@@ -1,5 +1,7 @@
 use super::*;
 
+use ast::*;
+
 #[test]
 fn ignore_whitespace_test() {
     let input: &str = r#"
@@ -13,27 +15,27 @@ fn ignore_whitespace_test() {
         .parse(lexer::Lexer::new(input))
         .unwrap();
 
-    let expected_ast = ast::Program {
+    let expected_ast = Program {
         stmts: vec![
-            ast::Stmt::Statement(
-                ast::Identifier::Name { name: "name" },
-                ast::Operator::Assign,
-                ast::Expression::Literal { value:
-                    ast::Number::Integer { value: 4 },
+            Stmt::Statement(
+                Identifier::Name { name: "name" },
+                Operator::Assign,
+                Expression::Literal { value:
+                    Number::Integer { value: 4 },
                 },
             ),
-            ast::Stmt::Statement(
-                ast::Identifier::Name { name: "base" },
-                ast::Operator::Assign,
-                ast::Expression::Literal { value:
-                    ast::Number::Integer { value: 3 },
+            Stmt::Statement(
+                Identifier::Name { name: "base" },
+                Operator::Assign,
+                Expression::Literal { value:
+                    Number::Integer { value: 3 },
                 },
             ),
-            ast::Stmt::Statement(
-                ast::Identifier::Name { name: "newline" },
-                ast::Operator::Assign,
-                ast::Expression::Literal { value:
-                    ast::Number::Integer { value: 1 },
+            Stmt::Statement(
+                Identifier::Name { name: "newline" },
+                Operator::Assign,
+                Expression::Literal { value:
+                    Number::Integer { value: 1 },
                 },
             ),
         ],
@@ -52,13 +54,13 @@ fn allow_underscores_in_identifiers_test() {
         .parse(lexer::Lexer::new(input))
         .unwrap();
 
-    let expected_ast = ast::Program {
+    let expected_ast = Program {
         stmts: vec![
-            ast::Stmt::Statement(
-                ast::Identifier::Name { name: "longer_name" },
-                ast::Operator::Assign,
-                ast::Expression::Literal { value:
-                    ast::Number::Integer { value: 3 },
+            Stmt::Statement(
+                Identifier::Name { name: "longer_name" },
+                Operator::Assign,
+                Expression::Literal { value:
+                    Number::Integer { value: 3 },
                 },
             ),
         ],
@@ -77,13 +79,13 @@ fn parse_integers_test() {
         .parse(lexer::Lexer::new(input))
         .unwrap();
 
-    let expected_ast = ast::Program {
+    let expected_ast = Program {
         stmts: vec![
-            ast::Stmt::Statement(
-                ast::Identifier::Name { name: "name" },
-                ast::Operator::Assign,
-                ast::Expression::Literal { value:
-                    ast::Number::Integer { value: 40 },
+            Stmt::Statement(
+                Identifier::Name { name: "name" },
+                Operator::Assign,
+                Expression::Literal { value:
+                    Number::Integer { value: 40 },
                 },
             )
         ],
