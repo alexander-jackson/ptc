@@ -22,7 +22,7 @@ impl<'input> Stmt<'input> {
     fn generate(&self) {
         println!("Generating code: {:?}", self);
         match &*self {
-            Stmt::Statement(ident, op, num) => generate_assignment(&*self),
+            Stmt::Statement(_, _, _) => generate_assignment(&*self),
         };
     }
 }
@@ -100,12 +100,6 @@ impl Number {
     fn to_string(&self) -> String {
         match *self {
             Number::Integer { value } => value.to_string(),
-        }
-    }
-
-    fn get_type(&self) -> Type {
-        match *self {
-            Number::Integer { value } => Type::Int,
         }
     }
 }
