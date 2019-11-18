@@ -34,7 +34,7 @@ Operator: ast::Operator = {
     "/" => ast::Operator::Divide,
 };
 
-Expression: ast::Expression = {
+Expression: ast::Expression<'input> = {
     <left: Expression> <op: Operator> <right: Number> =>
         ast::Expression::BinaryOperation {
             left: Box::new(left),
@@ -43,6 +43,9 @@ Expression: ast::Expression = {
         },
     "lpar" <expr: Expression> "rpar" =>
         ast::Expression::ParenExpr { expr: Box::new(expr) },
+    <ident: "identifier"> => ast::Expression::Identifier {
+        name: ast::Identifier::Name { name: ident },
+    },
     <num: Number> => ast::Expression::Literal {
         value: num,
     },
