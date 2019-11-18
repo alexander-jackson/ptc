@@ -10,6 +10,7 @@ lalrpop_mod!(pub parser);
 
 struct Args {
     filename: Option<String>,
+    generate: bool,
 }
 
 fn parse(input: &str) -> Result<ast::Program, String> {
@@ -24,6 +25,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let args = Args {
         filename: args.opt_value_from_str("--filename")?,
+        generate: args.contains("--generate"),
     };
 
     let filename = match args.filename {
@@ -36,7 +38,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ast = parse(&program_code).expect("Failed to parse the given program");
     dbg!(&ast);
 
-    ast.generate();
+    if args.generate {
+        ast.generate();
+    }
 
     Ok(())
 }
