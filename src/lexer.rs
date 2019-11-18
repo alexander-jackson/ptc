@@ -6,6 +6,7 @@ pub type Spanned<Tok, Loc, Error> = Result<(Loc, Tok, Loc), Error>;
 pub enum Tok<'input> {
     Identifier { name: &'input str },
     Assign,
+    Plus,
     Integer { value: u32 },
     SemiColon,
 }
@@ -77,6 +78,9 @@ impl<'input> Iterator for Lexer<'input> {
             } else if c == '=' {
                 self.update_lookahead();
                 return Some(Ok((0, Tok::Assign, 0)));
+            } else if c == '+' {
+                self.update_lookahead();
+                return Some(Ok((0, Tok::Plus, 0)));
             } else if c == ';' {
                 self.update_lookahead();
                 return Some(Ok((0, Tok::SemiColon, 0)));

@@ -18,17 +18,23 @@ fn ignore_whitespace_test() {
             ast::Stmt::Statement(
                 ast::Identifier::Name { name: "name" },
                 ast::Operator::Assign,
-                ast::Number::Integer { value: 4 },
+                ast::Expression::Literal { value:
+                    ast::Number::Integer { value: 4 },
+                },
             ),
             ast::Stmt::Statement(
                 ast::Identifier::Name { name: "base" },
                 ast::Operator::Assign,
-                ast::Number::Integer { value: 3 },
+                ast::Expression::Literal { value:
+                    ast::Number::Integer { value: 3 },
+                },
             ),
             ast::Stmt::Statement(
                 ast::Identifier::Name { name: "newline" },
                 ast::Operator::Assign,
-                ast::Number::Integer { value: 1 },
+                ast::Expression::Literal { value:
+                    ast::Number::Integer { value: 1 },
+                },
             ),
         ],
     };
@@ -51,7 +57,9 @@ fn allow_underscores_in_identifiers_test() {
             ast::Stmt::Statement(
                 ast::Identifier::Name { name: "longer_name" },
                 ast::Operator::Assign,
-                ast::Number::Integer { value: 3 },
+                ast::Expression::Literal { value:
+                    ast::Number::Integer { value: 3 },
+                },
             ),
         ],
     };
@@ -74,7 +82,9 @@ fn parse_integers_test() {
             ast::Stmt::Statement(
                 ast::Identifier::Name { name: "name" },
                 ast::Operator::Assign,
-                ast::Number::Integer { value: 40 },
+                ast::Expression::Literal { value:
+                    ast::Number::Integer { value: 40 },
+                },
             )
         ],
     };

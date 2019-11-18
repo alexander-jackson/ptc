@@ -15,7 +15,7 @@ impl Type {
 
 #[derive(Debug, PartialEq)]
 pub enum Stmt<'input> {
-    Statement(Identifier<'input>, Operator, Number),
+    Statement(Identifier<'input>, Operator, Expression),
 }
 
 impl<'input> Stmt<'input> {
@@ -43,6 +43,7 @@ impl<'input> Identifier<'input> {
 #[derive(Debug, PartialEq)]
 pub enum Operator {
     Assign,
+    Plus,
 }
 
 impl Operator {
@@ -51,7 +52,34 @@ impl Operator {
 
         match *self {
             Assign => "=",
+            Plus => "+",
         }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub enum Expression {
+    BinaryOperation {
+        left: Box<Number>,
+        op: Operator,
+        right: Box<Number>,
+    },
+    Literal { value: Number },
+}
+
+impl Expression {
+    fn to_string(&self) -> String {
+        use ast::Expression::*;
+
+        match &*self {
+            BinaryOperation { left, op, right } =>
+                left.to_string() + op.to_string() + &right.to_string(),
+            Literal { value } => value.to_string(),
+        }
+    }
+
+    fn get_type(&self) -> Type {
+        Type::Int
     }
 }
 

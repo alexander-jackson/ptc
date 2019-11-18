@@ -19,17 +19,28 @@ pub Program: ast::Program<'input> = {
 };
 
 Statement: ast::Stmt<'input> = {
-    Identifier Assign Number => ast::Stmt::Statement(<>),
+    Identifier Operator Expression => ast::Stmt::Statement(<>),
 };
 
 Identifier: ast::Identifier<'input> = {
     "identifier" => ast::identifier(<>),
 };
 
-Integer: ast::Number = <i: Integer> => i;
-
-Assign: ast::Operator = {
+Operator: ast::Operator = {
     "=" => ast::Operator::Assign,
+    "+" => ast::Operator::Plus,
+};
+
+Expression: ast::Expression = {
+    <left: Number> <op: Operator> <right: Number> =>
+        ast::Expression::BinaryOperation {
+            left: Box::new(left),
+            op: op,
+            right: Box::new(right),
+        },
+    <num: Number> => ast::Expression::Literal {
+        value: num,
+    },
 };
 
 Number: ast::Number = {
@@ -43,6 +54,7 @@ extern {
     enum lexer::Tok<'input> {
         "identifier" => lexer::Tok::Identifier { name: <&'input str> },
         "=" => lexer::Tok::Assign,
+        "+" => lexer::Tok::Plus,
         "integer" => lexer::Tok::Integer { value: <u32> },
         ";" => lexer::Tok::SemiColon,
     }
