@@ -16,7 +16,7 @@ pub enum Tok<'input> {
     Integer { value: u32 },
     LPar,
     RPar,
-    SemiColon,
+    Newline,
 }
 
 #[derive(Debug)]
@@ -104,9 +104,9 @@ impl<'input> Iterator for Lexer<'input> {
             } else if c == ')' {
                 self.update_lookahead();
                 return Some(Ok((0, Tok::RPar, 0)));
-            } else if c == ';' {
+            } else if c == '\n' {
                 self.update_lookahead();
-                return Some(Ok((0, Tok::SemiColon, 0)));
+                return Some(Ok((0, Tok::Newline, 0)));
             } else if c.is_digit(10) {
                 let value: u32 = self.read_integer().parse().unwrap();
                 return Some(Ok((0, Tok::Integer { value: value }, 0)));

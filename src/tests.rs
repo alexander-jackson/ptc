@@ -4,8 +4,7 @@ use ast::*;
 
 #[test]
 fn ignore_whitespace_test() {
-    let input: &str = r#"
-    name =    4;
+    let input: &str = r#"name =    4;
         base = 3;
 
     newline = 1;
@@ -46,8 +45,7 @@ fn ignore_whitespace_test() {
 
 #[test]
 fn allow_underscores_in_identifiers_test() {
-    let input: &str = r#"
-    longer_name = 3;
+    let input: &str = r#"longer_name = 3;
     "#;
 
     let ast = parser::ProgramParser::new()
@@ -71,8 +69,7 @@ fn allow_underscores_in_identifiers_test() {
 
 #[test]
 fn parse_integers_test() {
-    let input: &str = r#"
-    name = 40;
+    let input: &str = r#"name = 40;
     "#;
 
     let ast = parser::ProgramParser::new()
@@ -96,8 +93,7 @@ fn parse_integers_test() {
 
 #[test]
 fn parse_expressions_test() {
-    let input: &str = r#"
-    var = 1 / 1 * 1 + 1 - 1;
+    let input: &str = r#"var = 1 / 1 * 1 + 1 - 1;
     "#;
 
     let ast = parser::ProgramParser::new()
@@ -108,8 +104,7 @@ fn parse_expressions_test() {
 
 #[test]
 fn parse_bracketed_expression_test() {
-    let input: &str = r#"
-    var = (1 / 1) * 1;
+    let input: &str = r#"var = (1 / 1) * 1;
     "#;
 
     let ast = parser::ProgramParser::new()

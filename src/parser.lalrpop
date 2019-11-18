@@ -3,8 +3,8 @@ use ast;
 
 grammar<'input>;
 
-Semi<T>: Vec<T> = {
-    <v:(<T> ";")*> <e:T?> => match e {
+Lines<T>: Vec<T> = {
+    <v:(<T> "\n"+)*> <e:T?> => match e {
         None => v,
         Some(e) => {
             let mut v = v;
@@ -15,7 +15,7 @@ Semi<T>: Vec<T> = {
 };
 
 pub Program: ast::Program<'input> = {
-    <stmts: Semi<Statement>> => ast::Program { stmts },
+    <stmts: Lines<Statement>> => ast::Program { stmts },
 };
 
 Statement: ast::Stmt<'input> = {
@@ -66,7 +66,7 @@ extern {
         "integer" => lexer::Tok::Integer { value: <u32> },
         "lpar" => lexer::Tok::LPar,
         "rpar" => lexer::Tok::RPar,
-        ";" => lexer::Tok::SemiColon,
+        "\n" => lexer::Tok::Newline,
     }
 }
 
