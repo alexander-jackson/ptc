@@ -105,3 +105,15 @@ fn parse_expressions_test() {
 
     assert!(ast.is_ok());
 }
+
+#[test]
+fn parse_bracketed_expression_test() {
+    let input: &str = r#"
+    var = (1 / 1) * 1;
+    "#;
+
+    let ast = parser::ProgramParser::new()
+        .parse(lexer::Lexer::new(input));
+
+    assert!(ast.is_ok());
+}
