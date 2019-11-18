@@ -115,7 +115,7 @@ fn parse_bracketed_expression_test() {
 
 #[test]
 fn parse_identifier_expression_test() {
-    let input: &str = r#"var = var_one + var_two;
+    let input: &str = r#"var = var_one + 2;
     "#;
 
     let ast = parser::ProgramParser::new()
