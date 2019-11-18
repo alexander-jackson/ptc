@@ -44,6 +44,9 @@ impl<'input> Identifier<'input> {
 pub enum Operator {
     Assign,
     Plus,
+    Minus,
+    Multiply,
+    Divide,
 }
 
 impl Operator {
@@ -53,6 +56,9 @@ impl Operator {
         match *self {
             Assign => "=",
             Plus => "+",
+            Minus => "-",
+            Multiply => "*",
+            Divide => "/",
         }
     }
 }

@@ -29,6 +29,9 @@ Identifier: ast::Identifier<'input> = {
 Operator: ast::Operator = {
     "=" => ast::Operator::Assign,
     "+" => ast::Operator::Plus,
+    "-" => ast::Operator::Minus,
+    "*" => ast::Operator::Multiply,
+    "/" => ast::Operator::Divide,
 };
 
 Expression: ast::Expression = {
@@ -55,6 +58,9 @@ extern {
         "identifier" => lexer::Tok::Identifier { name: <&'input str> },
         "=" => lexer::Tok::Assign,
         "+" => lexer::Tok::Plus,
+        "-" => lexer::Tok::Minus,
+        "*" => lexer::Tok::Multiply,
+        "/" => lexer::Tok::Divide,
         "integer" => lexer::Tok::Integer { value: <u32> },
         ";" => lexer::Tok::SemiColon,
     }
