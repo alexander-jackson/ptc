@@ -41,6 +41,8 @@ Expression: ast::Expression = {
             op: op,
             right: Box::new(right),
         },
+    "lpar" <expr: Expression> "rpar" =>
+        ast::Expression::ParenExpr { expr: Box::new(expr) },
     <num: Number> => ast::Expression::Literal {
         value: num,
     },
@@ -62,6 +64,8 @@ extern {
         "*" => lexer::Tok::Multiply,
         "/" => lexer::Tok::Divide,
         "integer" => lexer::Tok::Integer { value: <u32> },
+        "lpar" => lexer::Tok::LPar,
+        "rpar" => lexer::Tok::RPar,
         ";" => lexer::Tok::SemiColon,
     }
 }

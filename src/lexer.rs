@@ -14,6 +14,8 @@ pub enum Tok<'input> {
     Divide,
 
     Integer { value: u32 },
+    LPar,
+    RPar,
     SemiColon,
 }
 
@@ -96,6 +98,12 @@ impl<'input> Iterator for Lexer<'input> {
             } else if c == '/' {
                 self.update_lookahead();
                 return Some(Ok((0, Tok::Divide, 0)));
+            } else if c == '(' {
+                self.update_lookahead();
+                return Some(Ok((0, Tok::LPar, 0)));
+            } else if c == ')' {
+                self.update_lookahead();
+                return Some(Ok((0, Tok::RPar, 0)));
             } else if c == ';' {
                 self.update_lookahead();
                 return Some(Ok((0, Tok::SemiColon, 0)));

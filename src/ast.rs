@@ -70,6 +70,7 @@ pub enum Expression {
         op: Operator,
         right: Box<Number>,
     },
+    ParenExpr { expr: Box<Expression> },
     Literal { value: Number },
 }
 
@@ -80,6 +81,7 @@ impl Expression {
         match &*self {
             BinaryOperation { left, op, right } =>
                 left.to_string() + op.to_string() + &right.to_string(),
+            ParenExpr { expr } => format!("({})", expr.to_string()),
             Literal { value } => value.to_string(),
         }
     }
