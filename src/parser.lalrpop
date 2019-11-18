@@ -32,7 +32,7 @@ Operator: ast::Operator = {
 };
 
 Expression: ast::Expression = {
-    <left: Number> <op: Operator> <right: Number> =>
+    <left: Expression> <op: Operator> <right: Number> =>
         ast::Expression::BinaryOperation {
             left: Box::new(left),
             op: op,

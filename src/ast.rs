@@ -60,7 +60,7 @@ impl Operator {
 #[derive(Debug, PartialEq)]
 pub enum Expression {
     BinaryOperation {
-        left: Box<Number>,
+        left: Box<Expression>,
         op: Operator,
         right: Box<Number>,
     },
