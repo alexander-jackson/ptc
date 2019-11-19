@@ -57,11 +57,3 @@ pub enum Expression {
 pub enum Number {
     Integer { value: u32 },
 }
-
-pub fn number(value: u32) -> Number {
-    Number::Integer { value }
-}
-
-pub fn identifier(name: String) -> Identifier {
-    Identifier::Name { name: name }
-}

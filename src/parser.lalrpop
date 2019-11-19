@@ -52,7 +52,7 @@ Expression: ast::Expression = {
 };
 
 Number: ast::Number = {
-    "integer" => ast::number(<>),
+    <i: "integer"> => ast::Number::Integer { value: i },
 };
 
 extern {
