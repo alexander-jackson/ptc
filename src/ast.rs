@@ -5,12 +5,6 @@ pub struct Program {
     pub stmts: Suite,
 }
 
-impl Program {
-    pub fn new(stmts: Vec<Stmt>) -> Self {
-        Program { stmts }
-    }
-}
-
 #[derive(Debug)]
 pub enum Type {
     Int,
