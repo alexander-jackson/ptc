@@ -16,8 +16,8 @@ fn ignore_whitespace_test() {
         .unwrap();
 
     let expected_ast = Program {
-        stmts: vec![
-            Stmt::Statement(
+        statements: vec![
+            Statement::Assign(
                 Identifier::Name {
                     name: String::from("name"),
                 },
@@ -26,7 +26,7 @@ fn ignore_whitespace_test() {
                     value: Number::Integer { value: 4 },
                 },
             ),
-            Stmt::Statement(
+            Statement::Assign(
                 Identifier::Name {
                     name: String::from("base"),
                 },
@@ -35,7 +35,7 @@ fn ignore_whitespace_test() {
                     value: Number::Integer { value: 3 },
                 },
             ),
-            Stmt::Statement(
+            Statement::Assign(
                 Identifier::Name {
                     name: String::from("newline"),
                 },
@@ -61,7 +61,7 @@ fn allow_underscores_in_identifiers_test() {
         .unwrap();
 
     let expected_ast = Program {
-        stmts: vec![Stmt::Statement(
+        statements: vec![Statement::Assign(
             Identifier::Name {
                 name: String::from("longer_name"),
             },
@@ -86,7 +86,7 @@ fn parse_integers_test() {
         .unwrap();
 
     let expected_ast = Program {
-        stmts: vec![Stmt::Statement(
+        statements: vec![Statement::Assign(
             Identifier::Name {
                 name: String::from("name"),
             },

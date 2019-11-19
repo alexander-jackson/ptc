@@ -18,7 +18,7 @@ Lines<T>: Vec<T> = {
 
 pub Program: ast::Program = {
     <lines:Line*> => ast::Program {
-        stmts: Vec::from_iter(lines.into_iter().flatten())
+        statements: Vec::from_iter(lines.into_iter().flatten())
     },
 };
 
@@ -28,7 +28,7 @@ Line: ast::Suite = {
 };
 
 Statement: ast::Suite = {
-    Identifier Operator Expression => vec![ast::Stmt::Statement(<>)],
+    Identifier Operator Expression => vec![ast::Statement::Assign(<>)],
 };
 
 Identifier: ast::Identifier = {

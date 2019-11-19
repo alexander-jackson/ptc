@@ -1,13 +1,13 @@
-pub type Suite = Vec<Stmt>;
+pub type Suite = Vec<Statement>;
 
 #[derive(Debug, PartialEq)]
 pub struct Program {
-    pub stmts: Suite,
+    pub statements: Suite,
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Stmt {
-    Statement(Identifier, Operator, Expression),
+pub enum Statement {
+    Assign(Identifier, Operator, Expression),
 }
 
 #[derive(Debug, PartialEq)]
