@@ -28,7 +28,7 @@ Line: ast::Suite = {
 };
 
 Statement: ast::Suite = {
-    <ident: Identifier> Operator <expr: Expression> => vec![
+    <ident: Identifier> "=" <expr: Expression> => vec![
         ast::Statement::Assign {
             ident: ident,
             expr: expr,
