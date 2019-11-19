@@ -34,6 +34,7 @@ Statement: ast::Suite = {
             expr: expr,
         }
     ],
+    "pass" => vec![ast::Statement::Pass],
 };
 
 Identifier: ast::Identifier = {
@@ -75,6 +76,7 @@ extern {
 
     enum lexer::Tok {
         "identifier" => lexer::Tok::Identifier { name: <String> },
+        "pass" => lexer::Tok::Pass,
         "=" => lexer::Tok::Equals,
         "+" => lexer::Tok::Plus,
         "-" => lexer::Tok::Minus,

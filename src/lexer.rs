@@ -3,6 +3,7 @@ pub type Spanned<Tok, Loc, Error> = Result<(Loc, Tok, Loc), Error>;
 #[derive(Clone, Debug)]
 pub enum Tok {
     Identifier { name: String },
+    Pass,
 
     // Operators
     Equals,
@@ -86,6 +87,11 @@ where
         while let Some((_i, c)) = self.lookahead {
             if c.is_alphabetic() {
                 let ident = self.read_identifier();
+
+                if ident == "pass" {
+                    return Some(Ok((0, Tok::Pass, 0)));
+                }
+
                 return Some(Ok((0, Tok::Identifier { name: ident }, 0)));
             } else if c == '=' {
                 self.update_lookahead();

@@ -11,6 +11,7 @@ pub enum Statement {
         ident: Identifier,
         expr: Expression
     },
+    Pass
 }
 
 #[derive(Debug, PartialEq)]
