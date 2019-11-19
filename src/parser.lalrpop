@@ -5,17 +5,6 @@ use ast;
 
 grammar;
 
-Lines<T>: Vec<T> = {
-    <v:(<T> "\n"+)*> <e:T?> => match e {
-        None => v,
-        Some(e) => {
-            let mut v = v;
-            v.push(e);
-            v
-        }
-    }
-};
-
 pub Program: ast::Program = {
     <lines:Line*> => ast::Program {
         statements: Vec::from_iter(lines.into_iter().flatten())
