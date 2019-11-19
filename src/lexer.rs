@@ -1,10 +1,8 @@
-use std::str::CharIndices;
-
 pub type Spanned<Tok, Loc, Error> = Result<(Loc, Tok, Loc), Error>;
 
-#[derive(Copy, Clone, Debug)]
-pub enum Tok<'input> {
-    Identifier { name: &'input str },
+#[derive(Clone, Debug)]
+pub enum Tok {
+    Identifier { name: String },
 
     // Operators
     Assign,
@@ -24,44 +22,46 @@ pub enum LexicalError {
     // Not possible
 }
 
-pub struct Lexer<'input> {
-    input: &'input str,
-    chars: CharIndices<'input>,
+pub struct Lexer<T: Iterator<Item = (usize, char)>> {
+    chars: T,
     lookahead: Option<(usize, char)>,
     index: usize,
 }
 
-impl<'input> Lexer<'input> {
-    pub fn new(input: &'input str) -> Self {
+impl<T> Lexer<T>
+where
+    T: Iterator<Item = (usize, char)>,
+{
+    pub fn new(input: T) -> Self {
         Lexer {
-            input: input,
-            chars: input.char_indices(),
+            chars: input,
             lookahead: None,
             index: 0,
         }
     }
 
-    fn read_while<F>(&mut self, mut pred: F) -> &'input str
+    fn read_while<F>(&mut self, mut pred: F) -> String
     where F: FnMut(char) -> bool,
     {
-        let start: usize = self.index - 1;
+        let mut value: String = String::new();
 
         while let Some((_i, c)) = self.lookahead {
             if pred(c) {
+                value.push(c);
                 self.update_lookahead();
             } else {
                 break;
             }
         }
 
-        &self.input[start..self.index - 1]
+        value
     }
 
-    fn read_identifier(&mut self) -> &'input str {
+    fn read_identifier(&mut self) -> String {
         self.read_while(|c| c.is_alphabetic() || c == '_')
     }
 
-    fn read_integer(&mut self) -> &'input str {
+    fn read_integer(&mut self) -> String {
         self.read_while(|c| c.is_digit(10))
     }
 
@@ -71,8 +71,11 @@ impl<'input> Lexer<'input> {
     }
 }
 
-impl<'input> Iterator for Lexer<'input> {
-    type Item = Spanned<Tok<'input>, usize, LexicalError>;
+impl<T> Iterator for Lexer<T>
+where
+    T: Iterator<Item = (usize, char)>,
+{
+    type Item = Spanned<Tok, usize, LexicalError>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index == 0 {

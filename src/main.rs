@@ -14,7 +14,7 @@ struct Args {
 }
 
 fn parse(input: &str) -> Result<ast::Program, String> {
-    match parser::ProgramParser::new().parse(lexer::Lexer::new(input)) {
+    match parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices())) {
         Ok(s) => Ok(s),
         Err(e) => Err(format!("{:?}", e)),
     }

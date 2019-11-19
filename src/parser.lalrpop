@@ -1,7 +1,7 @@
 use lexer;
 use ast;
 
-grammar<'input>;
+grammar;
 
 Lines<T>: Vec<T> = {
     <v:(<T> "\n"+)*> <e:T?> => match e {
@@ -14,16 +14,16 @@ Lines<T>: Vec<T> = {
     }
 };
 
-pub Program: ast::Program<'input> = {
+pub Program: ast::Program = {
     <stmts: Lines<Statement>> => ast::Program { stmts },
 };
 
-Statement: ast::Stmt<'input> = {
+Statement: ast::Stmt = {
     Identifier Operator Expression => ast::Stmt::Statement(<>),
 };
 
-Identifier: ast::Identifier<'input> = {
-    "identifier" => ast::identifier(<>),
+Identifier: ast::Identifier = {
+    <ident: "identifier"> => ast::Identifier::Name { name: ident },
 };
 
 Operator: ast::Operator = {
@@ -34,7 +34,7 @@ Operator: ast::Operator = {
     "/" => ast::Operator::Divide,
 };
 
-Expression: ast::Expression<'input> = {
+Expression: ast::Expression = {
     <left: Expression> <op: Operator> <right: Number> =>
         ast::Expression::BinaryOperation {
             left: Box::new(left),
@@ -59,8 +59,8 @@ extern {
     type Location = usize;
     type Error = lexer::LexicalError;
 
-    enum lexer::Tok<'input> {
-        "identifier" => lexer::Tok::Identifier { name: <&'input str> },
+    enum lexer::Tok {
+        "identifier" => lexer::Tok::Identifier { name: <String> },
         "=" => lexer::Tok::Assign,
         "+" => lexer::Tok::Plus,
         "-" => lexer::Tok::Minus,

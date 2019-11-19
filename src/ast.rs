@@ -1,3 +1,28 @@
+pub type Suite = Vec<Stmt>;
+
+#[derive(Debug, PartialEq)]
+pub struct Program {
+    pub stmts: Suite,
+}
+
+impl Program {
+    pub fn new(stmts: Vec<Stmt>) -> Self {
+        Program { stmts }
+    }
+
+    pub fn dump(&self) {
+        for ident in self.stmts.iter() {
+            println!("{:?}", ident);
+        }
+    }
+
+    pub fn generate(&self) {
+        for stmt in &self.stmts {
+            stmt.generate();
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum Type {
     Int,
@@ -14,11 +39,11 @@ impl Type {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Stmt<'input> {
-    Statement(Identifier<'input>, Operator, Expression<'input>),
+pub enum Stmt {
+    Statement(Identifier, Operator, Expression),
 }
 
-impl<'input> Stmt<'input> {
+impl Stmt {
     fn generate(&self) {
         println!("Generating code: {:?}", self);
         match &*self {
@@ -28,14 +53,14 @@ impl<'input> Stmt<'input> {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Identifier<'input> {
-    Name { name: &'input str },
+pub enum Identifier {
+    Name { name: String },
 }
 
-impl<'input> Identifier<'input> {
-    fn to_string(&self) -> &'input str {
-        match *self {
-            Identifier::Name { name } => name
+impl Identifier {
+    fn to_string(&self) -> String {
+        match &*self {
+            Identifier::Name { name } => String::from(name),
         }
     }
 }
@@ -64,18 +89,18 @@ impl Operator {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Expression<'input> {
+pub enum Expression {
     BinaryOperation {
-        left: Box<Expression<'input>>,
+        left: Box<Expression>,
         op: Operator,
         right: Box<Number>,
     },
-    ParenExpr { expr: Box<Expression<'input>> },
-    Identifier { name: Identifier<'input> },
+    ParenExpr { expr: Box<Expression> },
+    Identifier { name: Identifier },
     Literal { value: Number },
 }
 
-impl<'input> Expression<'input> {
+impl Expression {
     fn to_string(&self) -> String {
         use ast::Expression::*;
 
@@ -106,34 +131,11 @@ impl Number {
     }
 }
 
-#[derive(Debug, PartialEq)]
-pub struct Program<'input> {
-    pub stmts: Vec<Stmt<'input>>,
-}
-
-impl<'input> Program<'input> {
-    pub fn new(stmts: Vec<Stmt<'input>>) -> Self {
-        Program { stmts }
-    }
-
-    pub fn dump(&self) {
-        for ident in self.stmts.iter() {
-            println!("{:?}", ident);
-        }
-    }
-
-    pub fn generate(&self) {
-        for stmt in &self.stmts {
-            stmt.generate();
-        }
-    }
-}
-
 pub fn number(value: u32) -> Number {
     Number::Integer { value }
 }
 
-pub fn identifier<'input>(name: &'input str) -> Identifier<'input> {
+pub fn identifier(name: String) -> Identifier {
     Identifier::Name { name: name }
 }
 

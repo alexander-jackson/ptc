@@ -11,27 +11,27 @@ fn ignore_whitespace_test() {
     "#;
 
     let ast = parser::ProgramParser::new()
-        .parse(lexer::Lexer::new(input))
+        .parse(lexer::Lexer::new(input.char_indices()))
         .unwrap();
 
     let expected_ast = Program {
         stmts: vec![
             Stmt::Statement(
-                Identifier::Name { name: "name" },
+                Identifier::Name { name: String::from("name") },
                 Operator::Assign,
                 Expression::Literal { value:
                     Number::Integer { value: 4 },
                 },
             ),
             Stmt::Statement(
-                Identifier::Name { name: "base" },
+                Identifier::Name { name: String::from("base") },
                 Operator::Assign,
                 Expression::Literal { value:
                     Number::Integer { value: 3 },
                 },
             ),
             Stmt::Statement(
-                Identifier::Name { name: "newline" },
+                Identifier::Name { name: String::from("newline") },
                 Operator::Assign,
                 Expression::Literal { value:
                     Number::Integer { value: 1 },
@@ -49,13 +49,13 @@ fn allow_underscores_in_identifiers_test() {
     "#;
 
     let ast = parser::ProgramParser::new()
-        .parse(lexer::Lexer::new(input))
+        .parse(lexer::Lexer::new(input.char_indices()))
         .unwrap();
 
     let expected_ast = Program {
         stmts: vec![
             Stmt::Statement(
-                Identifier::Name { name: "longer_name" },
+                Identifier::Name { name: String::from("longer_name") },
                 Operator::Assign,
                 Expression::Literal { value:
                     Number::Integer { value: 3 },
@@ -73,13 +73,13 @@ fn parse_integers_test() {
     "#;
 
     let ast = parser::ProgramParser::new()
-        .parse(lexer::Lexer::new(input))
+        .parse(lexer::Lexer::new(input.char_indices()))
         .unwrap();
 
     let expected_ast = Program {
         stmts: vec![
             Stmt::Statement(
-                Identifier::Name { name: "name" },
+                Identifier::Name { name: String::from("name") },
                 Operator::Assign,
                 Expression::Literal { value:
                     Number::Integer { value: 40 },
@@ -97,7 +97,7 @@ fn parse_expressions_test() {
     "#;
 
     let ast = parser::ProgramParser::new()
-        .parse(lexer::Lexer::new(input));
+        .parse(lexer::Lexer::new(input.char_indices()));
 
     assert!(ast.is_ok());
 }
@@ -108,7 +108,7 @@ fn parse_bracketed_expression_test() {
     "#;
 
     let ast = parser::ProgramParser::new()
-        .parse(lexer::Lexer::new(input));
+        .parse(lexer::Lexer::new(input.char_indices()));
 
     assert!(ast.is_ok());
 }
@@ -119,7 +119,7 @@ fn parse_identifier_expression_test() {
     "#;
 
     let ast = parser::ProgramParser::new()
-        .parse(lexer::Lexer::new(input));
+        .parse(lexer::Lexer::new(input.char_indices()));
 
     assert!(ast.is_ok());
 }
