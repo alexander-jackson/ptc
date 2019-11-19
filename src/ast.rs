@@ -5,11 +5,6 @@ pub struct Program {
     pub stmts: Suite,
 }
 
-#[derive(Debug)]
-pub enum Type {
-    Int,
-}
-
 #[derive(Debug, PartialEq)]
 pub enum Stmt {
     Statement(Identifier, Operator, Expression),
