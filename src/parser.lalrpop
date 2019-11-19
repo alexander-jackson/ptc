@@ -1,3 +1,5 @@
+use std::iter::FromIterator;
+
 use lexer;
 use ast;
 
@@ -15,11 +17,18 @@ Lines<T>: Vec<T> = {
 };
 
 pub Program: ast::Program = {
-    <stmts: Lines<Statement>> => ast::Program { stmts },
+    <lines:Line*> => ast::Program {
+        stmts: Vec::from_iter(lines.into_iter().flatten())
+    },
 };
 
-Statement: ast::Stmt = {
-    Identifier Operator Expression => ast::Stmt::Statement(<>),
+Line: ast::Suite = {
+    Statement,
+    "\n" => vec![],
+};
+
+Statement: ast::Suite = {
+    Identifier Operator Expression => vec![ast::Stmt::Statement(<>)],
 };
 
 Identifier: ast::Identifier = {
