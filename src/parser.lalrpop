@@ -36,7 +36,7 @@ Identifier: ast::Identifier = {
 };
 
 Operator: ast::Operator = {
-    "=" => ast::Operator::Assign,
+    "=" => ast::Operator::Equals,
     "+" => ast::Operator::Plus,
     "-" => ast::Operator::Minus,
     "*" => ast::Operator::Multiply,
@@ -70,7 +70,7 @@ extern {
 
     enum lexer::Tok {
         "identifier" => lexer::Tok::Identifier { name: <String> },
-        "=" => lexer::Tok::Assign,
+        "=" => lexer::Tok::Equals,
         "+" => lexer::Tok::Plus,
         "-" => lexer::Tok::Minus,
         "*" => lexer::Tok::Multiply,

@@ -5,7 +5,7 @@ pub enum Tok {
     Identifier { name: String },
 
     // Operators
-    Assign,
+    Equals,
     Plus,
     Minus,
     Multiply,
@@ -89,7 +89,7 @@ where
                 return Some(Ok((0, Tok::Identifier { name: ident }, 0)));
             } else if c == '=' {
                 self.update_lookahead();
-                return Some(Ok((0, Tok::Assign, 0)));
+                return Some(Ok((0, Tok::Equals, 0)));
             } else if c == '+' {
                 self.update_lookahead();
                 return Some(Ok((0, Tok::Plus, 0)));

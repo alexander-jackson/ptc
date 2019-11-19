@@ -17,7 +17,7 @@ pub enum Identifier {
 
 #[derive(Debug, PartialEq)]
 pub enum Operator {
-    Assign,
+    Equals,
     Plus,
     Minus,
     Multiply,
