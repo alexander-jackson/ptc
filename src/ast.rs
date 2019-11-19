@@ -9,12 +9,6 @@ impl Program {
     pub fn new(stmts: Vec<Stmt>) -> Self {
         Program { stmts }
     }
-
-    pub fn dump(&self) {
-        for ident in self.stmts.iter() {
-            println!("{:?}", ident);
-        }
-    }
 }
 
 #[derive(Debug)]
