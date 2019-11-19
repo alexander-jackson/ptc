@@ -131,3 +131,14 @@ fn parse_identifier_expression_test() {
 
     assert!(ast.is_ok());
 }
+
+#[test]
+fn parse_pass_statement_test() {
+    let input: &str = r#"
+    pass
+    "#;
+
+    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
+
+    assert!(ast.is_ok());
+}
