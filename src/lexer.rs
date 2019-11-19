@@ -41,7 +41,8 @@ where
     }
 
     fn read_while<F>(&mut self, mut pred: F) -> String
-    where F: FnMut(char) -> bool,
+    where
+        F: FnMut(char) -> bool,
     {
         let mut value: String = String::new();
 

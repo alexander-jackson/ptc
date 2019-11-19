@@ -36,9 +36,15 @@ pub enum Expression {
         op: Operator,
         right: Box<Number>,
     },
-    ParenExpr { expr: Box<Expression> },
-    Identifier { name: Identifier },
-    Literal { value: Number },
+    ParenExpr {
+        expr: Box<Expression>,
+    },
+    Identifier {
+        name: Identifier,
+    },
+    Literal {
+        value: Number,
+    },
 }
 
 #[derive(Debug, PartialEq)]
