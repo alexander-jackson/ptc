@@ -7,7 +7,10 @@ pub struct Program {
 
 #[derive(Debug, PartialEq)]
 pub enum Statement {
-    Assign(Identifier, Operator, Expression),
+    Assign {
+        ident: Identifier,
+        expr: Expression
+    },
 }
 
 #[derive(Debug, PartialEq)]

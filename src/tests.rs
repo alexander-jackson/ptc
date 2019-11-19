@@ -17,33 +17,30 @@ fn ignore_whitespace_test() {
 
     let expected_ast = Program {
         statements: vec![
-            Statement::Assign(
-                Identifier::Name {
+            Statement::Assign {
+                ident: Identifier::Name {
                     name: String::from("name"),
                 },
-                Operator::Equals,
-                Expression::Literal {
+                expr: Expression::Literal {
                     value: Number::Integer { value: 4 },
                 },
-            ),
-            Statement::Assign(
-                Identifier::Name {
+            },
+            Statement::Assign {
+                ident: Identifier::Name {
                     name: String::from("base"),
                 },
-                Operator::Equals,
-                Expression::Literal {
+                expr: Expression::Literal {
                     value: Number::Integer { value: 3 },
                 },
-            ),
-            Statement::Assign(
-                Identifier::Name {
+            },
+            Statement::Assign {
+                ident: Identifier::Name {
                     name: String::from("newline"),
                 },
-                Operator::Equals,
-                Expression::Literal {
+                expr: Expression::Literal {
                     value: Number::Integer { value: 1 },
                 },
-            ),
+            },
         ],
     };
 
@@ -61,15 +58,16 @@ fn allow_underscores_in_identifiers_test() {
         .unwrap();
 
     let expected_ast = Program {
-        statements: vec![Statement::Assign(
-            Identifier::Name {
-                name: String::from("longer_name"),
-            },
-            Operator::Equals,
-            Expression::Literal {
-                value: Number::Integer { value: 3 },
-            },
-        )],
+        statements: vec![
+            Statement::Assign {
+                ident: Identifier::Name {
+                    name: String::from("longer_name"),
+                },
+                expr: Expression::Literal {
+                    value: Number::Integer { value: 3 },
+                },
+            }
+        ],
     };
 
     assert_eq!(&ast, &expected_ast);
@@ -86,15 +84,16 @@ fn parse_integers_test() {
         .unwrap();
 
     let expected_ast = Program {
-        statements: vec![Statement::Assign(
-            Identifier::Name {
-                name: String::from("name"),
-            },
-            Operator::Equals,
-            Expression::Literal {
-                value: Number::Integer { value: 40 },
-            },
-        )],
+        statements: vec![
+            Statement::Assign {
+                ident: Identifier::Name {
+                    name: String::from("name"),
+                },
+                expr: Expression::Literal {
+                    value: Number::Integer { value: 40 },
+                },
+            }
+        ],
     };
 
     assert_eq!(&ast, &expected_ast);

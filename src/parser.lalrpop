@@ -28,7 +28,12 @@ Line: ast::Suite = {
 };
 
 Statement: ast::Suite = {
-    Identifier Operator Expression => vec![ast::Statement::Assign(<>)],
+    <ident: Identifier> Operator <expr: Expression> => vec![
+        ast::Statement::Assign {
+            ident: ident,
+            expr: expr,
+        }
+    ],
 };
 
 Identifier: ast::Identifier = {
