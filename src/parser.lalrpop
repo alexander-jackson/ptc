@@ -17,13 +17,14 @@ Line: ast::Suite = {
 };
 
 Statement: ast::Suite = {
-    <ident: Identifier> "=" <expr: Expression> => vec![
-        ast::Statement::Assign {
-            ident: ident,
-            expr: expr,
-        }
-    ],
+    AssignStatement,
     "pass" => vec![ast::Statement::Pass],
+};
+
+AssignStatement: ast::Suite = {
+    <ident: Identifier> "=" <expr: Expression> => vec![
+        ast::Statement::Assign { ident: ident, expr: expr, },
+    ],
 };
 
 Identifier: ast::Identifier = {
