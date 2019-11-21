@@ -88,11 +88,12 @@ where
             if c.is_alphabetic() {
                 let ident = self.read_identifier();
 
-                if ident == "pass" {
-                    return Some(Ok((0, Tok::Pass, 0)));
-                }
+                let token: Tok = match ident.as_ref() {
+                    "pass" => Tok::Pass,
+                    _ => Tok::Identifier { name: ident },
+                };
 
-                return Some(Ok((0, Tok::Identifier { name: ident }, 0)));
+                return Some(Ok((0, token, 0)));
             } else if c == '=' {
                 self.update_lookahead();
                 return Some(Ok((0, Tok::Equals, 0)));
