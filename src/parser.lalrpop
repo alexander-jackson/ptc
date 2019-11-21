@@ -141,6 +141,7 @@ Primary: ast::Expression = {
 Atom: ast::Expression = {
     <ident: Identifier> => ast::Expression::Identifier { name: ident },
     <literal: Literal> => ast::Expression::Literal { value: literal },
+    Enclosure,
 };
 
 Identifier: ast::Identifier = {
@@ -149,6 +150,11 @@ Identifier: ast::Identifier = {
 
 Literal: ast::Literal = {
     <i: "integer"> => ast::Literal::Integer { value: i },
+};
+
+Enclosure: ast::Expression = {
+    "(" <expr: Expression> ")" =>
+        ast::Expression::ParenExpression { expr: Box::new(expr) },
 };
 
 extern {
@@ -167,8 +173,8 @@ extern {
         "*" => lexer::Tok::Multiply,
         "/" => lexer::Tok::Divide,
         "integer" => lexer::Tok::Integer { value: <u32> },
-        "lpar" => lexer::Tok::LPar,
-        "rpar" => lexer::Tok::RPar,
+        "(" => lexer::Tok::LPar,
+        ")" => lexer::Tok::RPar,
         "\n" => lexer::Tok::Newline,
     }
 }
