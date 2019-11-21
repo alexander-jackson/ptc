@@ -81,6 +81,18 @@ ShiftExpr: ast::Expression = {
 
 ArithmeticExpr: ast::Expression = {
     MultExpr,
+    <left: ArithmeticExpr> "+" <right: MultExpr> =>
+        ast::Expression::BinaryOperation {
+            left: Box::new(left),
+            op: ast::Operator::Plus,
+            right: Box::new(right),
+        },
+    <left: ArithmeticExpr> "-" <right: MultExpr> =>
+        ast::Expression::BinaryOperation {
+            left: Box::new(left),
+            op: ast::Operator::Minus,
+            right: Box::new(right),
+        },
 };
 
 MultExpr: ast::Expression = {

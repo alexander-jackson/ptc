@@ -33,7 +33,7 @@ pub enum Expression {
     BinaryOperation {
         left: Box<Expression>,
         op: Operator,
-        right: Box<Number>,
+        right: Box<Expression>,
     },
     ParenExpr {
         expr: Box<Expression>,
