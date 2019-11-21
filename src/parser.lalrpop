@@ -31,10 +31,6 @@ PassStatement: ast::Suite = {
     "pass" => vec![ast::Statement::Pass],
 };
 
-Identifier: ast::Identifier = {
-    <ident: "identifier"> => ast::Identifier::Name { name: ident },
-};
-
 Operator: ast::Operator = {
     "=" => ast::Operator::Equals,
     "+" => ast::Operator::Plus,
@@ -44,20 +40,71 @@ Operator: ast::Operator = {
 };
 
 Expression: ast::Expression = {
-    <left: Expression> <op: Operator> <right: Number> =>
-        ast::Expression::BinaryOperation {
-            left: Box::new(left),
-            op: op,
-            right: Box::new(right),
-        },
-    "lpar" <expr: Expression> "rpar" =>
-        ast::Expression::ParenExpr { expr: Box::new(expr) },
-    <ident: "identifier"> => ast::Expression::Identifier {
-        name: ast::Identifier::Name { name: ident },
-    },
-    <num: Number> => ast::Expression::Literal {
-        value: num,
-    },
+    ConditionalExpression,
+};
+
+ConditionalExpression: ast::Expression = {
+    OrTest,
+};
+
+OrTest: ast::Expression = {
+    AndTest,
+};
+
+AndTest: ast::Expression = {
+    NotTest,
+};
+
+NotTest: ast::Expression = {
+    Comparison,
+};
+
+Comparison: ast::Expression = {
+    OrExpr,
+};
+
+OrExpr: ast::Expression = {
+    XorExpr,
+};
+
+XorExpr: ast::Expression = {
+    AndExpr,
+};
+
+AndExpr: ast::Expression = {
+    ShiftExpr,
+};
+
+ShiftExpr: ast::Expression = {
+    ArithmeticExpr,
+};
+
+ArithmeticExpr: ast::Expression = {
+    MultExpr,
+};
+
+MultExpr: ast::Expression = {
+    UnaryExpr,
+};
+
+UnaryExpr: ast::Expression = {
+    PowerExpr,
+};
+
+PowerExpr: ast::Expression = {
+    Primary,
+};
+
+Primary: ast::Expression = {
+    Atom,
+};
+
+Atom: ast::Expression = {
+    <ident: Identifier> => ast::Expression::Identifier { name: ident },
+};
+
+Identifier: ast::Identifier = {
+    <ident: "identifier"> => ast::Identifier::Name { name: ident },
 };
 
 Number: ast::Number = {
