@@ -42,11 +42,11 @@ pub enum Expression {
         name: Identifier,
     },
     Literal {
-        value: Number,
+        value: Literal,
     },
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Number {
+pub enum Literal {
     Integer { value: u32 },
 }

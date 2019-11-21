@@ -123,14 +123,15 @@ Primary: ast::Expression = {
 
 Atom: ast::Expression = {
     <ident: Identifier> => ast::Expression::Identifier { name: ident },
+    <literal: Literal> => ast::Expression::Literal { value: literal },
 };
 
 Identifier: ast::Identifier = {
     <ident: "identifier"> => ast::Identifier::Name { name: ident },
 };
 
-Number: ast::Number = {
-    <i: "integer"> => ast::Number::Integer { value: i },
+Literal: ast::Literal = {
+    <i: "integer"> => ast::Literal::Integer { value: i },
 };
 
 extern {
