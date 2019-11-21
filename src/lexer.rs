@@ -11,6 +11,8 @@ pub enum Tok {
     Minus,
     Multiply,
     Divide,
+    LogicalOr,
+    LogicalAnd,
 
     Integer { value: u32 },
     LPar,
@@ -90,6 +92,8 @@ where
 
                 let token: Tok = match ident.as_ref() {
                     "pass" => Tok::Pass,
+                    "or" => Tok::LogicalOr,
+                    "and" => Tok::LogicalAnd,
                     _ => Tok::Identifier { name: ident },
                 };
 

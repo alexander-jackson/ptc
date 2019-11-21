@@ -49,10 +49,22 @@ ConditionalExpression: ast::Expression = {
 
 OrTest: ast::Expression = {
     AndTest,
+    <left: OrTest> "or" <right: AndTest> =>
+        ast::Expression::BinaryOperation {
+            left: Box::new(left),
+            op: ast::Operator::LogicalOr,
+            right: Box::new(right)
+        },
 };
 
 AndTest: ast::Expression = {
     NotTest,
+    <left: AndTest> "and" <right: NotTest> =>
+        ast::Expression::BinaryOperation {
+            left: Box::new(left),
+            op: ast::Operator::LogicalAnd,
+            right: Box::new(right)
+        },
 };
 
 NotTest: ast::Expression = {
@@ -141,6 +153,8 @@ extern {
     enum lexer::Tok {
         "identifier" => lexer::Tok::Identifier { name: <String> },
         "pass" => lexer::Tok::Pass,
+        "or" => lexer::Tok::LogicalOr,
+        "and" => lexer::Tok::LogicalAnd,
         "=" => lexer::Tok::Equals,
         "+" => lexer::Tok::Plus,
         "-" => lexer::Tok::Minus,

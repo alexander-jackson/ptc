@@ -21,6 +21,8 @@ pub enum Identifier {
 
 #[derive(Debug, PartialEq)]
 pub enum Operator {
+    LogicalOr,
+    LogicalAnd,
     Equals,
     Plus,
     Minus,
