@@ -94,8 +94,19 @@ ArithmeticExpr: ast::Expression = {
         },
 };
 
+MultOperator: ast::Operator = {
+    "*" => ast::Operator::Multiply,
+    "/" => ast::Operator::Divide,
+};
+
 MultExpr: ast::Expression = {
     UnaryExpr,
+    <left: MultExpr> <op: MultOperator> <right: UnaryExpr> =>
+        ast::Expression::BinaryOperation {
+            left: Box::new(left),
+            op: op,
+            right: Box::new(right),
+        },
 };
 
 UnaryExpr: ast::Expression = {
