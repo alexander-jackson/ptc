@@ -37,11 +37,15 @@ where
     T: Iterator<Item = (usize, char)>,
 {
     pub fn new(input: T) -> Self {
-        Lexer {
+        let mut lexer = Lexer {
             chars: input,
             lookahead: None,
             index: 0,
-        }
+        };
+
+        lexer.update_lookahead();
+        lexer.index = 0;
+        lexer
     }
 
     fn read_while<F>(&mut self, mut pred: F) -> String
@@ -83,10 +87,6 @@ where
     type Item = Spanned<Tok, usize, LexicalError>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index == 0 {
-            self.update_lookahead();
-        }
-
         while let Some((_i, c)) = self.lookahead {
             if c.is_alphabetic() {
                 let ident = self.read_identifier();
