@@ -78,6 +78,23 @@ where
         self.lookahead = self.chars.next();
         self.index += 1;
     }
+
+    fn check_operator(&mut self) -> Option<Tok> {
+        if let Some((_i, c)) = self.lookahead {
+            return match c {
+                '=' => Some(Tok::Equals),
+                '+' => Some(Tok::Plus),
+                '-' => Some(Tok::Minus),
+                '*' => Some(Tok::Multiply),
+                '/' => Some(Tok::Divide),
+                '(' => Some(Tok::LPar),
+                ')' => Some(Tok::RPar),
+                _ => None,
+            };
+        }
+
+        None
+    }
 }
 
 impl<T> Iterator for Lexer<T>
@@ -100,27 +117,6 @@ where
                 };
 
                 return Some(Ok((0, token, 0)));
-            } else if c == '=' {
-                self.update_lookahead();
-                return Some(Ok((0, Tok::Equals, 0)));
-            } else if c == '+' {
-                self.update_lookahead();
-                return Some(Ok((0, Tok::Plus, 0)));
-            } else if c == '-' {
-                self.update_lookahead();
-                return Some(Ok((0, Tok::Minus, 0)));
-            } else if c == '*' {
-                self.update_lookahead();
-                return Some(Ok((0, Tok::Multiply, 0)));
-            } else if c == '/' {
-                self.update_lookahead();
-                return Some(Ok((0, Tok::Divide, 0)));
-            } else if c == '(' {
-                self.update_lookahead();
-                return Some(Ok((0, Tok::LPar, 0)));
-            } else if c == ')' {
-                self.update_lookahead();
-                return Some(Ok((0, Tok::RPar, 0)));
             } else if c == '\n' {
                 self.update_lookahead();
                 return Some(Ok((0, Tok::Newline, 0)));
@@ -128,6 +124,14 @@ where
                 let value: u32 = self.read_integer().parse().unwrap();
                 return Some(Ok((0, Tok::Integer { value: value }, 0)));
             } else {
+                // Check for an operator
+                let op = self.check_operator();
+
+                if op.is_some() {
+                    self.update_lookahead();
+                    return Some(Ok((0, op.unwrap(), 0)));
+                }
+
                 self.update_lookahead();
                 continue;
             }
