@@ -22,7 +22,7 @@ fn ignore_whitespace_test() {
                     name: String::from("name"),
                 },
                 expr: Expression::Literal {
-                    value: Number::Integer { value: 4 },
+                    value: Literal::Integer { value: 4 },
                 },
             },
             Statement::Assign {
@@ -30,7 +30,7 @@ fn ignore_whitespace_test() {
                     name: String::from("base"),
                 },
                 expr: Expression::Literal {
-                    value: Number::Integer { value: 3 },
+                    value: Literal::Integer { value: 3 },
                 },
             },
             Statement::Assign {
@@ -38,7 +38,7 @@ fn ignore_whitespace_test() {
                     name: String::from("newline"),
                 },
                 expr: Expression::Literal {
-                    value: Number::Integer { value: 1 },
+                    value: Literal::Integer { value: 1 },
                 },
             },
         ],
@@ -64,7 +64,7 @@ fn allow_underscores_in_identifiers_test() {
                     name: String::from("longer_name"),
                 },
                 expr: Expression::Literal {
-                    value: Number::Integer { value: 3 },
+                    value: Literal::Integer { value: 3 },
                 },
             }
         ],
@@ -90,7 +90,7 @@ fn parse_integers_test() {
                     name: String::from("name"),
                 },
                 expr: Expression::Literal {
-                    value: Number::Integer { value: 40 },
+                    value: Literal::Integer { value: 40 },
                 },
             }
         ],
