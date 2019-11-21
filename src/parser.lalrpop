@@ -18,12 +18,19 @@ Line: ast::Suite = {
 
 Statement: ast::Suite = {
     AssignStatement,
+    ExpressionStatement,
     PassStatement,
 };
 
 AssignStatement: ast::Suite = {
     <ident: Identifier> "=" <expr: Expression> => vec![
         ast::Statement::Assign { ident: ident, expr: expr, },
+    ],
+};
+
+ExpressionStatement: ast::Suite = {
+    <expr: Expression> => vec![
+        ast::Statement::Expression { expr: expr, },
     ],
 };
 

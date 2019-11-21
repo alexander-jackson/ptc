@@ -11,6 +11,9 @@ pub enum Statement {
         ident: Identifier,
         expr: Expression
     },
+    Expression {
+        expr: Expression
+    },
     Pass
 }
 
