@@ -74,6 +74,39 @@ fn parse_identifier_expression_test() {
 }
 
 #[test]
+fn parse_logical_and_expression_test() {
+    let input: &str = r#"
+    variable and other_variable
+    "#;
+
+    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
+
+    assert!(ast.is_ok());
+}
+
+#[test]
+fn parse_logical_or_expression_test() {
+    let input: &str = r#"
+    variable or other_variable
+    "#;
+
+    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
+
+    assert!(ast.is_ok());
+}
+
+#[test]
+fn parse_logical_not_expression_test() {
+    let input: &str = r#"
+    not other_variable
+    "#;
+
+    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
+
+    assert!(ast.is_ok());
+}
+
+#[test]
 fn parse_pass_statement_test() {
     let input: &str = r#"
     pass
