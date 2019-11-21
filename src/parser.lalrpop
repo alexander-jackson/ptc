@@ -69,6 +69,11 @@ AndTest: ast::Expression = {
 
 NotTest: ast::Expression = {
     Comparison,
+    "not" <expr: NotTest> =>
+        ast::Expression::UnaryOperation {
+            op: ast::Operator::LogicalNot,
+            expr: Box::new(expr),
+        },
 };
 
 Comparison: ast::Expression = {
@@ -155,6 +160,7 @@ extern {
         "pass" => lexer::Tok::Pass,
         "or" => lexer::Tok::LogicalOr,
         "and" => lexer::Tok::LogicalAnd,
+        "not" => lexer::Tok::LogicalNot,
         "=" => lexer::Tok::Equals,
         "+" => lexer::Tok::Plus,
         "-" => lexer::Tok::Minus,

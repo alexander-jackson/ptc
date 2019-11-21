@@ -13,6 +13,7 @@ pub enum Tok {
     Divide,
     LogicalOr,
     LogicalAnd,
+    LogicalNot,
 
     Integer { value: u32 },
     LPar,
@@ -94,6 +95,7 @@ where
                     "pass" => Tok::Pass,
                     "or" => Tok::LogicalOr,
                     "and" => Tok::LogicalAnd,
+                    "not" => Tok::LogicalNot,
                     _ => Tok::Identifier { name: ident },
                 };
 

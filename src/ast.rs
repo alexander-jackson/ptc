@@ -23,6 +23,7 @@ pub enum Identifier {
 pub enum Operator {
     LogicalOr,
     LogicalAnd,
+    LogicalNot,
     Equals,
     Plus,
     Minus,
@@ -36,6 +37,10 @@ pub enum Expression {
         left: Box<Expression>,
         op: Operator,
         right: Box<Expression>,
+    },
+    UnaryOperation {
+        op: Operator,
+        expr: Box<Expression>,
     },
     ParenExpr {
         expr: Box<Expression>,
