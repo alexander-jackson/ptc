@@ -124,3 +124,16 @@ if 1:
 
     assert!(ast.is_ok());
 }
+
+#[test]
+fn parse_while_statement_test() {
+    let input: &str = r#"
+while 1:
+    pass
+
+"#;
+
+    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
+
+    assert!(ast.is_ok());
+}
