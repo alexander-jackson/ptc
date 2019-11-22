@@ -37,6 +37,7 @@ SmallStatement: ast::Statement = {
 
 CompoundStatement: ast::Statement = {
     IfStatement,
+    WhileStatement,
 };
 
 AssignStatement: ast::Statement = {
@@ -56,6 +57,14 @@ PassStatement: ast::Statement = {
 IfStatement: ast::Statement = {
     "if" <expr: Expression> ":" "\n" "indent" <stmt: Statement> "unindent" =>
         ast::Statement::IfStatement {
+            expr: expr,
+            stmt: stmt,
+        },
+};
+
+WhileStatement: ast::Statement = {
+    "while" <expr: Expression> ":" "\n" "indent" <stmt: Statement> "unindent" =>
+        ast::Statement::WhileStatement {
             expr: expr,
             stmt: stmt,
         },
@@ -197,6 +206,7 @@ extern {
         "identifier" => lexer::Tok::Identifier { name: <String> },
         "pass" => lexer::Tok::Pass,
         "if" => lexer::Tok::If,
+        "while" => lexer::Tok::While,
         "or" => lexer::Tok::LogicalOr,
         "and" => lexer::Tok::LogicalAnd,
         "not" => lexer::Tok::LogicalNot,

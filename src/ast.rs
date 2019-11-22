@@ -19,6 +19,10 @@ pub enum Statement {
         expr: Expression,
         stmt: Suite,
     },
+    WhileStatement {
+        expr: Expression,
+        stmt: Suite,
+    },
 }
 
 #[derive(Debug, PartialEq)]

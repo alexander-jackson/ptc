@@ -7,6 +7,7 @@ pub enum Tok {
     Identifier { name: String },
     Pass,
     If,
+    While,
 
     // Operators
     Equals,
@@ -152,6 +153,7 @@ where
                     "and" => Tok::LogicalAnd,
                     "not" => Tok::LogicalNot,
                     "if" => Tok::If,
+                    "while" => Tok::While,
                     _ => Tok::Identifier { name: ident },
                 };
 
