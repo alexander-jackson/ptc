@@ -14,7 +14,11 @@ pub enum Statement {
     Expression {
         expr: Expression
     },
-    Pass
+    Pass,
+    IfStatement {
+        expr: Expression,
+        stmt: Suite,
+    },
 }
 
 #[derive(Debug, PartialEq)]

@@ -20,6 +20,7 @@ Statement: ast::Suite = {
     AssignStatement,
     ExpressionStatement,
     PassStatement,
+    IfStatement,
 };
 
 AssignStatement: ast::Suite = {
@@ -36,6 +37,15 @@ ExpressionStatement: ast::Suite = {
 
 PassStatement: ast::Suite = {
     "pass" => vec![ast::Statement::Pass],
+};
+
+IfStatement: ast::Suite = {
+    "if" <expr: Expression> ":" "\n" "indent" <stmt: Statement> "\n" "unindent" => vec![
+        ast::Statement::IfStatement {
+            expr: expr,
+            stmt: stmt,
+        },
+    ],
 };
 
 Operator: ast::Operator = {
@@ -169,8 +179,11 @@ extern {
     type Error = lexer::LexicalError;
 
     enum lexer::Tok {
+        "indent" => lexer::Tok::Indent,
+        "unindent" => lexer::Tok::Unindent,
         "identifier" => lexer::Tok::Identifier { name: <String> },
         "pass" => lexer::Tok::Pass,
+        "if" => lexer::Tok::If,
         "or" => lexer::Tok::LogicalOr,
         "and" => lexer::Tok::LogicalAnd,
         "not" => lexer::Tok::LogicalNot,
@@ -182,6 +195,7 @@ extern {
         "integer" => lexer::Tok::Integer { value: <u32> },
         "(" => lexer::Tok::LPar,
         ")" => lexer::Tok::RPar,
+        ":" => lexer::Tok::Colon,
         "\n" => lexer::Tok::Newline,
     }
 }

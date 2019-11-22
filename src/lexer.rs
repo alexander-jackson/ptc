@@ -2,8 +2,11 @@ pub type Spanned<Tok, Loc, Error> = Result<(Loc, Tok, Loc), Error>;
 
 #[derive(Clone, Debug)]
 pub enum Tok {
+    Indent,
+    Unindent,
     Identifier { name: String },
     Pass,
+    If,
 
     // Operators
     Equals,
@@ -18,6 +21,7 @@ pub enum Tok {
     Integer { value: u32 },
     LPar,
     RPar,
+    Colon,
     Newline,
 }
 
@@ -30,6 +34,9 @@ pub struct Lexer<T: Iterator<Item = (usize, char)>> {
     chars: T,
     lookahead: Option<(usize, char)>,
     index: usize,
+    prev_spaces: usize,
+    curr_spaces: usize,
+    start_of_line: bool,
 }
 
 impl<T> Lexer<T>
@@ -41,6 +48,9 @@ where
             chars: input,
             lookahead: None,
             index: 0,
+            prev_spaces: 0,
+            curr_spaces: 0,
+            start_of_line: true,
         };
 
         lexer.update_lookahead();
@@ -89,6 +99,7 @@ where
                 '/' => Some(Tok::Divide),
                 '(' => Some(Tok::LPar),
                 ')' => Some(Tok::RPar),
+                ':' => Some(Tok::Colon),
                 _ => None,
             };
         }
@@ -105,6 +116,31 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some((_i, c)) = self.lookahead {
+            if self.start_of_line {
+                // Check for whitespace
+                if c == ' ' {
+                    self.curr_spaces = self.read_while(|c| c == ' ').len();
+                    self.start_of_line = false;
+
+                    // If prev < curr, we indented
+                    if self.prev_spaces < self.curr_spaces {
+                        return Some(Ok((0, Tok::Indent, 0)));
+                    }
+
+                    // If prev > curr, we unindented
+                    if self.prev_spaces > self.curr_spaces {
+                        return Some(Ok((0, Tok::Unindent, 0)));
+                    }
+                } else {
+                    // No whitespace, so check if this is an unindent
+                    self.start_of_line = false;
+
+                    if self.prev_spaces > self.curr_spaces {
+                        return Some(Ok((0, Tok::Unindent, 0)));
+                    }
+                }
+            }
+
             if c.is_alphabetic() {
                 let ident = self.read_identifier();
 
@@ -113,11 +149,15 @@ where
                     "or" => Tok::LogicalOr,
                     "and" => Tok::LogicalAnd,
                     "not" => Tok::LogicalNot,
+                    "if" => Tok::If,
                     _ => Tok::Identifier { name: ident },
                 };
 
                 return Some(Ok((0, token, 0)));
             } else if c == '\n' {
+                self.prev_spaces = self.curr_spaces;
+                self.curr_spaces = 0;
+                self.start_of_line = true;
                 self.update_lookahead();
                 return Some(Ok((0, Tok::Newline, 0)));
             } else if c.is_digit(10) {
