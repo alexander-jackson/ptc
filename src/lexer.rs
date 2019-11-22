@@ -22,6 +22,7 @@ pub enum Tok {
     LPar,
     RPar,
     Colon,
+    Semicolon,
     Newline,
 }
 
@@ -100,6 +101,7 @@ where
                 '(' => Some(Tok::LPar),
                 ')' => Some(Tok::RPar),
                 ':' => Some(Tok::Colon),
+                ';' => Some(Tok::Semicolon),
                 _ => None,
             };
         }

@@ -13,43 +13,52 @@ pub Program: ast::Program = {
 
 Line: ast::Suite = {
     Statement,
-    CompoundStatement,
     "\n" => vec![],
 };
 
 Statement: ast::Suite = {
+    StatementList,
+    <comp: CompoundStatement> => vec![comp],
+};
+
+StatementList: ast::Suite = {
+    <s1: SmallStatement> <s2: (";" SmallStatement)*> ";"? "\n" => {
+        let mut statements = vec![s1];
+        statements.extend(s2.into_iter().map(|e| e.1));
+        statements
+    }
+};
+
+SmallStatement: ast::Statement = {
     AssignStatement,
     ExpressionStatement,
     PassStatement,
 };
 
-CompoundStatement: ast::Suite = {
+CompoundStatement: ast::Statement = {
     IfStatement,
 };
 
-AssignStatement: ast::Suite = {
-    <ident: Identifier> "=" <expr: Expression> => vec![
+AssignStatement: ast::Statement = {
+    <ident: Identifier> "=" <expr: Expression> =>
         ast::Statement::Assign { ident: ident, expr: expr, },
-    ],
 };
 
-ExpressionStatement: ast::Suite = {
-    <expr: Expression> => vec![
+ExpressionStatement: ast::Statement = {
+    <expr: Expression> =>
         ast::Statement::Expression { expr: expr, },
-    ],
 };
 
-PassStatement: ast::Suite = {
-    "pass" => vec![ast::Statement::Pass],
+PassStatement: ast::Statement = {
+    "pass" => ast::Statement::Pass,
 };
 
-IfStatement: ast::Suite = {
-    "if" <expr: Expression> ":" "\n" "indent" <stmt: Statement> "\n" "unindent" => vec![
+IfStatement: ast::Statement = {
+    "if" <expr: Expression> ":" "\n" "indent" <stmt: Statement> "unindent" =>
         ast::Statement::IfStatement {
             expr: expr,
             stmt: stmt,
         },
-    ],
 };
 
 Operator: ast::Operator = {
@@ -200,6 +209,7 @@ extern {
         "(" => lexer::Tok::LPar,
         ")" => lexer::Tok::RPar,
         ":" => lexer::Tok::Colon,
+        ";" => lexer::Tok::Semicolon,
         "\n" => lexer::Tok::Newline,
     }
 }
