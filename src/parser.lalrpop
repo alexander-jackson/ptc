@@ -13,6 +13,7 @@ pub Program: ast::Program = {
 
 Line: ast::Suite = {
     Statement,
+    CompoundStatement,
     "\n" => vec![],
 };
 
@@ -20,6 +21,9 @@ Statement: ast::Suite = {
     AssignStatement,
     ExpressionStatement,
     PassStatement,
+};
+
+CompoundStatement: ast::Suite = {
     IfStatement,
 };
 
