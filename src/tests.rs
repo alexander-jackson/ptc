@@ -158,3 +158,16 @@ while 1:
 
     assert!(ast.is_ok());
 }
+
+#[test]
+fn check_nested_compound_statements_test() {
+    let input: &str = r#"
+while expression:
+    if other_expression:
+        pass
+"#;
+
+    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
+
+    assert!(ast.is_ok());
+}
