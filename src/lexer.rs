@@ -181,6 +181,12 @@ where
             }
         }
 
+        // Check whether the last line was indented
+        if self.prev_spaces > 0 {
+            self.prev_spaces = 0;
+            return Some(Ok((0, Tok::Unindent, 0)));
+        }
+
         return None;
     }
 }
