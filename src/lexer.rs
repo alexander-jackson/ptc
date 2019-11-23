@@ -111,6 +111,38 @@ where
 
         None
     }
+
+    fn check_for_indentation(&mut self) -> Option<Tok> {
+        if let Some((_i, c)) = self.lookahead {
+            // Check for whitespace
+            if c == ' ' {
+                self.curr_spaces = self.read_while(|c| c == ' ').len();
+                self.start_of_line = false;
+
+                // If prev < curr, we indented
+                if self.prev_spaces < self.curr_spaces {
+                    self.indentation_level += 1;
+                    return Some(Tok::Indent);
+                }
+
+                // If prev > curr, we unindented
+                if self.prev_spaces > self.curr_spaces {
+                    self.indentation_level -= 1;
+                    return Some(Tok::Unindent);
+                }
+            } else {
+                // No whitespace, so check if this is an unindent
+                self.start_of_line = false;
+
+                if self.prev_spaces > self.curr_spaces {
+                    self.indentation_level -= 1;
+                    return Some(Tok::Unindent);
+                }
+            }
+        }
+
+        None
+    }
 }
 
 impl<T> Iterator for Lexer<T>
@@ -122,30 +154,8 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         while let Some((_i, c)) = self.lookahead {
             if self.start_of_line {
-                // Check for whitespace
-                if c == ' ' {
-                    self.curr_spaces = self.read_while(|c| c == ' ').len();
-                    self.start_of_line = false;
-
-                    // If prev < curr, we indented
-                    if self.prev_spaces < self.curr_spaces {
-                        self.indentation_level += 1;
-                        return Some(Ok((0, Tok::Indent, 0)));
-                    }
-
-                    // If prev > curr, we unindented
-                    if self.prev_spaces > self.curr_spaces {
-                        self.indentation_level -= 1;
-                        return Some(Ok((0, Tok::Unindent, 0)));
-                    }
-                } else {
-                    // No whitespace, so check if this is an unindent
-                    self.start_of_line = false;
-
-                    if self.prev_spaces > self.curr_spaces {
-                        self.indentation_level -= 1;
-                        return Some(Ok((0, Tok::Unindent, 0)));
-                    }
+                if let Some(tok) = self.check_for_indentation() {
+                    return Some(Ok((0, tok, 0)));
                 }
             }
 
