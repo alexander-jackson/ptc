@@ -38,6 +38,7 @@ pub struct Lexer<T: Iterator<Item = (usize, char)>> {
     index: usize,
     prev_spaces: usize,
     curr_spaces: usize,
+    indentation_level: usize,
     start_of_line: bool,
 }
 
@@ -52,6 +53,7 @@ where
             index: 0,
             prev_spaces: 0,
             curr_spaces: 0,
+            indentation_level: 0,
             start_of_line: true,
         };
 
@@ -127,11 +129,13 @@ where
 
                     // If prev < curr, we indented
                     if self.prev_spaces < self.curr_spaces {
+                        self.indentation_level += 1;
                         return Some(Ok((0, Tok::Indent, 0)));
                     }
 
                     // If prev > curr, we unindented
                     if self.prev_spaces > self.curr_spaces {
+                        self.indentation_level -= 1;
                         return Some(Ok((0, Tok::Unindent, 0)));
                     }
                 } else {
@@ -139,6 +143,7 @@ where
                     self.start_of_line = false;
 
                     if self.prev_spaces > self.curr_spaces {
+                        self.indentation_level -= 1;
                         return Some(Ok((0, Tok::Unindent, 0)));
                     }
                 }
@@ -181,9 +186,9 @@ where
             }
         }
 
-        // Check whether the last line was indented
-        if self.prev_spaces > 0 {
-            self.prev_spaces = 0;
+        // Check whether we are currently indented
+        if self.indentation_level > 0 {
+            self.indentation_level -= 1;
             return Some(Ok((0, Tok::Unindent, 0)));
         }
 
