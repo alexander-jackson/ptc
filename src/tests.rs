@@ -215,3 +215,15 @@ def useless(x, y):
 
     assert!(ast.is_ok());
 }
+
+#[test]
+fn parse_return_statement_test() {
+    let input: &str = r#"
+def add(x, y):
+    return x + y
+"#;
+
+    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
+
+    assert!(ast.is_ok());
+}
