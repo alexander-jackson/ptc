@@ -71,7 +71,6 @@ WhileStatement: ast::Statement = {
 };
 
 Operator: ast::Operator = {
-    "=" => ast::Operator::Assign,
     "+" => ast::Operator::Plus,
     "-" => ast::Operator::Minus,
     "*" => ast::Operator::Multiply,
