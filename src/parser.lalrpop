@@ -39,6 +39,7 @@ SmallStatement: ast::Statement = {
 CompoundStatement: ast::Statement = {
     IfStatement,
     WhileStatement,
+    FunctionDeclStatement,
 };
 
 AssignStatement: ast::Statement = {
@@ -80,6 +81,26 @@ WhileStatement: ast::Statement = {
         ast::Statement::WhileStatement {
             expr: expr,
             stmt: stmt,
+        },
+};
+
+ArgumentList: Vec<ast::Identifier> = {
+    <l: (<Identifier> ",")*> <e: Identifier?> => match e {
+        None => l,
+        Some(e) => {
+            let mut l = l;
+            l.push(e);
+            l
+        },
+    },
+};
+
+FunctionDeclStatement: ast::Statement = {
+    "def" <ident: Identifier> "(" <args: ArgumentList> ")" ":" "\n" "indent" <stmt: Statement> "unindent" =>
+        ast::Statement::FunctionDecl {
+            name: ident,
+            args: args,
+            body: stmt,
         },
 };
 
@@ -234,6 +255,7 @@ extern {
         "pass" => lexer::Tok::Pass,
         "if" => lexer::Tok::If,
         "while" => lexer::Tok::While,
+        "def" => lexer::Tok::Def,
         "or" => lexer::Tok::LogicalOr,
         "and" => lexer::Tok::LogicalAnd,
         "not" => lexer::Tok::LogicalNot,
@@ -257,6 +279,7 @@ extern {
         ")" => lexer::Tok::RPar,
         ":" => lexer::Tok::Colon,
         ";" => lexer::Tok::Semicolon,
+        "," => lexer::Tok::Comma,
         "\n" => lexer::Tok::Newline,
     }
 }

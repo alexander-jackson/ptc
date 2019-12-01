@@ -8,6 +8,7 @@ pub enum Tok {
     Pass,
     If,
     While,
+    Def,
 
     // Operators
     Assign,
@@ -34,6 +35,7 @@ pub enum Tok {
     RPar,
     Colon,
     Semicolon,
+    Comma,
     Newline,
 }
 
@@ -110,6 +112,7 @@ where
                 ')' => Some(Tok::RPar),
                 ':' => Some(Tok::Colon),
                 ';' => Some(Tok::Semicolon),
+                ',' => Some(Tok::Comma),
                 _ => None,
             };
         }
@@ -292,6 +295,7 @@ where
                     "not" => Tok::LogicalNot,
                     "if" => Tok::If,
                     "while" => Tok::While,
+                    "def" => Tok::Def,
                     _ => Tok::Identifier { name: ident },
                 };
 
