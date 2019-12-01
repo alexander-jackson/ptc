@@ -71,7 +71,7 @@ WhileStatement: ast::Statement = {
 };
 
 Operator: ast::Operator = {
-    "=" => ast::Operator::Equals,
+    "=" => ast::Operator::Assign,
     "+" => ast::Operator::Plus,
     "-" => ast::Operator::Minus,
     "*" => ast::Operator::Multiply,
@@ -115,8 +115,23 @@ NotTest: ast::Expression = {
         },
 };
 
+ComparisonOperator: ast::Operator = {
+    "<" => ast::Operator::Less,
+    ">" => ast::Operator::Greater,
+    "<=" => ast::Operator::LessOrEqual,
+    ">=" => ast::Operator::GreaterOrEqual,
+    "==" => ast::Operator::Equal,
+    "!=" => ast::Operator::NotEqual,
+};
+
 Comparison: ast::Expression = {
     OrExpr,
+    <left: Comparison> <op: ComparisonOperator> <right: OrExpr> =>
+        ast::Expression::BinaryOperation {
+            left: Box::new(left),
+            op: op,
+            right: Box::new(right),
+        },
 };
 
 OrExpr: ast::Expression = {
@@ -210,11 +225,17 @@ extern {
         "or" => lexer::Tok::LogicalOr,
         "and" => lexer::Tok::LogicalAnd,
         "not" => lexer::Tok::LogicalNot,
-        "=" => lexer::Tok::Equals,
+        "=" => lexer::Tok::Assign,
         "+" => lexer::Tok::Plus,
         "-" => lexer::Tok::Minus,
         "*" => lexer::Tok::Multiply,
         "/" => lexer::Tok::Divide,
+        "<" => lexer::Tok::Less,
+        ">" => lexer::Tok::Greater,
+        "<=" => lexer::Tok::LessOrEqual,
+        ">=" => lexer::Tok::GreaterOrEqual,
+        "==" => lexer::Tok::Equal,
+        "!=" => lexer::Tok::NotEqual,
         "integer" => lexer::Tok::Integer { value: <u32> },
         "(" => lexer::Tok::LPar,
         ")" => lexer::Tok::RPar,

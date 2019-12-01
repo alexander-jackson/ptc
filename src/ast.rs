@@ -35,11 +35,17 @@ pub enum Operator {
     LogicalOr,
     LogicalAnd,
     LogicalNot,
-    Equals,
+    Assign,
     Plus,
     Minus,
     Multiply,
     Divide,
+    Less,
+    Greater,
+    LessOrEqual,
+    GreaterOrEqual,
+    Equal,
+    NotEqual,
 }
 
 #[derive(Debug, PartialEq)]

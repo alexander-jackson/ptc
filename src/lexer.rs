@@ -10,7 +10,7 @@ pub enum Tok {
     While,
 
     // Operators
-    Equals,
+    Assign,
     Plus,
     Minus,
     Multiply,
@@ -18,6 +18,12 @@ pub enum Tok {
     LogicalOr,
     LogicalAnd,
     LogicalNot,
+    Less,
+    Greater,
+    LessOrEqual,
+    GreaterOrEqual,
+    Equal,
+    NotEqual,
 
     Integer { value: u32 },
     LPar,
@@ -96,7 +102,6 @@ where
     fn check_operator(&mut self) -> Option<Tok> {
         if let Some((_i, c)) = self.lookahead {
             return match c {
-                '=' => Some(Tok::Equals),
                 '+' => Some(Tok::Plus),
                 '-' => Some(Tok::Minus),
                 '*' => Some(Tok::Multiply),
@@ -107,6 +112,68 @@ where
                 ';' => Some(Tok::Semicolon),
                 _ => None,
             };
+        }
+
+        None
+    }
+
+    fn check_multiple_character_operators(&mut self) -> Option<Tok> {
+        if let Some((_i, c)) = self.lookahead {
+            if c == '<' {
+                self.update_lookahead();
+
+                if let Some((_i, c)) = self.lookahead {
+                    return match c {
+                        '=' => {
+                            self.update_lookahead();
+                            Some(Tok::LessOrEqual)
+                        },
+                        _ => Some(Tok::Less),
+                    };
+                }
+            }
+
+            if c == '>' {
+                self.update_lookahead();
+
+                if let Some((_i, c)) = self.lookahead {
+                    return match c {
+                        '=' => {
+                            self.update_lookahead();
+                            Some(Tok::GreaterOrEqual)
+                        },
+                        _ => Some(Tok::Greater),
+                    };
+                }
+            }
+
+            if c == '!' {
+                self.update_lookahead();
+
+                if let Some((_i, c)) = self.lookahead {
+                    return match c {
+                        '=' => {
+                            self.update_lookahead();
+                            Some(Tok::NotEqual)
+                        },
+                        _ => None,
+                    };
+                }
+            }
+
+            if c == '=' {
+                self.update_lookahead();
+
+                if let Some((_i, c)) = self.lookahead {
+                    return match c {
+                        '=' => {
+                            self.update_lookahead();
+                            Some(Tok::Equal)
+                        },
+                        _ => Some(Tok::Assign),
+                    };
+                }
+            }
         }
 
         None
@@ -188,6 +255,12 @@ where
 
                 if op.is_some() {
                     self.update_lookahead();
+                    return Some(Ok((0, op.unwrap(), 0)));
+                }
+
+                let op = self.check_multiple_character_operators();
+
+                if op.is_some() {
                     return Some(Ok((0, op.unwrap(), 0)));
                 }
 
