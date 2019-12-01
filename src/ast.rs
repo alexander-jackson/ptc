@@ -9,7 +9,7 @@ pub struct Program {
 pub enum Statement {
     Assign {
         ident: Identifier,
-        expr: Expression
+        expr: Expression,
     },
     AugmentedAssign {
         ident: Identifier,
@@ -17,7 +17,7 @@ pub enum Statement {
         expr: Expression,
     },
     Expression {
-        expr: Expression
+        expr: Expression,
     },
     Pass,
     IfStatement {

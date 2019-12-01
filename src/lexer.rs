@@ -131,7 +131,7 @@ where
                         '=' => {
                             self.update_lookahead();
                             Some(Tok::LessOrEqual)
-                        },
+                        }
                         _ => Some(Tok::Less),
                     };
                 }
@@ -145,7 +145,7 @@ where
                         '=' => {
                             self.update_lookahead();
                             Some(Tok::GreaterOrEqual)
-                        },
+                        }
                         _ => Some(Tok::Greater),
                     };
                 }
@@ -159,7 +159,7 @@ where
                         '=' => {
                             self.update_lookahead();
                             Some(Tok::NotEqual)
-                        },
+                        }
                         _ => None,
                     };
                 }
@@ -173,7 +173,7 @@ where
                         '=' => {
                             self.update_lookahead();
                             Some(Tok::Equal)
-                        },
+                        }
                         _ => Some(Tok::Assign),
                     };
                 }
@@ -187,7 +187,7 @@ where
                         '=' => {
                             self.update_lookahead();
                             Some(Tok::PlusEquals)
-                        },
+                        }
                         _ => Some(Tok::Plus),
                     };
                 }
@@ -201,7 +201,7 @@ where
                         '=' => {
                             self.update_lookahead();
                             Some(Tok::MinusEquals)
-                        },
+                        }
                         _ => Some(Tok::Minus),
                     };
                 }
@@ -215,7 +215,7 @@ where
                         '=' => {
                             self.update_lookahead();
                             Some(Tok::MultiplyEquals)
-                        },
+                        }
                         _ => Some(Tok::Multiply),
                     };
                 }
@@ -229,7 +229,7 @@ where
                         '=' => {
                             self.update_lookahead();
                             Some(Tok::DivideEquals)
-                        },
+                        }
                         _ => Some(Tok::Divide),
                     };
                 }

@@ -2,34 +2,29 @@ use crate::*;
 
 #[test]
 fn allow_underscores_in_identifiers_test() {
-    let input: &str =
-r#"
+    let input: &str = r#"
 longer_name
 "#;
 
-    let ast = parser::ProgramParser::new()
-        .parse(lexer::Lexer::new(input.char_indices()));
+    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
 
     assert!(ast.is_ok());
 }
 
 #[test]
 fn parse_integers_test() {
-    let input: &str =
-r#"
+    let input: &str = r#"
 40
 "#;
 
-    let ast = parser::ProgramParser::new()
-        .parse(lexer::Lexer::new(input.char_indices()));
+    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
 
     assert!(ast.is_ok());
 }
 
 #[test]
 fn parse_expressions_test() {
-    let input: &str =
-r#"
+    let input: &str = r#"
 var = 1 / 1 * 1 + 1 - 1
 "#;
 
@@ -40,8 +35,7 @@ var = 1 / 1 * 1 + 1 - 1
 
 #[test]
 fn parse_bracketed_expression_test() {
-    let input: &str =
-r#"
+    let input: &str = r#"
 var = (1 / 1) * 1
 "#;
 
@@ -52,8 +46,7 @@ var = (1 / 1) * 1
 
 #[test]
 fn parse_comparison_operators_test() {
-    let input: &str =
-r#"
+    let input: &str = r#"
 var = 0 < 1
 var = 0 > 1
 var = 0 <= 1
@@ -69,8 +62,7 @@ var = 0 != 1
 
 #[test]
 fn parse_augmented_assignment_test() {
-    let input: &str =
-r#"
+    let input: &str = r#"
 var += 1
 var -= 1
 var *= 1
@@ -84,8 +76,7 @@ var /= 1
 
 #[test]
 fn parse_identifier_expression_test() {
-    let input: &str =
-r#"
+    let input: &str = r#"
 var = var_one + var_two
 "#;
 
@@ -96,8 +87,7 @@ var = var_one + var_two
 
 #[test]
 fn parse_function_call_expression_test() {
-    let input: &str =
-r#"
+    let input: &str = r#"
 var = add(1, 2)
 "#;
 
@@ -108,8 +98,7 @@ var = add(1, 2)
 
 #[test]
 fn parse_logical_and_expression_test() {
-    let input: &str =
-r#"
+    let input: &str = r#"
 variable and other_variable
 "#;
 
@@ -120,8 +109,7 @@ variable and other_variable
 
 #[test]
 fn parse_logical_or_expression_test() {
-    let input: &str =
-r#"
+    let input: &str = r#"
 variable or other_variable
 "#;
 
@@ -132,8 +120,7 @@ variable or other_variable
 
 #[test]
 fn parse_logical_not_expression_test() {
-    let input: &str =
-r#"
+    let input: &str = r#"
 not other_variable
 "#;
 
@@ -144,8 +131,7 @@ not other_variable
 
 #[test]
 fn parse_pass_statement_test() {
-    let input: &str =
-r#"
+    let input: &str = r#"
 pass
 "#;
 
