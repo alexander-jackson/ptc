@@ -53,6 +53,23 @@ var = (1 / 1) * 1
 }
 
 #[test]
+fn parse_comparison_operators_test() {
+    let input: &str =
+r#"
+var = 0 < 1
+var = 0 > 1
+var = 0 <= 1
+var = 0 >= 1
+var = 0 == 1
+var = 0 != 1
+"#;
+
+    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
+
+    assert!(ast.is_ok());
+}
+
+#[test]
 fn parse_identifier_expression_test() {
     let input: &str =
 r#"
@@ -160,7 +177,7 @@ while 1:
 }
 
 #[test]
-fn check_nested_compound_statements_test() {
+fn parse_nested_compound_statements_test() {
     let input: &str = r#"
 while expression:
     if other_expression:
