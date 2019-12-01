@@ -70,6 +70,21 @@ var = 0 != 1
 }
 
 #[test]
+fn parse_augmented_assignment_test() {
+    let input: &str =
+r#"
+var += 1
+var -= 1
+var *= 1
+var /= 1
+"#;
+
+    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
+
+    assert!(ast.is_ok());
+}
+
+#[test]
 fn parse_identifier_expression_test() {
     let input: &str =
 r#"
