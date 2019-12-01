@@ -1,4 +1,4 @@
-use super::*;
+use crate::*;
 
 #[test]
 fn allow_underscores_in_identifiers_test() {
