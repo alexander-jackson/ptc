@@ -97,6 +97,18 @@ var = var_one + var_two
 }
 
 #[test]
+fn parse_function_call_expression_test() {
+    let input: &str =
+r#"
+var = add(1, 2)
+"#;
+
+    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
+
+    assert!(ast.is_ok());
+}
+
+#[test]
 fn parse_logical_and_expression_test() {
     let input: &str =
 r#"
