@@ -31,6 +31,7 @@ StatementList: ast::Suite = {
 
 SmallStatement: ast::Statement = {
     AssignStatement,
+    AugmentedAssignStatement,
     ExpressionStatement,
     PassStatement,
 };
@@ -43,6 +44,18 @@ CompoundStatement: ast::Statement = {
 AssignStatement: ast::Statement = {
     <ident: Identifier> "=" <expr: Expression> =>
         ast::Statement::Assign { ident: ident, expr: expr, },
+};
+
+AugmentedAssignOperator: ast::Operator = {
+    "+=" => ast::Operator::PlusEquals,
+    "-=" => ast::Operator::MinusEquals,
+    "*=" => ast::Operator::MultiplyEquals,
+    "/=" => ast::Operator::DivideEquals,
+};
+
+AugmentedAssignStatement: ast::Statement = {
+    <ident: Identifier> <op: AugmentedAssignOperator> <expr: Expression> =>
+        ast::Statement::AugmentedAssign { ident: ident, op: op, expr: expr, },
 };
 
 ExpressionStatement: ast::Statement = {
@@ -229,6 +242,10 @@ extern {
         "-" => lexer::Tok::Minus,
         "*" => lexer::Tok::Multiply,
         "/" => lexer::Tok::Divide,
+        "+=" => lexer::Tok::PlusEquals,
+        "-=" => lexer::Tok::MinusEquals,
+        "*=" => lexer::Tok::MultiplyEquals,
+        "/=" => lexer::Tok::DivideEquals,
         "<" => lexer::Tok::Less,
         ">" => lexer::Tok::Greater,
         "<=" => lexer::Tok::LessOrEqual,

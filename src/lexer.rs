@@ -15,6 +15,10 @@ pub enum Tok {
     Minus,
     Multiply,
     Divide,
+    PlusEquals,
+    MinusEquals,
+    MultiplyEquals,
+    DivideEquals,
     LogicalOr,
     LogicalAnd,
     LogicalNot,
@@ -102,10 +106,6 @@ where
     fn check_operator(&mut self) -> Option<Tok> {
         if let Some((_i, c)) = self.lookahead {
             return match c {
-                '+' => Some(Tok::Plus),
-                '-' => Some(Tok::Minus),
-                '*' => Some(Tok::Multiply),
-                '/' => Some(Tok::Divide),
                 '(' => Some(Tok::LPar),
                 ')' => Some(Tok::RPar),
                 ':' => Some(Tok::Colon),
@@ -171,6 +171,62 @@ where
                             Some(Tok::Equal)
                         },
                         _ => Some(Tok::Assign),
+                    };
+                }
+            }
+
+            if c == '+' {
+                self.update_lookahead();
+
+                if let Some((_i, c)) = self.lookahead {
+                    return match c {
+                        '=' => {
+                            self.update_lookahead();
+                            Some(Tok::PlusEquals)
+                        },
+                        _ => Some(Tok::Plus),
+                    };
+                }
+            }
+
+            if c == '-' {
+                self.update_lookahead();
+
+                if let Some((_i, c)) = self.lookahead {
+                    return match c {
+                        '=' => {
+                            self.update_lookahead();
+                            Some(Tok::MinusEquals)
+                        },
+                        _ => Some(Tok::Minus),
+                    };
+                }
+            }
+
+            if c == '*' {
+                self.update_lookahead();
+
+                if let Some((_i, c)) = self.lookahead {
+                    return match c {
+                        '=' => {
+                            self.update_lookahead();
+                            Some(Tok::MultiplyEquals)
+                        },
+                        _ => Some(Tok::Multiply),
+                    };
+                }
+            }
+
+            if c == '/' {
+                self.update_lookahead();
+
+                if let Some((_i, c)) = self.lookahead {
+                    return match c {
+                        '=' => {
+                            self.update_lookahead();
+                            Some(Tok::DivideEquals)
+                        },
+                        _ => Some(Tok::Divide),
                     };
                 }
             }

@@ -11,6 +11,11 @@ pub enum Statement {
         ident: Identifier,
         expr: Expression
     },
+    AugmentedAssign {
+        ident: Identifier,
+        op: Operator,
+        expr: Expression,
+    },
     Expression {
         expr: Expression
     },
@@ -40,6 +45,10 @@ pub enum Operator {
     Minus,
     Multiply,
     Divide,
+    PlusEquals,
+    MinusEquals,
+    MultiplyEquals,
+    DivideEquals,
     Less,
     Greater,
     LessOrEqual,
