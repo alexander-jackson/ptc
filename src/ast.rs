@@ -28,6 +28,9 @@ pub enum Statement {
         expr: Expression,
         stmt: Suite,
     },
+    ReturnStatement {
+        expr: Expression,
+    },
     FunctionDecl {
         name: Identifier,
         args: Vec<Identifier>,

@@ -9,6 +9,7 @@ pub enum Tok {
     If,
     While,
     Def,
+    Return,
 
     // Operators
     Assign,
@@ -296,6 +297,7 @@ where
                     "if" => Tok::If,
                     "while" => Tok::While,
                     "def" => Tok::Def,
+                    "return" => Tok::Return,
                     _ => Tok::Identifier { name: ident },
                 };
 

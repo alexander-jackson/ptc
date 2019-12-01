@@ -34,6 +34,7 @@ SmallStatement: ast::Statement = {
     AugmentedAssignStatement,
     ExpressionStatement,
     PassStatement,
+    ReturnStatement,
 };
 
 CompoundStatement: ast::Statement = {
@@ -66,6 +67,11 @@ ExpressionStatement: ast::Statement = {
 
 PassStatement: ast::Statement = {
     "pass" => ast::Statement::Pass,
+};
+
+ReturnStatement: ast::Statement = {
+    "return" <expr: Expression> =>
+        ast::Statement::ReturnStatement { expr: expr },
 };
 
 IfStatement: ast::Statement = {
@@ -256,6 +262,7 @@ extern {
         "if" => lexer::Tok::If,
         "while" => lexer::Tok::While,
         "def" => lexer::Tok::Def,
+        "return" => lexer::Tok::Return,
         "or" => lexer::Tok::LogicalOr,
         "and" => lexer::Tok::LogicalAnd,
         "not" => lexer::Tok::LogicalNot,
