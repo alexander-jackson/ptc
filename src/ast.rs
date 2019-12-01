@@ -28,6 +28,11 @@ pub enum Statement {
         expr: Expression,
         stmt: Suite,
     },
+    FunctionDecl {
+        name: Identifier,
+        args: Vec<Identifier>,
+        body: Suite,
+    },
 }
 
 #[derive(Debug, PartialEq)]
