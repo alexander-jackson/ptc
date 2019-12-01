@@ -203,3 +203,15 @@ while expression:
 
     assert!(ast.is_ok());
 }
+
+#[test]
+fn parse_function_declaration_test() {
+    let input: &str = r#"
+def useless(x, y):
+    pass
+"#;
+
+    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
+
+    assert!(ast.is_ok());
+}
