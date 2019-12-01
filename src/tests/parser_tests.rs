@@ -10,8 +10,6 @@ longer_name
     let ast = parser::ProgramParser::new()
         .parse(lexer::Lexer::new(input.char_indices()));
 
-    dbg!(&ast);
-
     assert!(ast.is_ok());
 }
 
