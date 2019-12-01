@@ -229,12 +229,32 @@ PowerExpr: ast::Expression = {
 
 Primary: ast::Expression = {
     Atom,
+    Call,
 };
 
 Atom: ast::Expression = {
     <ident: Identifier> => ast::Expression::Identifier { name: ident },
     <literal: Literal> => ast::Expression::Literal { value: literal },
     Enclosure,
+};
+
+Call: ast::Expression = {
+    <ident: Identifier> "(" <args: CallArgs> ")" =>
+        ast::Expression::FunctionCall {
+            name: ident,
+            args: args,
+        },
+};
+
+CallArgs: Vec<ast::Expression> = {
+    <l: (<Expression> ",")*> <e: Expression?> => match e {
+        None => l,
+        Some(e) => {
+            let mut l = l;
+            l.push(e);
+            l
+        },
+    },
 };
 
 Identifier: ast::Identifier = {

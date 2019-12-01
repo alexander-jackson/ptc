@@ -79,6 +79,10 @@ pub enum Expression {
     ParenExpression {
         expr: Box<Expression>,
     },
+    FunctionCall {
+        name: Identifier,
+        args: Vec<Expression>,
+    },
     Identifier {
         name: Identifier,
     },
