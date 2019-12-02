@@ -1,5 +1,7 @@
 use std::fs;
 
+use ast::Generate;
+
 #[macro_use]
 extern crate lalrpop_util;
 
@@ -35,6 +37,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let ast = parse(&program_code).expect("Failed to parse the given program");
     dbg!(&ast);
+
+    dbg!(ast.generate());
 
     Ok(())
 }

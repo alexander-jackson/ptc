@@ -8,3 +8,7 @@ pub mod literal;
 use ast::statement::Statement;
 
 pub type Suite = Vec<Statement>;
+
+pub trait Generate {
+    fn generate(&self) -> String;
+}
