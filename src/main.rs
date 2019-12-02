@@ -12,7 +12,7 @@ struct Args {
     filename: Option<String>,
 }
 
-fn parse(input: &str) -> Result<ast::Program, String> {
+fn parse(input: &str) -> Result<ast::program::Program, String> {
     match parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices())) {
         Ok(s) => Ok(s),
         Err(e) => Err(format!("{:?}", e)),

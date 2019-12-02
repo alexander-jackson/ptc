@@ -5,8 +5,8 @@ use ast;
 
 grammar;
 
-pub Program: ast::Program = {
-    <lines:Line*> => ast::Program {
+pub Program: ast::program::Program = {
+    <lines:Line*> => ast::program::Program {
         statements: Vec::from_iter(lines.into_iter().flatten())
     },
 };
@@ -29,7 +29,7 @@ StatementList: ast::Suite = {
     }
 };
 
-SmallStatement: ast::Statement = {
+SmallStatement: ast::statement::Statement = {
     AssignStatement,
     AugmentedAssignStatement,
     ExpressionStatement,
@@ -37,60 +37,60 @@ SmallStatement: ast::Statement = {
     ReturnStatement,
 };
 
-CompoundStatement: ast::Statement = {
+CompoundStatement: ast::statement::Statement = {
     IfStatement,
     WhileStatement,
     FunctionDeclStatement,
 };
 
-AssignStatement: ast::Statement = {
+AssignStatement: ast::statement::Statement = {
     <ident: Identifier> "=" <expr: Expression> =>
-        ast::Statement::Assign { ident: ident, expr: expr, },
+        ast::statement::Statement::Assign { ident: ident, expr: expr, },
 };
 
-AugmentedAssignOperator: ast::Operator = {
-    "+=" => ast::Operator::PlusEquals,
-    "-=" => ast::Operator::MinusEquals,
-    "*=" => ast::Operator::MultiplyEquals,
-    "/=" => ast::Operator::DivideEquals,
+AugmentedAssignOperator: ast::operator::Operator = {
+    "+=" => ast::operator::Operator::PlusEquals,
+    "-=" => ast::operator::Operator::MinusEquals,
+    "*=" => ast::operator::Operator::MultiplyEquals,
+    "/=" => ast::operator::Operator::DivideEquals,
 };
 
-AugmentedAssignStatement: ast::Statement = {
+AugmentedAssignStatement: ast::statement::Statement = {
     <ident: Identifier> <op: AugmentedAssignOperator> <expr: Expression> =>
-        ast::Statement::AugmentedAssign { ident: ident, op: op, expr: expr, },
+        ast::statement::Statement::AugmentedAssign { ident: ident, op: op, expr: expr, },
 };
 
-ExpressionStatement: ast::Statement = {
+ExpressionStatement: ast::statement::Statement = {
     <expr: Expression> =>
-        ast::Statement::Expression { expr: expr, },
+        ast::statement::Statement::Expression { expr: expr, },
 };
 
-PassStatement: ast::Statement = {
-    "pass" => ast::Statement::Pass,
+PassStatement: ast::statement::Statement = {
+    "pass" => ast::statement::Statement::Pass,
 };
 
-ReturnStatement: ast::Statement = {
+ReturnStatement: ast::statement::Statement = {
     "return" <expr: Expression> =>
-        ast::Statement::ReturnStatement { expr: expr },
+        ast::statement::Statement::ReturnStatement { expr: expr },
 };
 
-IfStatement: ast::Statement = {
+IfStatement: ast::statement::Statement = {
     "if" <expr: Expression> ":" "\n" "indent" <stmt: Statement> "unindent" =>
-        ast::Statement::IfStatement {
+        ast::statement::Statement::IfStatement {
             expr: expr,
             stmt: stmt,
         },
 };
 
-WhileStatement: ast::Statement = {
+WhileStatement: ast::statement::Statement = {
     "while" <expr: Expression> ":" "\n" "indent" <stmt: Statement> "unindent" =>
-        ast::Statement::WhileStatement {
+        ast::statement::Statement::WhileStatement {
             expr: expr,
             stmt: stmt,
         },
 };
 
-ArgumentList: Vec<ast::Identifier> = {
+ArgumentList: Vec<ast::identifier::Identifier> = {
     <l: (<Identifier> ",")*> <e: Identifier?> => match e {
         None => l,
         Some(e) => {
@@ -101,152 +101,152 @@ ArgumentList: Vec<ast::Identifier> = {
     },
 };
 
-FunctionDeclStatement: ast::Statement = {
+FunctionDeclStatement: ast::statement::Statement = {
     "def" <ident: Identifier> "(" <args: ArgumentList> ")" ":" "\n" "indent" <stmt: Statement> "unindent" =>
-        ast::Statement::FunctionDecl {
+        ast::statement::Statement::FunctionDecl {
             name: ident,
             args: args,
             body: stmt,
         },
 };
 
-Operator: ast::Operator = {
-    "+" => ast::Operator::Plus,
-    "-" => ast::Operator::Minus,
-    "*" => ast::Operator::Multiply,
-    "/" => ast::Operator::Divide,
+Operator: ast::operator::Operator = {
+    "+" => ast::operator::Operator::Plus,
+    "-" => ast::operator::Operator::Minus,
+    "*" => ast::operator::Operator::Multiply,
+    "/" => ast::operator::Operator::Divide,
 };
 
-Expression: ast::Expression = {
+Expression: ast::expression::Expression = {
     ConditionalExpression,
 };
 
-ConditionalExpression: ast::Expression = {
+ConditionalExpression: ast::expression::Expression = {
     OrTest,
 };
 
-OrTest: ast::Expression = {
+OrTest: ast::expression::Expression = {
     AndTest,
     <left: OrTest> "or" <right: AndTest> =>
-        ast::Expression::BinaryOperation {
+        ast::expression::Expression::BinaryOperation {
             left: Box::new(left),
-            op: ast::Operator::LogicalOr,
+            op: ast::operator::Operator::LogicalOr,
             right: Box::new(right)
         },
 };
 
-AndTest: ast::Expression = {
+AndTest: ast::expression::Expression = {
     NotTest,
     <left: AndTest> "and" <right: NotTest> =>
-        ast::Expression::BinaryOperation {
+        ast::expression::Expression::BinaryOperation {
             left: Box::new(left),
-            op: ast::Operator::LogicalAnd,
+            op: ast::operator::Operator::LogicalAnd,
             right: Box::new(right)
         },
 };
 
-NotTest: ast::Expression = {
+NotTest: ast::expression::Expression = {
     Comparison,
     "not" <expr: NotTest> =>
-        ast::Expression::UnaryOperation {
-            op: ast::Operator::LogicalNot,
+        ast::expression::Expression::UnaryOperation {
+            op: ast::operator::Operator::LogicalNot,
             expr: Box::new(expr),
         },
 };
 
-ComparisonOperator: ast::Operator = {
-    "<" => ast::Operator::Less,
-    ">" => ast::Operator::Greater,
-    "<=" => ast::Operator::LessOrEqual,
-    ">=" => ast::Operator::GreaterOrEqual,
-    "==" => ast::Operator::Equal,
-    "!=" => ast::Operator::NotEqual,
+ComparisonOperator: ast::operator::Operator = {
+    "<" => ast::operator::Operator::Less,
+    ">" => ast::operator::Operator::Greater,
+    "<=" => ast::operator::Operator::LessOrEqual,
+    ">=" => ast::operator::Operator::GreaterOrEqual,
+    "==" => ast::operator::Operator::Equal,
+    "!=" => ast::operator::Operator::NotEqual,
 };
 
-Comparison: ast::Expression = {
+Comparison: ast::expression::Expression = {
     OrExpr,
     <left: Comparison> <op: ComparisonOperator> <right: OrExpr> =>
-        ast::Expression::BinaryOperation {
+        ast::expression::Expression::BinaryOperation {
             left: Box::new(left),
             op: op,
             right: Box::new(right),
         },
 };
 
-OrExpr: ast::Expression = {
+OrExpr: ast::expression::Expression = {
     XorExpr,
 };
 
-XorExpr: ast::Expression = {
+XorExpr: ast::expression::Expression = {
     AndExpr,
 };
 
-AndExpr: ast::Expression = {
+AndExpr: ast::expression::Expression = {
     ShiftExpr,
 };
 
-ShiftExpr: ast::Expression = {
+ShiftExpr: ast::expression::Expression = {
     ArithmeticExpr,
 };
 
-ArithmeticOperator: ast::Operator = {
-    "+" => ast::Operator::Plus,
-    "-" => ast::Operator::Minus,
+ArithmeticOperator: ast::operator::Operator = {
+    "+" => ast::operator::Operator::Plus,
+    "-" => ast::operator::Operator::Minus,
 };
 
-ArithmeticExpr: ast::Expression = {
+ArithmeticExpr: ast::expression::Expression = {
     MultExpr,
     <left: ArithmeticExpr> <op: ArithmeticOperator> <right: MultExpr> =>
-        ast::Expression::BinaryOperation {
+        ast::expression::Expression::BinaryOperation {
             left: Box::new(left),
             op: op,
             right: Box::new(right),
         },
 };
 
-MultOperator: ast::Operator = {
-    "*" => ast::Operator::Multiply,
-    "/" => ast::Operator::Divide,
+MultOperator: ast::operator::Operator = {
+    "*" => ast::operator::Operator::Multiply,
+    "/" => ast::operator::Operator::Divide,
 };
 
-MultExpr: ast::Expression = {
+MultExpr: ast::expression::Expression = {
     UnaryExpr,
     <left: MultExpr> <op: MultOperator> <right: UnaryExpr> =>
-        ast::Expression::BinaryOperation {
+        ast::expression::Expression::BinaryOperation {
             left: Box::new(left),
             op: op,
             right: Box::new(right),
         },
 };
 
-UnaryExpr: ast::Expression = {
+UnaryExpr: ast::expression::Expression = {
     PowerExpr,
 };
 
-PowerExpr: ast::Expression = {
+PowerExpr: ast::expression::Expression = {
     Primary,
 };
 
-Primary: ast::Expression = {
+Primary: ast::expression::Expression = {
     Atom,
     Call,
 };
 
-Atom: ast::Expression = {
-    <ident: Identifier> => ast::Expression::Identifier { name: ident },
-    <literal: Literal> => ast::Expression::Literal { value: literal },
+Atom: ast::expression::Expression = {
+    <ident: Identifier> => ast::expression::Expression::Identifier { name: ident },
+    <literal: Literal> => ast::expression::Expression::Literal { value: literal },
     Enclosure,
 };
 
-Call: ast::Expression = {
+Call: ast::expression::Expression = {
     <ident: Identifier> "(" <args: CallArgs> ")" =>
-        ast::Expression::FunctionCall {
+        ast::expression::Expression::FunctionCall {
             name: ident,
             args: args,
         },
 };
 
-CallArgs: Vec<ast::Expression> = {
+CallArgs: Vec<ast::expression::Expression> = {
     <l: (<Expression> ",")*> <e: Expression?> => match e {
         None => l,
         Some(e) => {
@@ -257,17 +257,17 @@ CallArgs: Vec<ast::Expression> = {
     },
 };
 
-Identifier: ast::Identifier = {
-    <ident: "identifier"> => ast::Identifier::Name { name: ident },
+Identifier: ast::identifier::Identifier = {
+    <ident: "identifier"> => ast::identifier::Identifier::Name { name: ident },
 };
 
-Literal: ast::Literal = {
-    <i: "integer"> => ast::Literal::Integer { value: i },
+Literal: ast::literal::Literal = {
+    <i: "integer"> => ast::literal::Literal::Integer { value: i },
 };
 
-Enclosure: ast::Expression = {
+Enclosure: ast::expression::Expression = {
     "(" <expr: Expression> ")" =>
-        ast::Expression::ParenExpression { expr: Box::new(expr) },
+        ast::expression::Expression::ParenExpression { expr: Box::new(expr) },
 };
 
 extern {
