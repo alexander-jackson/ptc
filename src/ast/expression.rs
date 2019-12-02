@@ -1,3 +1,5 @@
+use ast::Generate;
+
 use ast::operator::Operator;
 use ast::identifier::Identifier;
 use ast::literal::Literal;
@@ -28,3 +30,12 @@ pub enum Expression {
     },
 }
 
+impl Generate for Expression {
+    fn generate(&self) -> String {
+        match self {
+            Expression::Identifier { name } => name.generate(),
+            Expression::Literal { value } => value.generate(),
+            _ => String::from(""),
+        }
+    }
+}

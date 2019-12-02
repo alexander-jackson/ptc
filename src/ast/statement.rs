@@ -1,5 +1,6 @@
 use ast::Suite;
 use ast::Generate;
+
 use ast::expression::Expression;
 use ast::operator::Operator;
 use ast::identifier::Identifier;
@@ -40,6 +41,7 @@ pub enum Statement {
 impl Generate for Statement {
     fn generate(&self) -> String {
         match self {
+            Statement::Expression { expr } => expr.generate(),
             Statement::Pass => String::from(""),
             _ => String::from(""),
         }
