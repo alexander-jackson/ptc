@@ -38,7 +38,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ast = parse(&program_code).expect("Failed to parse the given program");
     dbg!(&ast);
 
-    dbg!(ast.generate());
+    println!("Program: {}", ast.generate());
 
     Ok(())
 }

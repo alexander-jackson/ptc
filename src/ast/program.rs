@@ -15,6 +15,6 @@ impl Generate for Program {
             code.push(stmt.generate());
         }
 
-        code.join(" ")
+        code.join("\n")
     }
 }
