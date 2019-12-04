@@ -9,7 +9,7 @@ use crate::ast::Generate;
 
 pub struct Args {
     /// File input using -f <filename> of --filename <filename>
-    pub filename: Option<String>,
+    filename: Option<String>,
 }
 
 pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
