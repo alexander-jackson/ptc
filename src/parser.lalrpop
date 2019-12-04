@@ -19,6 +19,7 @@ Line: ast::Suite = {
 Suite: ast::Suite = {
     "\n" "indent" <s: Statement+> "unindent" =>
         s.into_iter().flatten().collect(),
+    <s: StatementList> "\n" => s,
 };
 
 Statement: ast::Suite = {
