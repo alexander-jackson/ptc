@@ -64,6 +64,16 @@ impl Generate for Statement {
                     stmt[0].generate(),
                 )
             },
+            Statement::FunctionDecl { name, args, body } => {
+                format!(
+r#"int {}({}) {{
+    {}
+}}"#,
+                    name.generate(),
+                    args[0].generate(),
+                    body[0].generate(),
+                )
+            },
             _ => String::from(""),
         }
     }
