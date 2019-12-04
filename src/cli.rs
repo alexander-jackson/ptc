@@ -37,7 +37,7 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
         dbg!(&ast);
     }
 
-    println!("Program: {}", ast.generate());
+    println!("{}", ast.generate());
 
     Ok(())
 }
