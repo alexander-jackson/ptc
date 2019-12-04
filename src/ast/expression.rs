@@ -35,6 +35,14 @@ impl Generate for Expression {
         match self {
             Expression::Identifier { name } => name.generate(),
             Expression::Literal { value } => value.generate(),
+            Expression::BinaryOperation { left, op, right } => {
+                format!(
+                    "{} {} {}",
+                    left.generate(),
+                    op.generate(),
+                    right.generate(),
+                )
+            },
             _ => String::from(""),
         }
     }

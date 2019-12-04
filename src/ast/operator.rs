@@ -1,3 +1,5 @@
+use ast::Generate;
+
 #[derive(Debug, PartialEq)]
 pub enum Operator {
     LogicalOr,
@@ -18,4 +20,14 @@ pub enum Operator {
     GreaterOrEqual,
     Equal,
     NotEqual,
+}
+
+impl Generate for Operator {
+    fn generate(&self) -> String {
+        match self {
+            Operator::Plus => String::from("+"),
+            Operator::Minus => String::from("-"),
+            _ => String::from(""),
+        }
+    }
 }
