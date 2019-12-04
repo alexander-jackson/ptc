@@ -33,6 +33,10 @@ impl Generate for Operator {
             Operator::Minus => String::from("-"),
             Operator::Multiply => String::from("*"),
             Operator::Divide => String::from("/"),
+            Operator::PlusEquals => String::from("+="),
+            Operator::MinusEquals => String::from("-="),
+            Operator::MultiplyEquals => String::from("*="),
+            Operator::DivideEquals => String::from("/="),
             _ => String::from(""),
         }
     }
