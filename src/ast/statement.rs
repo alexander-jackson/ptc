@@ -43,14 +43,14 @@ impl Generate for Statement {
         match self {
             Statement::Assign { ident, expr } => {
                 format!(
-                    "{} = {}",
+                    "{} = {};",
                     ident.generate(),
                     expr.generate(),
                 )
             },
             Statement::AugmentedAssign { ident, op, expr } => {
                 format!(
-                    "{} {} {}",
+                    "{} {} {};",
                     ident.generate(),
                     op.generate(),
                     expr.generate(),
