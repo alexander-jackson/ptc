@@ -37,7 +37,12 @@ impl Generate for Operator {
             Operator::MinusEquals => String::from("-="),
             Operator::MultiplyEquals => String::from("*="),
             Operator::DivideEquals => String::from("/="),
-            _ => String::from(""),
+            Operator::Less => String::from("<"),
+            Operator::Greater => String::from(">"),
+            Operator::LessOrEqual => String::from("<="),
+            Operator::GreaterOrEqual => String::from(">="),
+            Operator::Equal => String::from("=="),
+            Operator::NotEqual => String::from("!="),
         }
     }
 }
