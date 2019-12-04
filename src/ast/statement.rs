@@ -22,11 +22,11 @@ pub enum Statement {
     Pass,
     IfStatement {
         expr: Expression,
-        stmt: Suite,
+        suite: Suite,
     },
     WhileStatement {
         expr: Expression,
-        stmt: Suite,
+        suite: Suite,
     },
     ReturnStatement {
         expr: Expression,
@@ -58,13 +58,13 @@ impl Generate for Statement {
             },
             Statement::Expression { expr } => expr.generate(),
             Statement::Pass => String::from(""),
-            Statement::IfStatement { expr, stmt } => {
+            Statement::IfStatement { expr, suite } => {
                 format!(
 r#"if ({}) {{
     {}
 }}"#,
                     expr.generate(),
-                    stmt[0].generate(),
+                    suite.generate(),
                 )
             },
             Statement::FunctionDecl { name, args, body } => {

@@ -16,6 +16,11 @@ Line: ast::Suite = {
     "\n" => vec![],
 };
 
+Suite: ast::Suite = {
+    "\n" "indent" <s: Statement+> "unindent" =>
+        s.into_iter().flatten().collect(),
+};
+
 Statement: ast::Suite = {
     StatementList,
     <comp: CompoundStatement> => vec![comp],
@@ -75,18 +80,18 @@ ReturnStatement: ast::statement::Statement = {
 };
 
 IfStatement: ast::statement::Statement = {
-    "if" <expr: Expression> ":" "\n" "indent" <stmt: Statement> "unindent" =>
+    "if" <expr: Expression> ":" "\n" "indent" <suite: Suite> "unindent" =>
         ast::statement::Statement::IfStatement {
             expr: expr,
-            stmt: stmt,
+            suite: suite,
         },
 };
 
 WhileStatement: ast::statement::Statement = {
-    "while" <expr: Expression> ":" "\n" "indent" <stmt: Statement> "unindent" =>
+    "while" <expr: Expression> ":" "\n" "indent" <suite: Suite> "unindent" =>
         ast::statement::Statement::WhileStatement {
             expr: expr,
-            stmt: stmt,
+            suite: suite,
         },
 };
 
@@ -102,11 +107,11 @@ ArgumentList: Vec<ast::identifier::Identifier> = {
 };
 
 FunctionDeclStatement: ast::statement::Statement = {
-    "def" <ident: Identifier> "(" <args: ArgumentList> ")" ":" "\n" "indent" <stmt: Statement> "unindent" =>
+    "def" <ident: Identifier> "(" <args: ArgumentList> ")" ":" <body: Suite> =>
         ast::statement::Statement::FunctionDecl {
             name: ident,
             args: args,
-            body: stmt,
+            body: body,
         },
 };
 

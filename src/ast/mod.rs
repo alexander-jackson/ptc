@@ -12,3 +12,11 @@ pub type Suite = Vec<Statement>;
 pub trait Generate {
     fn generate(&self) -> String;
 }
+
+impl Generate for Suite {
+    fn generate(&self) -> String {
+        self.iter()
+            .map(|s| s.generate())
+            .collect()
+    }
+}
