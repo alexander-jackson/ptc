@@ -8,8 +8,10 @@ use crate::lexer;
 use crate::ast::Generate;
 
 pub struct Args {
-    /// File input using -f <filename> of --filename <filename>
+    /// File input using -f <filename> or --filename <filename>
     filename: Option<String>,
+    /// Whether the AST should be displayed, specified by --ast
+    abstract_tree: bool,
 }
 
 pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
@@ -17,6 +19,7 @@ pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
 
     let args = Args {
         filename: args.opt_value_from_str(["-f", "--filename"])?,
+        abstract_tree: args.contains("--ast"),
     };
 
     Ok(args)
@@ -29,7 +32,10 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
     let program_code: String = fs::read_to_string(&filename).expect("Failed to read the file.");
 
     let ast = parse(&program_code).expect("Failed to parse the given program");
-    dbg!(&ast);
+
+    if args.abstract_tree {
+        dbg!(&ast);
+    }
 
     println!("Program: {}", ast.generate());
 
@@ -42,4 +48,3 @@ fn parse(input: &str) -> Result<ast::program::Program, String> {
         Err(e) => Err(format!("{:?}", e)),
     }
 }
-
