@@ -9,51 +9,16 @@ fn get_lexer_tokens(input: &str) -> Vec<lexer::Tok> {
 }
 
 #[test]
-fn lex_keywords_test() {
+fn lex_all_tokens_test() {
     let input: &str = r#"
-pass or and not if while def return
+
 "#;
 
     use lexer::Tok::*;
 
     let tokens = get_lexer_tokens(input);
     let expected = vec![
-        Newline, Pass, LogicalOr, LogicalAnd, LogicalNot, If, While, Def, Return, Newline,
-    ];
-
-    assert_eq!(tokens, expected);
-}
-
-#[test]
-fn lex_indentation_test() {
-    let input: &str = r#"
-if 1:
-    name
-"#;
-
-    use lexer::Tok::*;
-
-    let tokens = get_lexer_tokens(input);
-    let expected = vec![
-        Newline, If, Integer { value: 1 }, Colon, Newline, Indent, Identifier { name: String::from("name") }, Newline, Unindent];
-
-    assert_eq!(tokens, expected);
-}
-
-#[test]
-fn lex_compound_suite_test() {
-    let input: &str = r#"
-while 1:
-    pass
-    if 1:
-        pass
-"#;
-
-    use lexer::Tok::*;
-
-    let tokens = get_lexer_tokens(input);
-    let expected = vec![
-        Newline, While, Integer { value: 1 }, Colon, Newline, Indent, Pass, Newline, Indent, If, Integer { value: 1 }, Colon, Newline, Indent, Indent, Pass, Newline, Unindent, Unindent
+        Newline, Newline,
     ];
 
     assert_eq!(tokens, expected);

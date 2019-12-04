@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 pub type Spanned<Tok, Loc, Error> = Result<(Loc, Tok, Loc), Error>;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -48,11 +50,8 @@ pub enum LexicalError {
 pub struct Lexer<T: Iterator<Item = (usize, char)>> {
     chars: T,
     lookahead: Option<(usize, char)>,
+    queue: VecDeque<Tok>,
     index: usize,
-    prev_spaces: usize,
-    curr_spaces: usize,
-    indentation_level: usize,
-    start_of_line: bool,
     line_number: usize,
 }
 
@@ -64,11 +63,8 @@ where
         let mut lexer = Lexer {
             chars: input,
             lookahead: None,
+            queue: VecDeque::new(),
             index: 0,
-            prev_spaces: 0,
-            curr_spaces: 0,
-            indentation_level: 0,
-            start_of_line: true,
             line_number: 1,
         };
 
@@ -95,182 +91,19 @@ where
         value
     }
 
-    fn read_identifier(&mut self) -> String {
-        self.read_while(|c| c.is_alphabetic() || c == '_')
-    }
-
-    fn read_integer(&mut self) -> String {
-        self.read_while(|c| c.is_digit(10))
-    }
-
     fn update_lookahead(&mut self) {
         self.lookahead = self.chars.next();
         self.index += 1;
     }
 
-    fn check_operator(&mut self) -> Option<Tok> {
-        if let Some((_i, c)) = self.lookahead {
-            return match c {
-                '(' => Some(Tok::LPar),
-                ')' => Some(Tok::RPar),
-                ':' => Some(Tok::Colon),
-                ';' => Some(Tok::Semicolon),
-                ',' => Some(Tok::Comma),
-                _ => None,
-            };
+    fn lex_source(&mut self) {
+        let (_i, c) = self.lookahead.unwrap();
+
+        if c == '\n' {
+            self.queue.push_back(Tok::Newline);
         }
 
-        None
-    }
-
-    fn check_multiple_character_operators(&mut self) -> Option<Tok> {
-        if let Some((_i, c)) = self.lookahead {
-            if c == '<' {
-                self.update_lookahead();
-
-                if let Some((_i, c)) = self.lookahead {
-                    return match c {
-                        '=' => {
-                            self.update_lookahead();
-                            Some(Tok::LessOrEqual)
-                        }
-                        _ => Some(Tok::Less),
-                    };
-                }
-            }
-
-            if c == '>' {
-                self.update_lookahead();
-
-                if let Some((_i, c)) = self.lookahead {
-                    return match c {
-                        '=' => {
-                            self.update_lookahead();
-                            Some(Tok::GreaterOrEqual)
-                        }
-                        _ => Some(Tok::Greater),
-                    };
-                }
-            }
-
-            if c == '!' {
-                self.update_lookahead();
-
-                if let Some((_i, c)) = self.lookahead {
-                    return match c {
-                        '=' => {
-                            self.update_lookahead();
-                            Some(Tok::NotEqual)
-                        }
-                        _ => None,
-                    };
-                }
-            }
-
-            if c == '=' {
-                self.update_lookahead();
-
-                if let Some((_i, c)) = self.lookahead {
-                    return match c {
-                        '=' => {
-                            self.update_lookahead();
-                            Some(Tok::Equal)
-                        }
-                        _ => Some(Tok::Assign),
-                    };
-                }
-            }
-
-            if c == '+' {
-                self.update_lookahead();
-
-                if let Some((_i, c)) = self.lookahead {
-                    return match c {
-                        '=' => {
-                            self.update_lookahead();
-                            Some(Tok::PlusEquals)
-                        }
-                        _ => Some(Tok::Plus),
-                    };
-                }
-            }
-
-            if c == '-' {
-                self.update_lookahead();
-
-                if let Some((_i, c)) = self.lookahead {
-                    return match c {
-                        '=' => {
-                            self.update_lookahead();
-                            Some(Tok::MinusEquals)
-                        }
-                        _ => Some(Tok::Minus),
-                    };
-                }
-            }
-
-            if c == '*' {
-                self.update_lookahead();
-
-                if let Some((_i, c)) = self.lookahead {
-                    return match c {
-                        '=' => {
-                            self.update_lookahead();
-                            Some(Tok::MultiplyEquals)
-                        }
-                        _ => Some(Tok::Multiply),
-                    };
-                }
-            }
-
-            if c == '/' {
-                self.update_lookahead();
-
-                if let Some((_i, c)) = self.lookahead {
-                    return match c {
-                        '=' => {
-                            self.update_lookahead();
-                            Some(Tok::DivideEquals)
-                        }
-                        _ => Some(Tok::Divide),
-                    };
-                }
-            }
-        }
-
-        None
-    }
-
-    fn check_for_indentation(&mut self) -> Option<Tok> {
-        if let Some((_i, c)) = self.lookahead {
-            // Check for whitespace
-            if c == ' ' {
-                self.curr_spaces = self.read_while(|c| c == ' ').len();
-                self.start_of_line = false;
-
-                // If prev < curr, we indented
-                if self.prev_spaces < self.curr_spaces {
-                    self.indentation_level += 1;
-                    return Some(Tok::Indent);
-                }
-
-                // If prev > curr, we unindented
-                if self.prev_spaces > self.curr_spaces {
-                    self.indentation_level -= 1;
-                    return Some(Tok::Unindent);
-                }
-            } else {
-                // No whitespace, so check if this is an unindent
-                self.start_of_line = false;
-
-                if self.prev_spaces > self.curr_spaces {
-                    self.indentation_level -= 1;
-                    return Some(Tok::Unindent);
-                }
-            }
-        }
-
-        None
+        self.update_lookahead();
     }
 
     fn emit(&self, token: Tok) -> Option<Spanned<Tok, usize, LexicalError>> {
@@ -289,65 +122,20 @@ where
     type Item = Spanned<Tok, usize, LexicalError>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some((_i, c)) = self.lookahead {
-            if self.start_of_line {
-                if let Some(tok) = self.check_for_indentation() {
-                    return self.emit(tok);
-                }
-            }
-
-            if c.is_alphabetic() {
-                let ident = self.read_identifier();
-
-                let token: Tok = match ident.as_ref() {
-                    "pass" => Tok::Pass,
-                    "or" => Tok::LogicalOr,
-                    "and" => Tok::LogicalAnd,
-                    "not" => Tok::LogicalNot,
-                    "if" => Tok::If,
-                    "while" => Tok::While,
-                    "def" => Tok::Def,
-                    "return" => Tok::Return,
-                    _ => Tok::Identifier { name: ident },
-                };
-
-                return self.emit(token);
-            } else if c == '\n' {
-                self.prev_spaces = self.curr_spaces;
-                self.curr_spaces = 0;
-                self.start_of_line = true;
-                self.line_number += 1;
-                self.update_lookahead();
-                return self.emit(Tok::Newline);
-            } else if c.is_digit(10) {
-                let value: u32 = self.read_integer().parse().unwrap();
-                return self.emit(Tok::Integer { value: value });
-            } else {
-                // Check for an operator
-                let op = self.check_operator();
-
-                if op.is_some() {
-                    self.update_lookahead();
-                    return self.emit(op.unwrap());
-                }
-
-                let op = self.check_multiple_character_operators();
-
-                if op.is_some() {
-                    return self.emit(op.unwrap());
-                }
-
-                self.update_lookahead();
-                continue;
-            }
+        // If lookahead is None, we are at EOF
+        if self.lookahead.is_none() {
+            return None;
         }
 
-        // Check whether we are currently indented
-        if self.indentation_level > 0 {
-            self.indentation_level -= 1;
-            return self.emit(Tok::Unindent);
+        // If there are tokens in the queue, return the first one
+        if !self.queue.is_empty() {
+            let front: Tok = self.queue.pop_front().unwrap();
+            return self.emit(front);
         }
 
-        return None;
+        // Otherwise, do some lexing and return the next token
+        self.lex_source();
+        let front: Tok = self.queue.pop_front().unwrap();
+        return self.emit(front);
     }
 }
