@@ -58,6 +58,12 @@ impl Generate for Statement {
             },
             Statement::Expression { expr } => expr.generate(),
             Statement::Pass => String::from(""),
+            Statement::IfStatement { expr, stmt } => {
+                format!("if {}\n\t{}",
+                    expr.generate(),
+                    stmt[0].generate(),
+                )
+            },
             _ => String::from(""),
         }
     }
