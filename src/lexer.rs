@@ -53,6 +53,7 @@ pub struct Lexer<T: Iterator<Item = (usize, char)>> {
     curr_spaces: usize,
     indentation_level: usize,
     start_of_line: bool,
+    line_number: usize,
 }
 
 impl<T> Lexer<T>
@@ -68,6 +69,7 @@ where
             curr_spaces: 0,
             indentation_level: 0,
             start_of_line: true,
+            line_number: 1,
         };
 
         lexer.update_lookahead();
@@ -270,6 +272,14 @@ where
 
         None
     }
+
+    fn emit(&self, token: Tok) -> Option<Spanned<Tok, usize, LexicalError>> {
+        Some(Ok((
+            self.line_number,
+            token,
+            self.line_number,
+        )))
+    }
 }
 
 impl<T> Iterator for Lexer<T>
@@ -282,7 +292,7 @@ where
         while let Some((_i, c)) = self.lookahead {
             if self.start_of_line {
                 if let Some(tok) = self.check_for_indentation() {
-                    return Some(Ok((0, tok, 0)));
+                    return self.emit(tok);
                 }
             }
 
@@ -301,29 +311,30 @@ where
                     _ => Tok::Identifier { name: ident },
                 };
 
-                return Some(Ok((0, token, 0)));
+                return self.emit(token);
             } else if c == '\n' {
                 self.prev_spaces = self.curr_spaces;
                 self.curr_spaces = 0;
                 self.start_of_line = true;
+                self.line_number += 1;
                 self.update_lookahead();
-                return Some(Ok((0, Tok::Newline, 0)));
+                return self.emit(Tok::Newline);
             } else if c.is_digit(10) {
                 let value: u32 = self.read_integer().parse().unwrap();
-                return Some(Ok((0, Tok::Integer { value: value }, 0)));
+                return self.emit(Tok::Integer { value: value });
             } else {
                 // Check for an operator
                 let op = self.check_operator();
 
                 if op.is_some() {
                     self.update_lookahead();
-                    return Some(Ok((0, op.unwrap(), 0)));
+                    return self.emit(op.unwrap());
                 }
 
                 let op = self.check_multiple_character_operators();
 
                 if op.is_some() {
-                    return Some(Ok((0, op.unwrap(), 0)));
+                    return self.emit(op.unwrap());
                 }
 
                 self.update_lookahead();
@@ -334,7 +345,7 @@ where
         // Check whether we are currently indented
         if self.indentation_level > 0 {
             self.indentation_level -= 1;
-            return Some(Ok((0, Tok::Unindent, 0)));
+            return self.emit(Tok::Unindent);
         }
 
         return None;
