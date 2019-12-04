@@ -80,7 +80,7 @@ ReturnStatement: ast::statement::Statement = {
 };
 
 IfStatement: ast::statement::Statement = {
-    "if" <expr: Expression> ":" "\n" "indent" <suite: Suite> "unindent" =>
+    "if" <expr: Expression> ":" <suite: Suite> =>
         ast::statement::Statement::IfStatement {
             expr: expr,
             suite: suite,
@@ -88,7 +88,7 @@ IfStatement: ast::statement::Statement = {
 };
 
 WhileStatement: ast::statement::Statement = {
-    "while" <expr: Expression> ":" "\n" "indent" <suite: Suite> "unindent" =>
+    "while" <expr: Expression> ":" <suite: Suite> =>
         ast::statement::Statement::WhileStatement {
             expr: expr,
             suite: suite,
