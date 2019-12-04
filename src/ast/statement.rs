@@ -65,12 +65,17 @@ impl Generate for Statement {
                 )
             },
             Statement::FunctionDecl { name, args, body } => {
+                let arg_str: String = args.iter()
+                    .map(|a| format!("int {}", a.generate()))
+                    .collect::<Vec<String>>()
+                    .join(", ");
+
                 format!(
 r#"int {}({}) {{
     {}
 }}"#,
                     name.generate(),
-                    args[0].generate(),
+                    arg_str,
                     body[0].generate(),
                 )
             },
