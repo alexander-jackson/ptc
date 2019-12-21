@@ -59,6 +59,13 @@ impl Generate for Statement {
                 expr.generate(),
                 suite.generate(),
             ),
+            Statement::WhileStatement { expr, suite } => format!(
+                r#"while ({}) {{
+    {}
+}}"#,
+                expr.generate(),
+                suite.generate(),
+            ),
             Statement::FunctionDecl { name, args, body } => {
                 let arg_str: String = args
                     .iter()
