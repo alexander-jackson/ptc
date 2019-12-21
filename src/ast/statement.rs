@@ -66,6 +66,7 @@ impl Generate for Statement {
                 expr.generate(),
                 suite.generate(),
             ),
+            Statement::ReturnStatement { expr } => format!("return {}", expr.generate()),
             Statement::FunctionDecl { name, args, body } => {
                 let arg_str: String = args
                     .iter()
@@ -82,7 +83,6 @@ impl Generate for Statement {
                     body[0].generate(),
                 )
             }
-            _ => String::from(""),
         }
     }
 }
