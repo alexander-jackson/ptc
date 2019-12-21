@@ -106,19 +106,17 @@ where
     fn read_identifier_or_keyword(&mut self) {
         let ident: String = self.read_while(|c| c.is_alphabetic() || c == '_');
 
-        self.queue.push_back(
-            match ident.as_ref() {
-                "pass" => Tok::Pass,
-                "if" => Tok::If,
-                "while" => Tok::While,
-                "def" => Tok::Def,
-                "return" => Tok::Return,
-                "or" => Tok::LogicalOr,
-                "and" => Tok::LogicalAnd,
-                "not" => Tok::LogicalNot,
-                _ => Tok::Identifier { name: ident },
-            }
-        );
+        self.queue.push_back(match ident.as_ref() {
+            "pass" => Tok::Pass,
+            "if" => Tok::If,
+            "while" => Tok::While,
+            "def" => Tok::Def,
+            "return" => Tok::Return,
+            "or" => Tok::LogicalOr,
+            "and" => Tok::LogicalAnd,
+            "not" => Tok::LogicalNot,
+            _ => Tok::Identifier { name: ident },
+        });
     }
 
     fn read_number(&mut self) {
@@ -268,11 +266,7 @@ where
     }
 
     fn emit(&self, token: Tok) -> Option<Spanned<Tok, usize, LexicalError>> {
-        Some(Ok((
-            self.line_number,
-            token,
-            self.line_number,
-        )))
+        Some(Ok((self.line_number, token, self.line_number)))
     }
 }
 

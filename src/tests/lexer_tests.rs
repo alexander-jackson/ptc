@@ -17,9 +17,7 @@ fn lex_all_tokens_test() {
     use lexer::Tok::*;
 
     let tokens = get_lexer_tokens(input);
-    let expected = vec![
-        Newline, Newline,
-    ];
+    let expected = vec![Newline, Newline];
 
     assert_eq!(tokens, expected);
 }

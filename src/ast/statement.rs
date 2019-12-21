@@ -1,9 +1,9 @@
-use ast::Suite;
 use ast::Generate;
+use ast::Suite;
 
 use ast::expression::Expression;
-use ast::operator::Operator;
 use ast::identifier::Identifier;
+use ast::operator::Operator;
 
 #[derive(Debug, PartialEq)]
 pub enum Statement {
@@ -42,46 +42,39 @@ impl Generate for Statement {
     fn generate(&self) -> String {
         match self {
             Statement::Assign { ident, expr } => {
-                format!(
-                    "{} = {};",
-                    ident.generate(),
-                    expr.generate(),
-                )
-            },
-            Statement::AugmentedAssign { ident, op, expr } => {
-                format!(
-                    "{} {} {};",
-                    ident.generate(),
-                    op.generate(),
-                    expr.generate(),
-                )
-            },
+                format!("{} = {};", ident.generate(), expr.generate(),)
+            }
+            Statement::AugmentedAssign { ident, op, expr } => format!(
+                "{} {} {};",
+                ident.generate(),
+                op.generate(),
+                expr.generate(),
+            ),
             Statement::Expression { expr } => expr.generate(),
             Statement::Pass => String::from(""),
-            Statement::IfStatement { expr, suite } => {
-                format!(
-r#"if ({}) {{
+            Statement::IfStatement { expr, suite } => format!(
+                r#"if ({}) {{
     {}
 }}"#,
-                    expr.generate(),
-                    suite.generate(),
-                )
-            },
+                expr.generate(),
+                suite.generate(),
+            ),
             Statement::FunctionDecl { name, args, body } => {
-                let arg_str: String = args.iter()
+                let arg_str: String = args
+                    .iter()
                     .map(|a| format!("int {}", a.generate()))
                     .collect::<Vec<String>>()
                     .join(", ");
 
                 format!(
-r#"int {}({}) {{
+                    r#"int {}({}) {{
     {}
 }}"#,
                     name.generate(),
                     arg_str,
                     body[0].generate(),
                 )
-            },
+            }
             _ => String::from(""),
         }
     }

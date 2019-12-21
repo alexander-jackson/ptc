@@ -1,5 +1,5 @@
-use ast::Suite;
 use ast::Generate;
+use ast::Suite;
 
 #[derive(Debug, PartialEq)]
 pub struct Program {

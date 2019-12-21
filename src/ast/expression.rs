@@ -1,8 +1,8 @@
 use ast::Generate;
 
-use ast::operator::Operator;
 use ast::identifier::Identifier;
 use ast::literal::Literal;
+use ast::operator::Operator;
 
 #[derive(Debug, PartialEq)]
 pub enum Expression {
@@ -36,13 +36,8 @@ impl Generate for Expression {
             Expression::Identifier { name } => name.generate(),
             Expression::Literal { value } => value.generate(),
             Expression::BinaryOperation { left, op, right } => {
-                format!(
-                    "{} {} {}",
-                    left.generate(),
-                    op.generate(),
-                    right.generate(),
-                )
-            },
+                format!("{} {} {}", left.generate(), op.generate(), right.generate(),)
+            }
             _ => String::from(""),
         }
     }

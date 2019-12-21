@@ -1,9 +1,9 @@
-pub mod program;
-pub mod statement;
 pub mod expression;
-pub mod operator;
 pub mod identifier;
 pub mod literal;
+pub mod operator;
+pub mod program;
+pub mod statement;
 
 use ast::statement::Statement;
 
@@ -15,8 +15,6 @@ pub trait Generate {
 
 impl Generate for Suite {
     fn generate(&self) -> String {
-        self.iter()
-            .map(|s| s.generate())
-            .collect()
+        self.iter().map(|s| s.generate()).collect()
     }
 }

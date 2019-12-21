@@ -1,9 +1,9 @@
-use std::fs;
 use std::error::Error;
+use std::fs;
 
 use crate::ast;
-use crate::parser;
 use crate::lexer;
+use crate::parser;
 
 use crate::ast::Generate;
 
@@ -29,7 +29,8 @@ pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
 }
 
 pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
-    let filename = args.filename
+    let filename = args
+        .filename
         .expect("Please supply a filename with [-f/--filename]");
 
     let program_code: String = fs::read_to_string(&filename).expect("Failed to read the file.");
