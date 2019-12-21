@@ -80,7 +80,7 @@ impl Generate for Statement {
 }}"#,
                     name.generate(),
                     arg_str,
-                    body[0].generate(),
+                    body.generate(),
                 )
             }
         }
