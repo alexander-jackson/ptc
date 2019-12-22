@@ -39,13 +39,7 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
     let program_code: String = fs::read_to_string(&filename).expect("Failed to read the file.");
 
     if args.tokens {
-        let mut lexer = lexer::Lexer::new(program_code.char_indices());
-
-        while let Some(t) = lexer.next() {
-            dbg!(t.unwrap().1);
-        }
-
-        return Ok(());
+        return display_tokens(&program_code);
     }
 
     let ast = parse(&program_code).expect("Failed to parse the given program");
@@ -83,4 +77,15 @@ fn get_output_filename(filename: &str) -> Result<String, String> {
     }
 
     Ok(output_filename)
+}
+
+fn display_tokens(program_code: &str) -> Result<(), Box<dyn Error>> {
+    let mut lexer = lexer::Lexer::new(program_code.char_indices());
+
+    while let Some(t) = lexer.next() {
+        let curr = t.unwrap().1;
+        println!("Token: {:#?}", curr);
+    }
+
+    Ok(())
 }
