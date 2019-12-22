@@ -52,16 +52,12 @@ impl Generate for Statement {
             ),
             Statement::Expression { expr } => expr.generate(),
             Statement::Pass => String::from(""),
-            Statement::IfStatement { expr, suite } => format!(
-                "if ({}) {{ {} }}",
-                expr.generate(),
-                suite.generate(),
-            ),
-            Statement::WhileStatement { expr, suite } => format!(
-                "while ({}) {{ {} }}",
-                expr.generate(),
-                suite.generate(),
-            ),
+            Statement::IfStatement { expr, suite } => {
+                format!("if ({}) {{ {} }}", expr.generate(), suite.generate(),)
+            }
+            Statement::WhileStatement { expr, suite } => {
+                format!("while ({}) {{ {} }}", expr.generate(), suite.generate(),)
+            }
             Statement::ReturnStatement { expr } => format!("return {};", expr.generate()),
             Statement::FunctionDecl { name, args, body } => {
                 let arg_str: String = args
