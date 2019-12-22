@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fs;
+use std::path::Path;
 
 use crate::ast;
 use crate::lexer;
@@ -33,6 +34,8 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
         .filename
         .expect("Please supply a filename with [-f/--filename]");
 
+    let output_filename = get_output_filename(&filename)?;
+
     let program_code: String = fs::read_to_string(&filename).expect("Failed to read the file.");
 
     if args.tokens {
@@ -51,7 +54,11 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
         dbg!(&ast);
     }
 
-    println!("{}", ast.generate());
+    let generated_code = ast.generate();
+    // This is safe as we have already checked whether the file exists
+    fs::write(&output_filename, &generated_code).unwrap();
+
+    println!("{}", &generated_code);
 
     Ok(())
 }
@@ -61,4 +68,19 @@ fn parse(input: &str) -> Result<ast::program::Program, String> {
         Ok(s) => Ok(s),
         Err(e) => Err(format!("{:?}", e)),
     }
+}
+
+fn get_output_filename(filename: &str) -> Result<String, String> {
+    let path_struct = Path::new(&filename);
+    let stem = path_struct.file_stem().unwrap();
+    let basename = stem.to_str().unwrap();
+
+    let output_filename = format!("{}.c", basename);
+
+    if Path::new(&output_filename).exists() {
+        // Path already exists so we cannot use this one
+        return Err(format!("File {} already exists.", output_filename));
+    }
+
+    Ok(output_filename)
 }
