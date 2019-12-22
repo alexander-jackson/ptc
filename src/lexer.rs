@@ -208,6 +208,12 @@ where
         let indents: usize = self.read_while(|c| c == ' ').len();
         let current: usize = *self.indentation.length.last().unwrap();
 
+        if self.lookahead.is_some() && self.lookahead.unwrap().1 == '\n' {
+            self.read_newline();
+            self.read_indentation();
+            return;
+        }
+
         if indents != current {
             // Indentation level has changed
             if current < indents {
@@ -241,17 +247,13 @@ where
             self.start_of_line = false;
         }
 
-        let mut c: char = self.lookahead.unwrap().1;
+        self.read_while(|c| c == ' ');
 
-        while c == ' ' {
-            self.update_lookahead();
-
-            if self.lookahead.is_none() {
-                return;
-            }
-
-            c = self.lookahead.unwrap().1;
+        if self.lookahead.is_none() {
+            return;
         }
+
+        let c: char = self.lookahead.unwrap().1;
 
         // If c is a character, read an identifier
         if c.is_alphabetic() || c == '_' {
