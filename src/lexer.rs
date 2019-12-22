@@ -319,6 +319,6 @@ where
         self.lex_source();
 
         let front: Tok = self.queue.pop_front().unwrap();
-        return self.emit(front);
+        self.emit(front)
     }
 }
