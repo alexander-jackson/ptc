@@ -85,6 +85,7 @@ where
         lexer
     }
 
+    /// Generic read function that reads from the source while a predicate `pred` holds.
     fn read_while<F>(&mut self, mut pred: F) -> String
     where
         F: FnMut(char) -> bool,
@@ -103,6 +104,8 @@ where
         value
     }
 
+    /// Reads a string of characters from the source.
+    /// Determines whether it is a keyword and adds to the queue accordingly.
     fn read_identifier_or_keyword(&mut self) {
         let ident: String = self.read_while(|c| c.is_alphabetic() || c == '_');
 
@@ -119,11 +122,14 @@ where
         });
     }
 
+    /// Reads a number specified in Base10 from the source.
     fn read_number(&mut self) {
         let number: u32 = self.read_while(|c| c.is_digit(10)).parse().unwrap();
         self.queue.push_back(Tok::Integer { value: number });
     }
 
+    /// Reads 'punctuation' from the source.
+    /// Starts with single characters and moves onto multichars.
     fn read_punctuation(&mut self) {
         // We can immediately match the single character operators
         let c: char = self.lookahead.unwrap().1;
@@ -147,6 +153,9 @@ where
         self.read_multichar();
     }
 
+    /// Attempts to read a multichar token from the source.
+    /// Sets up the multichars and calls `match_multichar_op` for each.
+    /// Deals with the single case of `!=` where `!` is not a valid token.
     fn read_multichar(&mut self) {
         let multichars: Vec<(char, char, Tok, Tok)> = vec![
             ('=', '=', Tok::Assign, Tok::Equal),
@@ -176,6 +185,10 @@ where
         }
     }
 
+    /// Generically matches any token that could be either 1 or 2 characters.
+    ///
+    /// For example, this can be used to match + and += by specifying multichar = (+, =, Plus,
+    /// PlusEqual). Allows for much easier matching.
     fn match_multichar_op(&mut self, multichar: (char, char, Tok, Tok)) {
         // Unpack the arguments
         let (c1, c2, t1, t2): (char, char, Tok, Tok) = multichar;
@@ -196,6 +209,7 @@ where
         }
     }
 
+    /// Reads a newline character from the source and updates internal variables.
     fn read_newline(&mut self) {
         self.queue.push_back(Tok::Newline);
         self.update_lookahead();
@@ -204,6 +218,8 @@ where
         self.line_number += 1;
     }
 
+    /// Reads the indentation for a new line and deals with previous indentation levels.
+    /// Updates the queue with new indents or unindents if needed.
     fn read_indentation(&mut self) {
         let indents: usize = self.read_while(|c| c == ' ').len();
         let current: usize = *self.indentation.length.last().unwrap();
@@ -236,6 +252,7 @@ where
         }
     }
 
+    /// Updates the lexer lookahead.
     fn update_lookahead(&mut self) {
         self.lookahead = self.chars.next();
         self.index += 1;
@@ -267,6 +284,7 @@ where
         }
     }
 
+    /// Formats a token for LALRPOP without the need to write this ugly syntax everywhere.
     fn emit(&self, token: Tok) -> Option<Spanned<Tok, usize, LexicalError>> {
         Some(Ok((self.line_number, token, self.line_number)))
     }
