@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fs;
 use std::path::Path;
+use std::process::Command;
 
 use crate::ast;
 use crate::lexer;
@@ -52,6 +53,16 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
     // This is safe as we have already checked whether the file exists
     fs::write(&output_filename, &generated_code).unwrap();
 
+    if check_clang_format_exists() {
+        let command_status = Command::new("clang-format").arg("-i").arg(&output_filename).spawn();
+        match command_status {
+            Ok(_) => (),
+            Err(_) => eprintln!("Failed to execute clang-format on the output file."),
+        };
+    } else {
+        println!("clang-format does not exist");
+    }
+
     println!("{}", &generated_code);
 
     Ok(())
@@ -88,4 +99,8 @@ fn display_tokens(program_code: &str) -> Result<(), Box<dyn Error>> {
     }
 
     Ok(())
+}
+
+fn check_clang_format_exists() -> bool {
+    Command::new("clang-format").arg("--version").spawn().is_ok()
 }
