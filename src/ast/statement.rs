@@ -53,16 +53,12 @@ impl Generate for Statement {
             Statement::Expression { expr } => expr.generate(),
             Statement::Pass => String::from(""),
             Statement::IfStatement { expr, suite } => format!(
-                r#"if ({}) {{
-    {}
-}}"#,
+                "if ({}) {{ {} }}",
                 expr.generate(),
                 suite.generate(),
             ),
             Statement::WhileStatement { expr, suite } => format!(
-                r#"while ({}) {{
-    {}
-}}"#,
+                "while ({}) {{ {} }}",
                 expr.generate(),
                 suite.generate(),
             ),
@@ -75,9 +71,7 @@ impl Generate for Statement {
                     .join(", ");
 
                 format!(
-                    r#"int {}({}) {{
-    {}
-}}"#,
+                    "int {}({}) {{ {} }}",
                     name.generate(),
                     arg_str,
                     body.generate(),

@@ -15,6 +15,6 @@ pub trait Generate {
 
 impl Generate for Suite {
     fn generate(&self) -> String {
-        self.iter().map(|s| s.generate()).collect()
+        self.iter().map(|s| s.generate()).collect::<Vec<String>>().join(" ")
     }
 }
