@@ -36,19 +36,14 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
     let code: String = fs::read_to_string(&filename).expect("Failed to read the file.");
 
     if args.tokens {
-        return display_tokens(&code);
+        display_tokens(&code)?;
     }
 
     let ast = get_abstract_syntax_tree(&code, args.abstract_tree);
     let generated = ast.generate();
     let output = get_output_filename(&filename);
 
-    if output.is_some() {
-        write_and_format_output_file(&output.unwrap(), &generated);
-    } else {
-        eprintln!("The output file already exists, so the code will be displayed to the screen: ");
-        println!("{}", &generated);
-    }
+    write_generated_output(&output, &generated);
 
     Ok(())
 }
@@ -87,6 +82,15 @@ fn display_tokens(program_code: &str) -> Result<(), Box<dyn Error>> {
 
 fn check_clang_format_exists() -> bool {
     Command::new("clang-format").arg("--version").spawn().is_ok()
+}
+
+fn write_generated_output(output: &Option<String>, generated: &str) {
+    if output.is_some() {
+        write_and_format_output_file(output.as_ref().unwrap(), &generated);
+    } else {
+        eprintln!("The output file already exists, so the code will be displayed to the screen: ");
+        println!("{}", &generated);
+    }
 }
 
 fn write_and_format_output_file(filename: &str, code: &str) {
