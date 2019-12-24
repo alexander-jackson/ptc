@@ -40,7 +40,7 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
     let generated = ast.generate();
     let output = get_output_filename(&filename);
 
-    write_generated_output(&output, &generated);
+    write_generated_output(&output, &generated)?;
 
     Ok(())
 }
@@ -81,27 +81,27 @@ fn check_clang_format_exists() -> bool {
     Command::new("clang-format").arg("--version").spawn().is_ok()
 }
 
-fn write_generated_output(output: &Option<String>, generated: &str) {
+fn write_generated_output(output: &Option<String>, generated: &str) -> Result<(), Box<dyn Error>> {
     if output.is_some() {
-        write_and_format_output_file(output.as_ref().unwrap(), &generated);
+        write_and_format_output_file(output.as_ref().unwrap(), &generated)?;
     } else {
         eprintln!("The output file already exists, so the code will be displayed to the screen: ");
         println!("{}", &generated);
     }
+
+    Ok(())
 }
 
-fn write_and_format_output_file(filename: &str, code: &str) {
-    fs::write(&filename, &code).unwrap();
+fn write_and_format_output_file(filename: &str, code: &str) -> Result<(), Box<dyn Error>> {
+    fs::write(&filename, &code)?;
 
     if check_clang_format_exists() {
-        let command_status = Command::new("clang-format").arg("-i").arg(&filename).spawn();
-        match command_status {
-            Ok(_) => (),
-            Err(_) => eprintln!("Failed to execute clang-format on the output file."),
-        };
+        Command::new("clang-format").arg("-i").arg(&filename).spawn()?;
     } else {
         println!("clang-format does not exist");
     }
+
+    Ok(())
 }
 
 fn get_abstract_syntax_tree(code: &str, display: bool) -> ast::program::Program {
