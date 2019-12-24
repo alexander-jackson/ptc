@@ -18,16 +18,14 @@ pub struct Args {
     tokens: bool,
 }
 
-pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
+pub fn get_arguments() -> Args {
     let mut args = pico_args::Arguments::from_env();
 
-    let args = Args {
+    Args {
         filename: args.value_from_str(["-f", "--filename"]),
         abstract_tree: args.contains("--ast"),
         tokens: args.contains("--tokens"),
-    };
-
-    Ok(args)
+    }
 }
 
 pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
