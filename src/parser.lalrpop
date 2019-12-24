@@ -81,10 +81,11 @@ ReturnStatement: ast::statement::Statement = {
 };
 
 IfStatement: ast::statement::Statement = {
-    "if" <expr: Expression> ":" <suite: Suite> =>
+    "if" <expr: Expression> ":" <suite: Suite> <optional: ("else" ":" Suite)?> =>
         ast::statement::Statement::IfStatement {
             expr: expr,
             suite: suite,
+            optional: optional.map(|o| o.2),
         },
 };
 
@@ -286,6 +287,7 @@ extern {
         "identifier" => lexer::Tok::Identifier { name: <String> },
         "pass" => lexer::Tok::Pass,
         "if" => lexer::Tok::If,
+        "else" => lexer::Tok::Else,
         "while" => lexer::Tok::While,
         "def" => lexer::Tok::Def,
         "return" => lexer::Tok::Return,

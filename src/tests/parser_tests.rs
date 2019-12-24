@@ -154,6 +154,20 @@ if 1:
 }
 
 #[test]
+fn parse_if_else_statement_test() {
+    let input: &str = r#"
+if 1:
+    pass
+else:
+    pass
+"#;
+
+    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
+
+    assert!(ast.is_ok());
+}
+
+#[test]
 fn parse_while_statement_test() {
     let input: &str = r#"
 while 1:

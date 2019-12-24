@@ -9,6 +9,7 @@ pub enum Tok {
     Identifier { name: String },
     Pass,
     If,
+    Else,
     While,
     Def,
     Return,
@@ -112,6 +113,7 @@ where
         self.queue.push_back(match ident.as_ref() {
             "pass" => Tok::Pass,
             "if" => Tok::If,
+            "else" => Tok::Else,
             "while" => Tok::While,
             "def" => Tok::Def,
             "return" => Tok::Return,

@@ -23,6 +23,7 @@ pub enum Statement {
     IfStatement {
         expr: Expression,
         suite: Suite,
+        optional: Option<Suite>,
     },
     WhileStatement {
         expr: Expression,
@@ -52,8 +53,16 @@ impl Generate for Statement {
             ),
             Statement::Expression { expr } => expr.generate(),
             Statement::Pass => String::from(""),
-            Statement::IfStatement { expr, suite } => {
-                format!("if ({}) {{ {} }}", expr.generate(), suite.generate(),)
+            Statement::IfStatement { expr, suite, optional } => {
+                let mut output = String::new();
+                output.push_str(&format!("if ({}) {{ {} }}", expr.generate(), suite.generate(),));
+
+                if optional.is_some() {
+                    let optional_gen: String = format!("else {{ {} }}", optional.as_ref().unwrap().generate());
+                    output.push_str(&optional_gen);
+                }
+
+                output
             }
             Statement::WhileStatement { expr, suite } => {
                 format!("while ({}) {{ {} }}", expr.generate(), suite.generate(),)
