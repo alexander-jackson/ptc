@@ -30,8 +30,7 @@ pub fn get_arguments() -> Args {
 
 pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
     let filename = args.filename?;
-
-    let code: String = fs::read_to_string(&filename).expect("Failed to read the file.");
+    let code: String = fs::read_to_string(&filename)?;
 
     if args.tokens {
         display_tokens(&code)?;
