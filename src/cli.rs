@@ -59,10 +59,10 @@ fn get_output_filename(filename: &str) -> Option<String> {
 
     let output = format!("{}.c", basename);
 
-    if Path::new(&output).exists() {
-        None
-    } else {
+    if !Path::new(&output).exists() {
         Some(output)
+    } else {
+        None
     }
 }
 
