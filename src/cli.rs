@@ -78,7 +78,10 @@ fn display_tokens(program_code: &str) -> Result<(), Box<dyn Error>> {
 }
 
 fn check_clang_format_exists() -> bool {
-    Command::new("clang-format").arg("--version").spawn().is_ok()
+    Command::new("clang-format")
+        .arg("--version")
+        .spawn()
+        .is_ok()
 }
 
 fn write_generated_output(output: &Option<String>, generated: &str) -> Result<(), Box<dyn Error>> {
@@ -96,7 +99,10 @@ fn write_and_format_output_file(filename: &str, code: &str) -> Result<(), Box<dy
     fs::write(&filename, &code)?;
 
     if check_clang_format_exists() {
-        Command::new("clang-format").arg("-i").arg(&filename).spawn()?;
+        Command::new("clang-format")
+            .arg("-i")
+            .arg(&filename)
+            .spawn()?;
     } else {
         println!("clang-format does not exist");
     }
