@@ -36,6 +36,9 @@ impl Generate for Expression {
             Expression::BinaryOperation { left, op, right } => {
                 format!("{} {} {}", left.generate(), op.generate(), right.generate())
             }
+            Expression::UnaryOperation { op, expr } => {
+                format!("{}{}", op.generate(), expr.generate())
+            }
             Expression::ParenExpression { expr } => format!("({})", expr.generate()),
             Expression::FunctionCall { name, args } => {
                 let arg_str: String = args
@@ -47,7 +50,6 @@ impl Generate for Expression {
             }
             Expression::Identifier { name } => name.generate(),
             Expression::Literal { value } => value.generate(),
-            _ => String::from(""),
         }
     }
 }
