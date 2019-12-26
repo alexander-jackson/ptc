@@ -20,6 +20,19 @@ macro_rules! parser_success {
     }
 }
 
+macro_rules! parser_failure {
+    ($($name:ident: $expr:expr,)*) => {
+        $(
+            #[test]
+            fn $name() {
+                let input: &str = $expr;
+                let ast = get_ast(input);
+                assert!(ast.is_err());
+            }
+        )*
+    }
+}
+
 parser_success! {
     parse_underscores_in_identifiers: "longer_name\n",
     parse_integers: "40\n",
@@ -37,4 +50,9 @@ parser_success! {
     parse_nested_compound_statements: "while expression:\n    if other_expression:\n        pass\n",
     parse_function_declaration: "def useless(x, y):\n    pass\n",
     parse_return_statement: "def add(x, y):\n    return x + y\n",
+}
+
+parser_failure! {
+    fail_compound_without_indentation: "if 1:\npass",
+    fail_function_call_with_trailing_comma: "add(1, 2,)",
 }
