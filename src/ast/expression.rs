@@ -34,7 +34,15 @@ impl Generate for Expression {
     fn generate(&self) -> String {
         match self {
             Expression::BinaryOperation { left, op, right } => {
-                format!("{} {} {}", left.generate(), op.generate(), right.generate(),)
+                format!("{} {} {}", left.generate(), op.generate(), right.generate())
+            }
+            Expression::FunctionCall { name, args } => {
+                let arg_str: String = args
+                    .iter()
+                    .map(|a| a.generate())
+                    .collect::<Vec<String>>()
+                    .join(", ");
+                format!("{}({})", name.generate(), arg_str)
             }
             Expression::Identifier { name } => name.generate(),
             Expression::Literal { value } => value.generate(),
