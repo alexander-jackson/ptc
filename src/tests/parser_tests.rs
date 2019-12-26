@@ -1,216 +1,73 @@
 use crate::*;
 
-#[test]
-fn allow_underscores_in_identifiers_test() {
-    let input: &str = r#"
-longer_name
-"#;
+fn get_ast(input: &str) -> Result<ast::program::Program, String> {
+    let parser = parser::ProgramParser::new();
+    let lexer = lexer::Lexer::new(input.char_indices());
 
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
+    parser.parse(lexer).map_err(|e| format!("{:?}", e))
 }
 
-#[test]
-fn parse_integers_test() {
-    let input: &str = r#"
-40
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
+macro_rules! parser_success {
+    ($($name:ident: $expr:expr,)*) => {
+        $(
+            #[test]
+            fn $name() {
+                let input: &str = $expr;
+                let ast = get_ast(input);
+                assert!(ast.is_ok());
+            }
+        )*
+    }
 }
 
-#[test]
-fn parse_expressions_test() {
-    let input: &str = r#"
-var = 1 / 1 * 1 + 1 - 1
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_bracketed_expression_test() {
-    let input: &str = r#"
-var = (1 / 1) * 1
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_comparison_operators_test() {
-    let input: &str = r#"
+parser_success! {
+    allow_underscores_in_identifiers: "longer_name\n",
+    parse_integers: "40\n",
+    parse_expressions: "var = 1 + 1 - 1 * 1 / 1\n",
+    parse_bracketed_expressions: "var = (1 - 1) * 1\n",
+    parse_comparison_operators: r#"
 var = 0 < 1
 var = 0 > 1
 var = 0 <= 1
 var = 0 >= 1
 var = 0 == 1
 var = 0 != 1
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_augmented_assignment_test() {
-    let input: &str = r#"
+"#,
+    parse_augmented_assignments: r#"
 var += 1
 var -= 1
 var *= 1
 var /= 1
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_identifier_expression_test() {
-    let input: &str = r#"
-var = var_one + var_two
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_function_call_expression_test() {
-    let input: &str = r#"
-var = add(1, 2)
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_logical_and_expression_test() {
-    let input: &str = r#"
-variable and other_variable
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_logical_or_expression_test() {
-    let input: &str = r#"
-variable or other_variable
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_logical_not_expression_test() {
-    let input: &str = r#"
-not other_variable
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_pass_statement_test() {
-    let input: &str = r#"
-pass
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_if_statement_test() {
-    let input: &str = r#"
+"#,
+    parse_identifier_expression: "var = var_one + var_two\n",
+    parse_function_call: "var = add(1, 2)\n",
+    parse_logical_expressions: "a and b\na or b\nnot a\n",
+    parse_pass_statement: "pass\n",
+    parse_if_statement: r#"
 if 1:
     pass
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_if_else_statement_test() {
-    let input: &str = r#"
+"#,
+    parse_if_else_statement: r#"
 if 1:
     pass
 else:
     pass
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_while_statement_test() {
-    let input: &str = r#"
+"#,
+    parse_while_statement: r#"
 while 1:
     pass
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_nested_compound_statements_test() {
-    let input: &str = r#"
+"#,
+    parse_nested_compound_statements: r#"
 while expression:
     if other_expression:
         pass
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_function_declaration_test() {
-    let input: &str = r#"
+"#,
+    parse_function_declaration: r#"
 def useless(x, y):
     pass
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
-}
-
-#[test]
-fn parse_return_statement_test() {
-    let input: &str = r#"
+"#,
+    parse_return_statement: r#"
 def add(x, y):
     return x + y
-"#;
-
-    let ast = parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices()));
-
-    assert!(ast.is_ok());
+"#,
 }
