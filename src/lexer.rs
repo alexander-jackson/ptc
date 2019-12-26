@@ -48,9 +48,16 @@ pub enum LexicalError {
     // Not possible
 }
 
+enum IndentationChar {
+    Unknown,
+    Space,
+    Tab,
+}
+
 struct Indentation {
     length: Vec<usize>,
     level: usize,
+    character: IndentationChar,
 }
 
 pub struct Lexer<T: Iterator<Item = (usize, char)>> {
@@ -78,6 +85,7 @@ where
             indentation: Indentation {
                 length: vec![0],
                 level: 0,
+                character: IndentationChar::Unknown,
             },
         };
 
@@ -223,7 +231,30 @@ where
     /// Reads the indentation for a new line and deals with previous indentation levels.
     /// Updates the queue with new indents or unindents if needed.
     fn read_indentation(&mut self) {
-        let indents: usize = self.read_while(|c| c == ' ').len();
+        let indents: usize = match self.indentation.character {
+            IndentationChar::Unknown => {
+                if self.lookahead.is_some() {
+                    let c: char = self.lookahead.unwrap().1;
+
+                    match c {
+                        ' ' => {
+                            self.indentation.character = IndentationChar::Space;
+                            self.read_while(|c| c == ' ').len()
+                        }
+                        '\t' => {
+                            self.indentation.character = IndentationChar::Tab;
+                            self.read_while(|c| c == '\t').len()
+                        }
+                        _ => 0,
+                    }
+                } else {
+                    0
+                }
+            }
+            IndentationChar::Space => self.read_while(|c| c == ' ').len(),
+            IndentationChar::Tab => self.read_while(|c| c == '\t').len(),
+        };
+
         let current: usize = *self.indentation.length.last().unwrap();
 
         if self.lookahead.is_some() && self.lookahead.unwrap().1 == '\n' {
