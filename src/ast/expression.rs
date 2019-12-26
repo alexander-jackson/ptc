@@ -33,11 +33,11 @@ pub enum Expression {
 impl Generate for Expression {
     fn generate(&self) -> String {
         match self {
-            Expression::Identifier { name } => name.generate(),
-            Expression::Literal { value } => value.generate(),
             Expression::BinaryOperation { left, op, right } => {
                 format!("{} {} {}", left.generate(), op.generate(), right.generate(),)
             }
+            Expression::Identifier { name } => name.generate(),
+            Expression::Literal { value } => value.generate(),
             _ => String::from(""),
         }
     }
