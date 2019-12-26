@@ -36,6 +36,7 @@ impl Generate for Expression {
             Expression::BinaryOperation { left, op, right } => {
                 format!("{} {} {}", left.generate(), op.generate(), right.generate())
             }
+            Expression::ParenExpression { expr } => format!("({})", expr.generate()),
             Expression::FunctionCall { name, args } => {
                 let arg_str: String = args
                     .iter()
