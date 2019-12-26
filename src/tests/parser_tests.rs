@@ -21,7 +21,7 @@ macro_rules! parser_success {
 }
 
 parser_success! {
-    allow_underscores_in_identifiers: "longer_name\n",
+    parse_underscores_in_identifiers: "longer_name\n",
     parse_integers: "40\n",
     parse_expressions: "var = 1 + 1 - 1 * 1 / 1\n",
     parse_bracketed_expressions: "var = (1 - 1) * 1\n",
