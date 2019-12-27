@@ -43,7 +43,7 @@ impl Generate for Expression {
             Expression::FunctionCall { name, args } => {
                 let arg_str: Option<String> = args.as_ref().map(|s| {
                     s.iter()
-                        .map(|a| format!("int {}", a.generate()))
+                        .map(|a| a.generate())
                         .collect::<Vec<String>>()
                         .join(", ")
                 });
