@@ -98,13 +98,10 @@ WhileStatement: ast::statement::Statement = {
 };
 
 ArgumentList: Vec<ast::identifier::Identifier> = {
-    <l: (<Identifier> ",")*> <e: Identifier?> => match e {
-        None => l,
-        Some(e) => {
-            let mut l = l;
-            l.push(e);
-            l
-        },
+    <l: (<Identifier> ",")*> <e: Identifier> => {
+        let mut l = l;
+        l.push(e);
+        l
     },
 };
 
@@ -254,13 +251,10 @@ Call: ast::expression::Expression = {
 };
 
 CallArgs: Vec<ast::expression::Expression> = {
-    <l: (<Expression> ",")*> <e: Expression?> => match e {
-        None => l,
-        Some(e) => {
-            let mut l = l;
-            l.push(e);
-            l
-        },
+    <l: (<Expression> ",")*> <e: Expression> => {
+        let mut l = l;
+        l.push(e);
+        l
     },
 };
 
