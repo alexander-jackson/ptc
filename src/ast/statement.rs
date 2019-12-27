@@ -78,14 +78,14 @@ impl Generate for Statement {
             }
             Statement::ReturnStatement { expr } => format!("return {};", expr.generate()),
             Statement::FunctionDecl { name, args, body } => {
-                let arg_str: String = match args {
-                    Some(a) => a
-                        .iter()
+                let arg_str: Option<String> = args.as_ref().map(|s| {
+                    s.iter()
                         .map(|a| format!("int {}", a.generate()))
                         .collect::<Vec<String>>()
-                        .join(", "),
-                    None => String::from(""),
-                };
+                        .join(", ")
+                });
+
+                let arg_str = arg_str.unwrap_or(String::from(""));
 
                 format!(
                     "int {}({}) {{ {} }}",
