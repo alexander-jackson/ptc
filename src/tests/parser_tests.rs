@@ -50,6 +50,8 @@ parser_success! {
     parse_nested_compound_statements: "while expression:\n    if other_expression:\n        pass\n",
     parse_function_declaration: "def useless(x, y):\n    pass\n",
     parse_return_statement: "def add(x, y):\n    return x + y\n",
+    parse_empty_function_declaration: "def useless():\n    pass\n",
+    parse_empty_function_call: "useless()\n",
 }
 
 parser_failure! {
