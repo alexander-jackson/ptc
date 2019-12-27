@@ -51,7 +51,7 @@ impl Generate for Statement {
                 op.generate(),
                 expr.generate(),
             ),
-            Statement::Expression { expr } => expr.generate(),
+            Statement::Expression { expr } => format!("{};", expr.generate()),
             Statement::Pass => String::from(""),
             Statement::IfStatement {
                 expr,
@@ -67,7 +67,7 @@ impl Generate for Statement {
 
                 if optional.is_some() {
                     let optional_gen: String =
-                        format!("else {{ {} }}", optional.as_ref().unwrap().generate());
+                        format!(" else {{ {} }}", optional.as_ref().unwrap().generate());
                     output.push_str(&optional_gen);
                 }
 
