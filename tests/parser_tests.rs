@@ -1,8 +1,8 @@
-use crate::*;
+extern crate ptc;
 
-fn get_ast(input: &str) -> Result<ast::program::Program, String> {
-    let parser = parser::ProgramParser::new();
-    let lexer = lexer::Lexer::new(input.char_indices());
+fn get_ast(input: &str) -> Result<ptc::ast::program::Program, String> {
+    let parser = ptc::parser::ProgramParser::new();
+    let lexer = ptc::lexer::Lexer::new(input.char_indices());
 
     parser.parse(lexer).map_err(|e| format!("{:?}", e))
 }

@@ -1,10 +1,10 @@
-use crate::*;
+extern crate ptc;
 
-use ast::Generate;
+use ptc::ast::Generate;
 
 fn get_output(input: &str) -> String {
-    let parser = parser::ProgramParser::new();
-    let lexer = lexer::Lexer::new(input.char_indices());
+    let parser = ptc::parser::ProgramParser::new();
+    let lexer = ptc::lexer::Lexer::new(input.char_indices());
 
     parser.parse(lexer).map_err(|e| format!("{:?}", e)).unwrap().generate()
 }
