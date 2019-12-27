@@ -54,6 +54,6 @@ parser_success! {
 
 parser_failure! {
     fail_compound_without_indentation: "if 1:\npass",
-    fail_function_call_with_trailing_comma: "add(1, 2,)",
+    fail_function_call_with_trailing_comma: "add(1, 2,)\n",
     fail_function_definition_with_trailing_comma: "def add(x, y,):\n    pass\n",
 }
