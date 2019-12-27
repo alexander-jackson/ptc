@@ -15,6 +15,9 @@ impl Generate for Program {
             code.push(stmt.generate());
         }
 
+        // Add a blank line at the end of the file
+        code.push(String::from(""));
+
         code.join("\n")
     }
 }
