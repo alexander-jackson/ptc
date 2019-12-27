@@ -355,27 +355,3 @@ where
         self.emit(front)
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::iter::FromIterator;
-
-    fn get_lexer_tokens(input: &str) -> Vec<Tok> {
-        let lexer = Lexer::new(input.char_indices());
-
-        Vec::from_iter(lexer.map(|x| x.unwrap().1))
-    }
-
-    #[test]
-    fn lex_all_tokens_test() {
-        let input: &str = "\n\n";
-
-        use lexer::Tok::*;
-
-        let tokens = get_lexer_tokens(input);
-        let expected = vec![Newline, Newline];
-
-        assert_eq!(tokens, expected);
-    }
-}
