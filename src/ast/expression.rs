@@ -20,7 +20,7 @@ pub enum Expression {
     },
     FunctionCall {
         name: Identifier,
-        args: Vec<Expression>,
+        args: Option<Vec<Expression>>,
     },
     Identifier {
         name: Identifier,
@@ -41,11 +41,15 @@ impl Generate for Expression {
             }
             Expression::ParenExpression { expr } => format!("({})", expr.generate()),
             Expression::FunctionCall { name, args } => {
-                let arg_str: String = args
-                    .iter()
-                    .map(|a| a.generate())
-                    .collect::<Vec<String>>()
-                    .join(", ");
+                let arg_str: String = match args {
+                    Some(a) => a
+                        .iter()
+                        .map(|a| a.generate())
+                        .collect::<Vec<String>>()
+                        .join(", "),
+                    None => String::from(""),
+                };
+
                 format!("{}({})", name.generate(), arg_str)
             }
             Expression::Identifier { name } => name.generate(),

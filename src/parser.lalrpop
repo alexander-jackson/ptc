@@ -106,16 +106,10 @@ ArgumentList: Vec<ast::identifier::Identifier> = {
 };
 
 FunctionDeclStatement: ast::statement::Statement = {
-    "def" <ident: Identifier> "(" <args: ArgumentList> ")" ":" <body: Suite> =>
+    "def" <ident: Identifier> "(" <args: ArgumentList?> ")" ":" <body: Suite> =>
         ast::statement::Statement::FunctionDecl {
             name: ident,
             args: args,
-            body: body,
-        },
-    "def" <ident: Identifier> "(" ")" ":" <body: Suite> =>
-        ast::statement::Statement::FunctionDecl {
-            name: ident,
-            args: vec![],
             body: body,
         },
 };
@@ -249,15 +243,10 @@ Atom: ast::expression::Expression = {
 };
 
 Call: ast::expression::Expression = {
-    <ident: Identifier> "(" <args: CallArgs> ")" =>
+    <ident: Identifier> "(" <args: CallArgs?> ")" =>
         ast::expression::Expression::FunctionCall {
             name: ident,
             args: args,
-        },
-    <ident: Identifier> "(" ")" =>
-        ast::expression::Expression::FunctionCall {
-            name: ident,
-            args: vec![],
         },
 };
 

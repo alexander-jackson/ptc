@@ -34,7 +34,7 @@ pub enum Statement {
     },
     FunctionDecl {
         name: Identifier,
-        args: Vec<Identifier>,
+        args: Option<Vec<Identifier>>,
         body: Suite,
     },
 }
@@ -78,11 +78,14 @@ impl Generate for Statement {
             }
             Statement::ReturnStatement { expr } => format!("return {};", expr.generate()),
             Statement::FunctionDecl { name, args, body } => {
-                let arg_str: String = args
-                    .iter()
-                    .map(|a| format!("int {}", a.generate()))
-                    .collect::<Vec<String>>()
-                    .join(", ");
+                let arg_str: String = match args {
+                    Some(a) => a
+                        .iter()
+                        .map(|a| format!("int {}", a.generate()))
+                        .collect::<Vec<String>>()
+                        .join(", "),
+                    None => String::from(""),
+                };
 
                 format!(
                     "int {}({}) {{ {} }}",
