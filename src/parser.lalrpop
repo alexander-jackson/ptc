@@ -112,6 +112,12 @@ FunctionDeclStatement: ast::statement::Statement = {
             args: args,
             body: body,
         },
+    "def" <ident: Identifier> "(" ")" ":" <body: Suite> =>
+        ast::statement::Statement::FunctionDecl {
+            name: ident,
+            args: vec![],
+            body: body,
+        },
 };
 
 Operator: ast::operator::Operator = {
@@ -247,6 +253,11 @@ Call: ast::expression::Expression = {
         ast::expression::Expression::FunctionCall {
             name: ident,
             args: args,
+        },
+    <ident: Identifier> "(" ")" =>
+        ast::expression::Expression::FunctionCall {
+            name: ident,
+            args: vec![],
         },
 };
 
