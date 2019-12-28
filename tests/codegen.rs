@@ -6,7 +6,11 @@ fn get_output(input: &str) -> String {
     let parser = ptc::parser::ProgramParser::new();
     let lexer = ptc::lexer::Lexer::new(input.char_indices());
 
-    parser.parse(lexer).map_err(|e| format!("{:?}", e)).unwrap().generate()
+    parser
+        .parse(lexer)
+        .map_err(|e| format!("{:?}", e))
+        .unwrap()
+        .generate()
 }
 
 macro_rules! generate {
