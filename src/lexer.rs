@@ -153,8 +153,8 @@ where
             _ => None,
         };
 
-        if single.is_some() {
-            self.queue.push_back(single.unwrap());
+        if let Some(tok) = single {
+            self.queue.push_back(tok);
             self.update_lookahead();
             return;
         }

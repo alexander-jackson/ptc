@@ -46,9 +46,9 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
 }
 
 fn display_tokens(program_code: &str) -> Result<(), Box<dyn Error>> {
-    let mut lexer = lexer::Lexer::new(program_code.char_indices());
+    let lexer = lexer::Lexer::new(program_code.char_indices());
 
-    while let Some(t) = lexer.next() {
+    for t in lexer {
         let curr = t.unwrap().1;
         println!("Token: {:#?}", curr);
     }

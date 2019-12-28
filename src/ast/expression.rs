@@ -48,7 +48,7 @@ impl Generate for Expression {
                         .join(", ")
                 });
 
-                let arg_str = arg_str.unwrap_or(String::from(""));
+                let arg_str = arg_str.unwrap_or_else(|| String::from(""));
 
                 format!("{}({})", name.generate(), arg_str)
             }
