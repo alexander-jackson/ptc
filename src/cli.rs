@@ -16,6 +16,28 @@ pub struct Args {
     abstract_tree: bool,
     /// Whether we should display tokens, specified by --tokens
     tokens: bool,
+    /// Whether the help message should be displayed
+    help: bool,
+}
+
+fn display_help_message() {
+    println!(
+        r#"
+ptc (Python to C Compiler)
+Transpiles code from Python to C
+
+USAGE:
+    ptc [FLAGS] [OPTIONS]
+
+FLAGS:
+    --ast               Displays the abstract syntax tree after parsing
+    --tokens            Displays the tokens output by the lexer for the given input
+    -h, --help          Prints this help information
+
+OPTIONS:
+    -f, --filename <path>           Prints age debug info for the given username
+"#
+    );
 }
 
 pub fn get_arguments() -> Args {
@@ -25,10 +47,16 @@ pub fn get_arguments() -> Args {
         filename: args.value_from_str(["-f", "--filename"]),
         abstract_tree: args.contains("--ast"),
         tokens: args.contains("--tokens"),
+        help: args.contains(["-h", "--help"]),
     }
 }
 
 pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
+    if args.help {
+        display_help_message();
+        return Ok(());
+    }
+
     let filename = args.filename?;
     let code: String = fs::read_to_string(&filename)?;
 
