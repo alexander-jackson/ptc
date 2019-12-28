@@ -45,11 +45,15 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn parse(input: &str) -> Result<ast::program::Program, String> {
-    match parser::ProgramParser::new().parse(lexer::Lexer::new(input.char_indices())) {
-        Ok(s) => Ok(s),
-        Err(e) => Err(format!("{:?}", e)),
+fn display_tokens(program_code: &str) -> Result<(), Box<dyn Error>> {
+    let mut lexer = lexer::Lexer::new(program_code.char_indices());
+
+    while let Some(t) = lexer.next() {
+        let curr = t.unwrap().1;
+        println!("Token: {:#?}", curr);
     }
+
+    Ok(())
 }
 
 fn get_output_filename(filename: &str) -> Option<String> {
@@ -66,12 +70,12 @@ fn get_output_filename(filename: &str) -> Option<String> {
     }
 }
 
-fn display_tokens(program_code: &str) -> Result<(), Box<dyn Error>> {
-    let mut lexer = lexer::Lexer::new(program_code.char_indices());
-
-    while let Some(t) = lexer.next() {
-        let curr = t.unwrap().1;
-        println!("Token: {:#?}", curr);
+fn write_generated_output(output: &Option<String>, generated: &str) -> Result<(), Box<dyn Error>> {
+    if output.is_some() {
+        write_and_format_output_file(output.as_ref().unwrap(), &generated)?;
+    } else {
+        eprintln!("The output file already exists, so the code will be displayed to the screen: ");
+        println!("{}", &generated);
     }
 
     Ok(())
@@ -82,17 +86,6 @@ fn check_clang_format_exists() -> bool {
         .arg("--version")
         .spawn()
         .is_ok()
-}
-
-fn write_generated_output(output: &Option<String>, generated: &str) -> Result<(), Box<dyn Error>> {
-    if output.is_some() {
-        write_and_format_output_file(output.as_ref().unwrap(), &generated)?;
-    } else {
-        eprintln!("The output file already exists, so the code will be displayed to the screen: ");
-        println!("{}", &generated);
-    }
-
-    Ok(())
 }
 
 fn write_and_format_output_file(filename: &str, code: &str) -> Result<(), Box<dyn Error>> {
@@ -110,11 +103,24 @@ fn write_and_format_output_file(filename: &str, code: &str) -> Result<(), Box<dy
     Ok(())
 }
 
+fn parse(input: &str) -> Result<ast::program::Program, String> {
+    let lex_input = input.char_indices();
+    let lexer = lexer::Lexer::new(lex_input);
+    let parser = parser::ProgramParser::new();
+    let result = parser.parse(lexer);
+
+    match result {
+        Ok(s) => Ok(s),
+        Err(e) => Err(format!("{:?}", e)),
+    }
+}
+
 fn get_abstract_syntax_tree(code: &str, display: bool) -> ast::program::Program {
     let ast = parse(&code).expect("Failed to parse the given program");
 
     if display {
-        println!("Abstract syntax tree:\n{:#?}", &ast);
+        println!("Abstract syntax tree:");
+        println!("{:#?}", &ast);
     }
 
     ast
