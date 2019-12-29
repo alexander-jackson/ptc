@@ -10,14 +10,14 @@ use crate::parser;
 use crate::ast::Generate;
 
 pub struct Args {
-    /// File input using -f <filename> or --filename <filename>
-    filename: Result<String, pico_args::Error>,
     /// Whether the AST should be displayed, specified by --ast
     abstract_tree: bool,
     /// Whether we should display tokens, specified by --tokens
     tokens: bool,
     /// Whether the help message should be displayed
     help: bool,
+    /// All paths that the compiler should be run on
+    paths: Vec<String>,
 }
 
 fn display_help_message() {
@@ -27,15 +27,15 @@ ptc (Python to C Compiler)
 Transpiles code from Python to C
 
 USAGE:
-    ptc [FLAGS] [OPTIONS]
+    ptc [FLAGS] [OPTIONS] [PATH(S)]
 
 FLAGS:
     --ast               Displays the abstract syntax tree after parsing
     --tokens            Displays the tokens output by the lexer for the given input
     -h, --help          Prints this help information
 
-OPTIONS:
-    -f, --filename <path>           Prints age debug info for the given username
+ARGS:
+    <PATH(S)>           Paths of Python files to transpile
 "#
     );
 }
@@ -44,10 +44,10 @@ pub fn get_arguments() -> Args {
     let mut args = pico_args::Arguments::from_env();
 
     Args {
-        filename: args.value_from_str(["-f", "--filename"]),
         abstract_tree: args.contains("--ast"),
         tokens: args.contains("--tokens"),
         help: args.contains(["-h", "--help"]),
+        paths: args.free().unwrap(),
     }
 }
 
@@ -57,8 +57,15 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
 
-    let filename = args.filename?;
-    let code: String = fs::read_to_string(&filename)?;
+    for path in &args.paths {
+        process_path(&path, &args)?;
+    }
+
+    Ok(())
+}
+
+fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
+    let code: String = fs::read_to_string(&path)?;
 
     if args.tokens {
         display_tokens(&code)?;
@@ -66,7 +73,7 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
 
     let ast = get_abstract_syntax_tree(&code, args.abstract_tree);
     let generated = ast.generate();
-    let output = get_output_filename(&filename);
+    let output = get_output_filename(&path);
 
     write_generated_output(&output, &generated)?;
 
