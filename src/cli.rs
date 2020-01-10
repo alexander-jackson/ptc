@@ -52,7 +52,7 @@ pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
 }
 
 pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
-    if args.help {
+    if args.help || args.paths.is_empty() {
         display_help_message();
         return Ok(());
     }
