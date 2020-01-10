@@ -10,7 +10,6 @@ pub mod lexer;
 lalrpop_mod!(pub parser);
 
 pub fn lib_main() {
-    let args = cli::get_arguments();
-    let result = cli::process_args(args);
+    let result = cli::get_arguments().and_then(cli::process_args);
     error_handling::handle_errors(result);
 }

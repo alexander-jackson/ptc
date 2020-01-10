@@ -40,15 +40,15 @@ ARGS:
     );
 }
 
-pub fn get_arguments() -> Args {
+pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
     let mut args = pico_args::Arguments::from_env();
 
-    Args {
+    Ok(Args {
         abstract_tree: args.contains("--ast"),
         tokens: args.contains("--tokens"),
         help: args.contains(["-h", "--help"]),
-        paths: args.free().unwrap(),
-    }
+        paths: args.free()?,
+    })
 }
 
 pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
