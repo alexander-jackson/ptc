@@ -14,6 +14,8 @@ pub struct Args {
     abstract_tree: bool,
     /// Whether we should display tokens, specified by --tokens
     tokens: bool,
+    /// Whether we should display generated code, specified by --display
+    display: bool,
     /// Whether the help message should be displayed
     help: bool,
     /// All paths that the compiler should be run on
@@ -32,6 +34,7 @@ USAGE:
 FLAGS:
     --ast               Displays the abstract syntax tree after parsing
     --tokens            Displays the tokens output by the lexer for the given input
+    --display           Displays the output code to the screen instead of writing to a file
     -h, --help          Prints this help information
 
 ARGS:
@@ -46,6 +49,7 @@ pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
     Ok(Args {
         abstract_tree: args.contains("--ast"),
         tokens: args.contains("--tokens"),
+        display: args.contains("--display"),
         help: args.contains(["-h", "--help"]),
         paths: args.free()?,
     })
@@ -75,7 +79,11 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     let generated = ast.generate();
     let output = get_output_filename(&path);
 
-    write_and_format_output_file(&output, &generated)?;
+    if args.display {
+        println!("{}", &generated);
+    } else {
+        write_and_format_output_file(&output, &generated)?;
+    }
 
     Ok(())
 }
