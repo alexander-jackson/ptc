@@ -75,7 +75,7 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     let generated = ast.generate();
     let output = get_output_filename(&path);
 
-    write_generated_output(&output, &generated)?;
+    write_and_format_output_file(&output, &generated)?;
 
     Ok(())
 }
@@ -91,29 +91,12 @@ fn display_tokens(program_code: &str) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn get_output_filename(filename: &str) -> Option<String> {
+fn get_output_filename(filename: &str) -> String {
     let path_struct = Path::new(&filename);
     let stem = path_struct.file_stem().unwrap();
     let basename = stem.to_str().unwrap();
 
-    let output = format!("{}.c", basename);
-
-    if !Path::new(&output).exists() {
-        Some(output)
-    } else {
-        None
-    }
-}
-
-fn write_generated_output(output: &Option<String>, generated: &str) -> Result<(), Box<dyn Error>> {
-    if output.is_some() {
-        write_and_format_output_file(output.as_ref().unwrap(), &generated)?;
-    } else {
-        eprintln!("The output file already exists, so the code will be displayed to the screen: ");
-        println!("{}", &generated);
-    }
-
-    Ok(())
+    format!("{}.c", basename)
 }
 
 fn check_clang_format_exists() -> bool {
