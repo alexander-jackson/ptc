@@ -3,6 +3,7 @@ use std::fs;
 use std::env;
 use std::path::Path;
 use std::process::Command;
+use std::collections::HashSet;
 
 use crate::ast;
 use crate::lexer;
@@ -77,7 +78,7 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     }
 
     let ast = get_abstract_syntax_tree(&code, args.abstract_tree);
-    let generated = ast.generate();
+    let generated = ast.generate(&mut HashSet::new());
     let output = get_output_filename(&path);
 
     if args.display {

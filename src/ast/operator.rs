@@ -1,4 +1,5 @@
 use ast::Generate;
+use ast::SymbolTable;
 
 #[derive(Debug, PartialEq)]
 pub enum Operator {
@@ -23,7 +24,7 @@ pub enum Operator {
 }
 
 impl Generate for Operator {
-    fn generate(&self) -> String {
+    fn generate(&self, _symbol_table: &mut SymbolTable) -> String {
         match self {
             Operator::LogicalOr => String::from("||"),
             Operator::LogicalAnd => String::from("&&"),

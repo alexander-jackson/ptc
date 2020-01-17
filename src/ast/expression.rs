@@ -1,4 +1,5 @@
 use ast::Generate;
+use ast::SymbolTable;
 
 use ast::identifier::Identifier;
 use ast::literal::Literal;
@@ -31,29 +32,29 @@ pub enum Expression {
 }
 
 impl Generate for Expression {
-    fn generate(&self) -> String {
+    fn generate(&self, symbol_table: &mut SymbolTable) -> String {
         match self {
             Expression::BinaryOperation { left, op, right } => {
-                format!("{} {} {}", left.generate(), op.generate(), right.generate())
+                format!("{} {} {}", left.generate(symbol_table), op.generate(symbol_table), right.generate(symbol_table))
             }
             Expression::UnaryOperation { op, expr } => {
-                format!("{}{}", op.generate(), expr.generate())
+                format!("{}{}", op.generate(symbol_table), expr.generate(symbol_table))
             }
-            Expression::ParenExpression { expr } => format!("({})", expr.generate()),
+            Expression::ParenExpression { expr } => format!("({})", expr.generate(symbol_table)),
             Expression::FunctionCall { name, args } => {
                 let arg_str: Option<String> = args.as_ref().map(|s| {
                     s.iter()
-                        .map(|a| a.generate())
+                        .map(|a| a.generate(symbol_table))
                         .collect::<Vec<String>>()
                         .join(", ")
                 });
 
                 let arg_str = arg_str.unwrap_or_else(|| String::from(""));
 
-                format!("{}({})", name.generate(), arg_str)
+                format!("{}({})", name.generate(symbol_table), arg_str)
             }
-            Expression::Identifier { name } => name.generate(),
-            Expression::Literal { value } => value.generate(),
+            Expression::Identifier { name } => name.generate(symbol_table),
+            Expression::Literal { value } => value.generate(symbol_table),
         }
     }
 }

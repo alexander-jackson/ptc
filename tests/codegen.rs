@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 extern crate ptc;
 
 use ptc::ast::Generate;
@@ -10,7 +12,7 @@ fn get_output(input: &str) -> String {
         .parse(lexer)
         .map_err(|e| format!("{:?}", e))
         .unwrap()
-        .generate()
+        .generate(&mut HashSet::new())
 }
 
 macro_rules! generate {
@@ -31,7 +33,7 @@ generate! {
     generate_integer: "1\n", "1;\n",
     generate_identifier: "name\n", "name;\n",
     generate_function_call: "add(1, 2)\n", "add(1, 2);\n",
-    generate_assign_statement: "x = 0\n", "x = 0;\n",
+    generate_assign_statement: "x = 0\n", "int x = 0;\n",
     generate_augmented_assign_statement: "x += 1\n", "x += 1;\n",
     generate_expression_statement: "3 + 4\n", "3 + 4;\n",
     generate_pass_statement: "pass\n", "\n",
