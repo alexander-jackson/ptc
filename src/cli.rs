@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fs;
+use std::env;
 use std::path::Path;
 use std::process::Command;
 
@@ -107,23 +108,34 @@ fn get_output_filename(filename: &str) -> String {
     format!("{}.c", basename)
 }
 
-fn check_clang_format_exists() -> bool {
-    Command::new("clang-format")
-        .arg("--version")
-        .spawn()
-        .is_ok()
+fn clang_format_exists() -> bool {
+    match env::var_os("PATH") {
+        Some(paths) => {
+            for path in env::split_paths(&paths) {
+                if Path::new(&path.join("clang-format")).exists() {
+                    return true;
+                }
+            }
+        },
+        None => (),
+    }
+
+    false
 }
 
 fn write_and_format_output_file(filename: &str, code: &str) -> Result<(), Box<dyn Error>> {
     fs::write(&filename, &code)?;
 
-    if check_clang_format_exists() {
-        Command::new("clang-format")
-            .arg("-i")
-            .arg(&filename)
-            .spawn()?;
-    } else {
-        println!("clang-format does not exist");
+    if clang_format_exists() {
+        let mut command = Command::new("clang-format");
+        command.arg("-i");
+        command.arg(&filename);
+
+        if Path::new(".clang-format").exists() {
+            command.arg("--style=file");
+        }
+
+        command.spawn()?;
     }
 
     Ok(())
