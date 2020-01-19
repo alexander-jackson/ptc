@@ -327,27 +327,22 @@ where
     type Item = Spanned<Tok, usize, LexicalError>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // If lookahead is None, we are at EOF
-        if self.lookahead.is_none() {
-            self.read_indentation();
-
-            if !self.queue.is_empty() {
-                let front: Tok = self.queue.pop_front().unwrap();
-                return self.emit(front);
+        match self.lookahead {
+            Some(_) => {
+                self.lex_source();
             }
+            None => {
+                if let Some(t) = self.queue.pop_front() {
+                    return self.emit(t);
+                }
 
-            return None;
+                self.read_indentation();
+            }
         }
 
-        // If there are tokens in the queue, return the first one
-        if let Some(t) = self.queue.pop_front() {
-            return self.emit(t);
+        match self.queue.pop_front() {
+            Some(t) => self.emit(t),
+            None => None
         }
-
-        // Otherwise, do some lexing and return the next token
-        self.lex_source();
-
-        let front: Tok = self.queue.pop_front().unwrap();
-        self.emit(front)
     }
 }
