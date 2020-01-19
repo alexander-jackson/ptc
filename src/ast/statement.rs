@@ -46,6 +46,7 @@ impl Generate for Statement {
             Statement::Assign { ident, expr } => {
                 // Check whether the variable is undefined
                 let identifier: String = ident.generate(context);
+
                 let prefix: String = if context.contains(&identifier) {
                     String::from("")
                 } else {
@@ -55,19 +56,19 @@ impl Generate for Statement {
 
                 format!("{}{} = {};", prefix, identifier, expr.generate(context))
             }
-            Statement::AugmentedAssign { ident, op, expr } => format!(
-                "{} {} {};",
-                ident.generate(context),
-                op.generate(context),
-                expr.generate(context),
-            ),
-            Statement::Expression { expr } => format!("{};", expr.generate(context)),
-            Statement::Pass => String::from(""),
-            Statement::IfStatement {
-                expr,
-                suite,
-                optional,
-            } => {
+            Statement::AugmentedAssign { ident, op, expr } => {
+                let ident_gen = ident.generate(context);
+                let op_gen = op.generate(context);
+                let expr_gen = expr.generate(context);
+                format!("{} {} {};", ident_gen, op_gen, expr_gen)
+            }
+            Statement::Expression { expr } => {
+                format!("{};", expr.generate(context))
+            }
+            Statement::Pass => {
+                String::from("")
+            }
+            Statement::IfStatement { expr, suite, optional } => {
                 let expr_gen = expr.generate(context);
 
                 context.add_scope();
@@ -95,7 +96,9 @@ impl Generate for Statement {
 
                 format!("while ({}) {{ {} }}", expr_gen, suite_gen)
             }
-            Statement::ReturnStatement { expr } => format!("return {};", expr.generate(context)),
+            Statement::ReturnStatement { expr } => {
+                format!("return {};", expr.generate(context))
+            }
             Statement::FunctionDecl { name, args, body } => {
                 let arg_str: Option<String> = args.as_ref().map(|s| {
                     s.iter()
