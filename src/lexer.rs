@@ -295,11 +295,11 @@ where
     }
 
     fn current_char_equals(&self, c: char) -> bool {
-        return if let Some(l) = self.lookahead.map(|x| x.1) {
-            c == l
-        } else {
-            false
-        };
+        if let Some(l) = self.lookahead.map(|x| x.1) {
+            return c == l;
+        }
+
+        false
     }
 
     fn lex_source(&mut self) {
