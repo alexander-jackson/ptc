@@ -24,3 +24,25 @@ impl Generate for Suite {
             .join(" ")
     }
 }
+
+pub struct Context {
+    symbol_table: Vec<HashSet<String>>,
+}
+
+impl Context {
+    pub fn new() -> Self {
+        Self { symbol_table: Vec::new() }
+    }
+
+    pub fn add_scope(&mut self) {
+        self.symbol_table.push(HashSet::new());
+    }
+
+    pub fn remove_scope(&mut self) {
+        self.symbol_table.pop();
+    }
+
+    pub fn contains(&self, variable: &str) -> bool {
+        self.symbol_table.iter().any(|x| x.contains(variable))
+    }
+}
