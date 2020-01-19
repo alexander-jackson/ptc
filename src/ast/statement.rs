@@ -1,6 +1,6 @@
 use ast::Generate;
 use ast::Suite;
-use ast::SymbolTable;
+use ast::Context;
 
 use ast::expression::Expression;
 use ast::identifier::Identifier;
@@ -41,27 +41,27 @@ pub enum Statement {
 }
 
 impl Generate for Statement {
-    fn generate(&self, symbol_table: &mut SymbolTable) -> String {
+    fn generate(&self, context: &mut Context) -> String {
         match self {
             Statement::Assign { ident, expr } => {
                 // Check whether the variable is undefined
-                let identifier: String = ident.generate(symbol_table);
-                let prefix: String = if symbol_table.contains(&identifier) {
+                let identifier: String = ident.generate(context);
+                let prefix: String = if context.contains(&identifier) {
                     String::from("")
                 } else {
-                    symbol_table.insert(identifier.clone());
+                    context.insert(&identifier);
                     String::from("int ")
                 };
 
-                format!("{}{} = {};", prefix, identifier, expr.generate(symbol_table),)
+                format!("{}{} = {};", prefix, identifier, expr.generate(context),)
             }
             Statement::AugmentedAssign { ident, op, expr } => format!(
                 "{} {} {};",
-                ident.generate(symbol_table),
-                op.generate(symbol_table),
-                expr.generate(symbol_table),
+                ident.generate(context),
+                op.generate(context),
+                expr.generate(context),
             ),
-            Statement::Expression { expr } => format!("{};", expr.generate(symbol_table)),
+            Statement::Expression { expr } => format!("{};", expr.generate(context)),
             Statement::Pass => String::from(""),
             Statement::IfStatement {
                 expr,
@@ -69,39 +69,59 @@ impl Generate for Statement {
                 optional,
             } => {
                 let mut output = String::new();
+
+                let expr_gen = expr.generate(context);
+
+                context.add_scope();
+                let suite_gen = suite.generate(context);
+                context.remove_scope();
+
                 output.push_str(&format!(
-                    "if ({}) {{ {} }}",
-                    expr.generate(symbol_table),
-                    suite.generate(symbol_table),
+                    "if ({}) {{ {} }}", expr_gen, suite_gen
                 ));
 
-                if optional.is_some() {
-                    let optional_gen: String =
-                        format!(" else {{ {} }}", optional.as_ref().unwrap().generate(symbol_table));
-                    output.push_str(&optional_gen);
-                }
+                match optional.as_ref() {
+                    Some(s) => {
+                        context.add_scope();
+                        let optional_gen = s.generate(context);
+                        context.remove_scope();
+                        output.push_str(&format!(" else {{ {} }}", &optional_gen));
+                    }
+                    None => (),
+                };
 
                 output
             }
             Statement::WhileStatement { expr, suite } => {
-                format!("while ({}) {{ {} }}", expr.generate(symbol_table), suite.generate(symbol_table),)
+                let expr_gen = expr.generate(context);
+
+                context.add_scope();
+                let suite_gen = suite.generate(context);
+                context.remove_scope();
+
+                format!("while ({}) {{ {} }}", expr_gen, suite_gen)
             }
-            Statement::ReturnStatement { expr } => format!("return {};", expr.generate(symbol_table)),
+            Statement::ReturnStatement { expr } => format!("return {};", expr.generate(context)),
             Statement::FunctionDecl { name, args, body } => {
                 let arg_str: Option<String> = args.as_ref().map(|s| {
                     s.iter()
-                        .map(|a| format!("int {}", a.generate(symbol_table)))
+                        .map(|a| format!("int {}", a.generate(context)))
                         .collect::<Vec<String>>()
                         .join(", ")
                 });
 
                 let arg_str = arg_str.unwrap_or_else(|| String::from(""));
+                let name_gen = name.generate(context);
+
+                context.add_scope();
+                let body_gen = body.generate(context);
+                context.remove_scope();
 
                 format!(
                     "int {}({}) {{ {} }}",
-                    name.generate(symbol_table),
+                    name_gen,
                     arg_str,
-                    body.generate(symbol_table),
+                    body_gen,
                 )
             }
         }

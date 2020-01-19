@@ -1,8 +1,7 @@
-use std::collections::HashSet;
-
 extern crate ptc;
 
 use ptc::ast::Generate;
+use ptc::ast::Context;
 
 fn get_output(input: &str) -> String {
     let parser = ptc::parser::ProgramParser::new();
@@ -12,7 +11,7 @@ fn get_output(input: &str) -> String {
         .parse(lexer)
         .map_err(|e| format!("{:?}", e))
         .unwrap()
-        .generate(&mut HashSet::new())
+        .generate(&mut Context::new())
 }
 
 macro_rules! generate {

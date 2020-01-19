@@ -1,5 +1,5 @@
 use ast::Generate;
-use ast::SymbolTable;
+use ast::Context;
 
 #[derive(Debug, PartialEq)]
 pub enum Literal {
@@ -7,7 +7,7 @@ pub enum Literal {
 }
 
 impl Generate for Literal {
-    fn generate(&self, _t: &mut SymbolTable) -> String {
+    fn generate(&self, _t: &mut Context) -> String {
         match self {
             Literal::Integer { value } => value.to_string(),
         }

@@ -1,5 +1,5 @@
 use ast::Generate;
-use ast::SymbolTable;
+use ast::Context;
 
 #[derive(Debug, PartialEq)]
 pub enum Identifier {
@@ -7,7 +7,7 @@ pub enum Identifier {
 }
 
 impl Generate for Identifier {
-    fn generate(&self, _t: &mut SymbolTable) -> String {
+    fn generate(&self, _t: &mut Context) -> String {
         match self {
             Identifier::Name { name } => name.to_string(),
         }

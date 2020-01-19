@@ -3,13 +3,13 @@ use std::fs;
 use std::env;
 use std::path::Path;
 use std::process::Command;
-use std::collections::HashSet;
 
 use crate::ast;
 use crate::lexer;
 use crate::parser;
 
 use crate::ast::Generate;
+use crate::ast::Context;
 
 pub struct Args {
     /// Whether the AST should be displayed, specified by --ast
@@ -78,7 +78,7 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     }
 
     let ast = get_abstract_syntax_tree(&code, args.abstract_tree);
-    let generated = ast.generate(&mut HashSet::new());
+    let generated = ast.generate(&mut Context::new());
     let output = get_output_filename(&path);
 
     if args.display {
