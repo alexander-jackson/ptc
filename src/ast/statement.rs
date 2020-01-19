@@ -71,15 +71,15 @@ impl Generate for Statement {
             } => {
                 let expr_gen = expr.generate(context);
 
-                context.add_scope();
+                context.push_scope();
                 let suite_gen = suite.generate(context);
-                context.remove_scope();
+                context.pop_scope();
 
                 let optional_gen = match optional.as_ref() {
                     Some(s) => {
-                        context.add_scope();
+                        context.push_scope();
                         let optional_gen = s.generate(context);
-                        context.remove_scope();
+                        context.pop_scope();
                         format!(" else {{ {} }}", &optional_gen)
                     }
                     None => String::from(""),
@@ -90,9 +90,9 @@ impl Generate for Statement {
             Statement::WhileStatement { expr, suite } => {
                 let expr_gen = expr.generate(context);
 
-                context.add_scope();
+                context.push_scope();
                 let suite_gen = suite.generate(context);
-                context.remove_scope();
+                context.pop_scope();
 
                 format!("while ({}) {{ {} }}", expr_gen, suite_gen)
             }
@@ -108,9 +108,9 @@ impl Generate for Statement {
                 let arg_str = arg_str.unwrap_or_else(|| String::from(""));
                 let name_gen = name.generate(context);
 
-                context.add_scope();
+                context.push_scope();
                 let body_gen = body.generate(context);
-                context.remove_scope();
+                context.pop_scope();
 
                 format!("int {}({}) {{ {} }}", name_gen, arg_str, body_gen,)
             }

@@ -35,11 +35,11 @@ impl Context {
         }
     }
 
-    pub fn add_scope(&mut self) {
+    pub fn push_scope(&mut self) {
         self.symbol_table.push(HashSet::new());
     }
 
-    pub fn remove_scope(&mut self) {
+    pub fn pop_scope(&mut self) {
         self.symbol_table.pop();
     }
 
