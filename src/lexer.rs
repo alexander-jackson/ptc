@@ -60,6 +60,24 @@ struct Indentation {
     character: IndentationChar,
 }
 
+impl Indentation {
+    pub fn new() -> Indentation {
+        Indentation {
+            length: vec![0],
+            level: 0,
+            character: IndentationChar::Unknown,
+        }
+    }
+
+    pub fn get_current_length(&self) -> usize {
+        self.length[self.length.len() - 1]
+    }
+
+    pub fn pop_length(&mut self) -> usize {
+        self.length.pop().unwrap()
+    }
+}
+
 pub struct Lexer<T: Iterator<Item = (usize, char)>> {
     chars: T,
     lookahead: Option<(usize, char)>,
@@ -82,11 +100,7 @@ where
             index: 0,
             line_number: 1,
             start_of_line: true,
-            indentation: Indentation {
-                length: vec![0],
-                level: 0,
-                character: IndentationChar::Unknown,
-            },
+            indentation: Indentation::new(),
         };
 
         lexer.update_lookahead();
@@ -249,7 +263,7 @@ where
             IndentationChar::Tab => self.read_while(|c| c == '\t').len(),
         };
 
-        let current: usize = *self.indentation.length.last().unwrap();
+        let current: usize = self.indentation.get_current_length();
 
         if self.current_char_equals('\n') {
             self.read_newline();
@@ -266,12 +280,9 @@ where
                 self.queue.push_back(Tok::Indent);
             } else {
                 // See how far back we have gone
-                let mut len: usize = self.indentation.length.pop().unwrap();
-
-                while len > indents {
+                while self.indentation.pop_length() > indents {
                     self.indentation.level -= 1;
                     self.queue.push_back(Tok::Unindent);
-                    len = self.indentation.length.pop().unwrap();
                 }
 
                 self.indentation.length.push(indents);
