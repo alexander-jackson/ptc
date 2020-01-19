@@ -142,15 +142,18 @@ where
     /// Starts with single characters and moves onto multichars.
     fn read_punctuation(&mut self) {
         // We can immediately match the single character operators
-        let c: char = self.lookahead.unwrap().1;
-
-        let single: Option<Tok> = match c {
-            '(' => Some(Tok::LPar),
-            ')' => Some(Tok::RPar),
-            ':' => Some(Tok::Colon),
-            ';' => Some(Tok::Semicolon),
-            ',' => Some(Tok::Comma),
-            _ => None,
+        let single: Option<Tok> = match self.lookahead {
+            Some(l) => {
+                match l.1 {
+                    '(' => Some(Tok::LPar),
+                    ')' => Some(Tok::RPar),
+                    ':' => Some(Tok::Colon),
+                    ';' => Some(Tok::Semicolon),
+                    ',' => Some(Tok::Comma),
+                    _ => None,
+                }
+            }
+            None => None
         };
 
         if let Some(tok) = single {
