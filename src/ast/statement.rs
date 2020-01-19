@@ -62,13 +62,13 @@ impl Generate for Statement {
                 let expr_gen = expr.generate(context);
                 format!("{} {} {};", ident_gen, op_gen, expr_gen)
             }
-            Statement::Expression { expr } => {
-                format!("{};", expr.generate(context))
-            }
-            Statement::Pass => {
-                String::from("")
-            }
-            Statement::IfStatement { expr, suite, optional } => {
+            Statement::Expression { expr } => format!("{};", expr.generate(context)),
+            Statement::Pass => String::from(""),
+            Statement::IfStatement {
+                expr,
+                suite,
+                optional,
+            } => {
                 let expr_gen = expr.generate(context);
 
                 context.add_scope();
@@ -96,9 +96,7 @@ impl Generate for Statement {
 
                 format!("while ({}) {{ {} }}", expr_gen, suite_gen)
             }
-            Statement::ReturnStatement { expr } => {
-                format!("return {};", expr.generate(context))
-            }
+            Statement::ReturnStatement { expr } => format!("return {};", expr.generate(context)),
             Statement::FunctionDecl { name, args, body } => {
                 let arg_str: Option<String> = args.as_ref().map(|s| {
                     s.iter()
