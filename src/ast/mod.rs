@@ -48,10 +48,7 @@ impl Context {
     }
 
     pub fn insert(&mut self, variable: &str) {
-        self.symbol_table
-            .last()
-            .cloned()
-            .unwrap()
-            .insert(variable.to_string());
+        let index: usize = self.symbol_table.len() - 1;
+        self.symbol_table[index].insert(variable.to_string());
     }
 }
