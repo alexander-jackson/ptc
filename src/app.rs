@@ -84,12 +84,16 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     if args.display {
         println!("{}", &generated);
     } else {
-        write_and_format_output_file(&output, &generated)?;
+        match output {
+            Some(s) => write_and_format_output_file(&s, &generated)?,
+            None => eprintln!("Failed to get the output filename.")
+        }
     }
 
     Ok(())
 }
 
+// TODO: Remove this return type //
 fn display_tokens(program_code: &str) -> Result<(), Box<dyn Error>> {
     let lexer = lexer::Lexer::new(program_code.char_indices());
 
@@ -103,12 +107,12 @@ fn display_tokens(program_code: &str) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn get_output_filename(filename: &str) -> String {
+fn get_output_filename(filename: &str) -> Option<String> {
     let path_struct = Path::new(&filename);
-    let stem = path_struct.file_stem().unwrap();
-    let basename = stem.to_str().unwrap();
+    let stem = path_struct.file_stem()?;
+    let basename = stem.to_str()?;
 
-    format!("{}.c", basename)
+    Some(format!("{}.c", basename))
 }
 
 fn clang_format_exists() -> bool {
