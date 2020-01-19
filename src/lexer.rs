@@ -306,9 +306,9 @@ where
         if self.start_of_line {
             self.read_indentation();
             self.start_of_line = false;
+        } else {
+            self.read_while(|c| c == ' ');
         }
-
-        self.read_while(|c| c == ' ');
 
         if let Some(c) = self.lookahead.map(|x| x.1) {
             if c.is_alphabetic() || c == '_' {
