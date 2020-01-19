@@ -185,13 +185,10 @@ where
         }
 
         // Deal with the only multichar op that isn't splitable
-        let mut c: char = self.lookahead.unwrap().1;
-
-        if c == '!' {
+        if self.current_char_equals('!') {
             self.update_lookahead();
-            c = self.lookahead.unwrap().1;
 
-            if c == '=' {
+            if self.current_char_equals('=') {
                 self.update_lookahead();
                 self.queue.push_back(Tok::NotEqual);
             }
@@ -205,15 +202,11 @@ where
     fn match_multichar_op(&mut self, multichar: (char, char, Tok, Tok)) {
         // Unpack the arguments
         let (c1, c2, t1, t2): (char, char, Tok, Tok) = multichar;
-        // Get the current character
-        let mut c: char = self.lookahead.unwrap().1;
 
-        if c == c1 {
-            // Either t1 or t2 now
+        if self.current_char_equals(c1) {
             self.update_lookahead();
-            c = self.lookahead.unwrap().1;
 
-            if c == c2 {
+            if self.current_char_equals(c2) {
                 self.update_lookahead();
                 self.queue.push_back(t2);
             } else {
@@ -236,9 +229,7 @@ where
     fn read_indentation(&mut self) {
         let indents: usize = match self.indentation.character {
             IndentationChar::Unknown => {
-                if self.lookahead.is_some() {
-                    let c: char = self.lookahead.unwrap().1;
-
+                if let Some(c) = self.lookahead.map(|x| x.1) {
                     match c {
                         ' ' => {
                             self.indentation.character = IndentationChar::Space;
@@ -260,7 +251,7 @@ where
 
         let current: usize = *self.indentation.length.last().unwrap();
 
-        if self.lookahead.is_some() && self.lookahead.unwrap().1 == '\n' {
+        if self.current_char_equals('\n') {
             self.read_newline();
             self.read_indentation();
             return;
@@ -294,6 +285,14 @@ where
         self.index += 1;
     }
 
+    fn current_char_equals(&self, c: char) -> bool {
+        return if let Some(l) = self.lookahead.map(|x| x.1) {
+            c == l
+        } else {
+            false
+        }
+    }
+
     fn lex_source(&mut self) {
         if self.start_of_line {
             self.read_indentation();
@@ -302,21 +301,16 @@ where
 
         self.read_while(|c| c == ' ');
 
-        if self.lookahead.is_none() {
-            return;
-        }
-
-        let c: char = self.lookahead.unwrap().1;
-
-        // If c is a character, read an identifier
-        if c.is_alphabetic() || c == '_' {
-            self.read_identifier_or_keyword();
-        } else if c.is_digit(10) {
-            self.read_number();
-        } else if c == '\n' {
-            self.read_newline();
-        } else {
-            self.read_punctuation();
+        if let Some(c) = self.lookahead.map(|x| x.1) {
+            if c.is_alphabetic() || c == '_' {
+                self.read_identifier_or_keyword();
+            } else if c.is_digit(10) {
+                self.read_number();
+            } else if c == '\n' {
+                self.read_newline();
+            } else {
+                self.read_punctuation();
+            }
         }
     }
 
