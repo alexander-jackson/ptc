@@ -74,19 +74,17 @@ impl Generate for Statement {
                 let suite_gen = suite.generate(context);
                 context.remove_scope();
 
-                let mut output = format!("if ({}) {{ {} }}", expr_gen, suite_gen);
-
-                match optional.as_ref() {
+                let optional_gen = match optional.as_ref() {
                     Some(s) => {
                         context.add_scope();
                         let optional_gen = s.generate(context);
                         context.remove_scope();
-                        output.push_str(&format!(" else {{ {} }}", &optional_gen));
+                        format!(" else {{ {} }}", &optional_gen)
                     }
-                    None => (),
+                    None => String::from(""),
                 };
 
-                output
+                format!("if ({}) {{ {} }}{}", expr_gen, suite_gen, optional_gen)
             }
             Statement::WhileStatement { expr, suite } => {
                 let expr_gen = expr.generate(context);
