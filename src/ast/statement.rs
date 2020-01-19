@@ -53,7 +53,7 @@ impl Generate for Statement {
                     String::from("int ")
                 };
 
-                format!("{}{} = {};", prefix, identifier, expr.generate(context),)
+                format!("{}{} = {};", prefix, identifier, expr.generate(context))
             }
             Statement::AugmentedAssign { ident, op, expr } => format!(
                 "{} {} {};",
@@ -68,15 +68,13 @@ impl Generate for Statement {
                 suite,
                 optional,
             } => {
-                let mut output = String::new();
-
                 let expr_gen = expr.generate(context);
 
                 context.add_scope();
                 let suite_gen = suite.generate(context);
                 context.remove_scope();
 
-                output.push_str(&format!("if ({}) {{ {} }}", expr_gen, suite_gen));
+                let mut output = format!("if ({}) {{ {} }}", expr_gen, suite_gen);
 
                 match optional.as_ref() {
                     Some(s) => {
