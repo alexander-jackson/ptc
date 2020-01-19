@@ -340,9 +340,8 @@ where
         }
 
         // If there are tokens in the queue, return the first one
-        if !self.queue.is_empty() {
-            let front: Tok = self.queue.pop_front().unwrap();
-            return self.emit(front);
+        if let Some(t) = self.queue.pop_front() {
+            return self.emit(t);
         }
 
         // Otherwise, do some lexing and return the next token
