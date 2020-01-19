@@ -157,17 +157,15 @@ where
     fn read_punctuation(&mut self) {
         // We can immediately match the single character operators
         let single: Option<Tok> = match self.lookahead.map(|x| x.1) {
-            Some(c) => {
-                match c {
-                    '(' => Some(Tok::LPar),
-                    ')' => Some(Tok::RPar),
-                    ':' => Some(Tok::Colon),
-                    ';' => Some(Tok::Semicolon),
-                    ',' => Some(Tok::Comma),
-                    _ => None,
-                }
-            }
-            None => None
+            Some(c) => match c {
+                '(' => Some(Tok::LPar),
+                ')' => Some(Tok::RPar),
+                ':' => Some(Tok::Colon),
+                ';' => Some(Tok::Semicolon),
+                ',' => Some(Tok::Comma),
+                _ => None,
+            },
+            None => None,
         };
 
         if let Some(tok) = single {
@@ -301,7 +299,7 @@ where
             c == l
         } else {
             false
-        }
+        };
     }
 
     fn lex_source(&mut self) {
@@ -353,7 +351,7 @@ where
 
         match self.queue.pop_front() {
             Some(t) => self.emit(t),
-            None => None
+            None => None,
         }
     }
 }

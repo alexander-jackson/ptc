@@ -86,7 +86,7 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     } else {
         match output {
             Some(s) => write_and_format_output_file(&s, &generated)?,
-            None => eprintln!("Failed to get the output filename.")
+            None => eprintln!("Failed to get the output filename."),
         }
     }
 
@@ -99,7 +99,7 @@ fn display_tokens(program_code: &str) {
     for t in lexer {
         match t.map(|x| x.1) {
             Ok(c) => println!("Token: {:#?}", c),
-            Err(e) => eprintln!("Error: {:?}", e)
+            Err(e) => eprintln!("Error: {:?}", e),
         }
     }
 }
