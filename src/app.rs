@@ -94,8 +94,10 @@ fn display_tokens(program_code: &str) -> Result<(), Box<dyn Error>> {
     let lexer = lexer::Lexer::new(program_code.char_indices());
 
     for t in lexer {
-        let curr = t.unwrap().1;
-        println!("Token: {:#?}", curr);
+        match t.map(|x| x.1) {
+            Ok(c) => println!("Token: {:#?}", c),
+            Err(e) => eprintln!("Error: {:?}", e)
+        }
     }
 
     Ok(())
