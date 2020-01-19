@@ -29,8 +29,8 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new() -> Self {
-        Self {
+    pub fn new() -> Context {
+        Context {
             symbol_table: vec![HashSet::new()],
         }
     }
@@ -50,5 +50,11 @@ impl Context {
     pub fn insert(&mut self, variable: &str) {
         let index: usize = self.symbol_table.len() - 1;
         self.symbol_table[index].insert(variable.to_string());
+    }
+}
+
+impl Default for Context {
+    fn default() -> Context {
+        Context::new()
     }
 }

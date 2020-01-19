@@ -110,15 +110,12 @@ fn get_output_filename(filename: &str) -> String {
 }
 
 fn clang_format_exists() -> bool {
-    match env::var_os("PATH") {
-        Some(paths) => {
-            for path in env::split_paths(&paths) {
-                if Path::new(&path.join("clang-format")).exists() {
-                    return true;
-                }
+    if let Some(paths) = env::var_os("PATH") {
+        for path in env::split_paths(&paths) {
+            if Path::new(&path.join("clang-format")).exists() {
+                return true;
             }
         }
-        None => (),
     }
 
     false
