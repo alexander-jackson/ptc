@@ -1,5 +1,5 @@
-use ast::Generate;
 use ast::Context;
+use ast::Generate;
 
 use ast::identifier::Identifier;
 use ast::literal::Literal;
@@ -34,9 +34,12 @@ pub enum Expression {
 impl Generate for Expression {
     fn generate(&self, context: &mut Context) -> String {
         match self {
-            Expression::BinaryOperation { left, op, right } => {
-                format!("{} {} {}", left.generate(context), op.generate(context), right.generate(context))
-            }
+            Expression::BinaryOperation { left, op, right } => format!(
+                "{} {} {}",
+                left.generate(context),
+                op.generate(context),
+                right.generate(context)
+            ),
             Expression::UnaryOperation { op, expr } => {
                 format!("{}{}", op.generate(context), expr.generate(context))
             }

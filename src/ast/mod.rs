@@ -30,7 +30,9 @@ pub struct Context {
 
 impl Context {
     pub fn new() -> Self {
-        Self { symbol_table: vec![HashSet::new()] }
+        Self {
+            symbol_table: vec![HashSet::new()],
+        }
     }
 
     pub fn add_scope(&mut self) {
@@ -46,6 +48,10 @@ impl Context {
     }
 
     pub fn insert(&mut self, variable: &str) {
-        self.symbol_table.last().cloned().unwrap().insert(variable.to_string());
+        self.symbol_table
+            .last()
+            .cloned()
+            .unwrap()
+            .insert(variable.to_string());
     }
 }

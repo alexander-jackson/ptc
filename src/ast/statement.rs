@@ -1,6 +1,6 @@
+use ast::Context;
 use ast::Generate;
 use ast::Suite;
-use ast::Context;
 
 use ast::expression::Expression;
 use ast::identifier::Identifier;
@@ -76,9 +76,7 @@ impl Generate for Statement {
                 let suite_gen = suite.generate(context);
                 context.remove_scope();
 
-                output.push_str(&format!(
-                    "if ({}) {{ {} }}", expr_gen, suite_gen
-                ));
+                output.push_str(&format!("if ({}) {{ {} }}", expr_gen, suite_gen));
 
                 match optional.as_ref() {
                     Some(s) => {
@@ -117,12 +115,7 @@ impl Generate for Statement {
                 let body_gen = body.generate(context);
                 context.remove_scope();
 
-                format!(
-                    "int {}({}) {{ {} }}",
-                    name_gen,
-                    arg_str,
-                    body_gen,
-                )
+                format!("int {}({}) {{ {} }}", name_gen, arg_str, body_gen,)
             }
         }
     }

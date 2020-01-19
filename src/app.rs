@@ -1,6 +1,6 @@
+use std::env;
 use std::error::Error;
 use std::fs;
-use std::env;
 use std::path::Path;
 use std::process::Command;
 
@@ -8,8 +8,8 @@ use crate::ast;
 use crate::lexer;
 use crate::parser;
 
-use crate::ast::Generate;
 use crate::ast::Context;
+use crate::ast::Generate;
 
 pub struct Args {
     /// Whether the AST should be displayed, specified by --ast
@@ -117,7 +117,7 @@ fn clang_format_exists() -> bool {
                     return true;
                 }
             }
-        },
+        }
         None => (),
     }
 

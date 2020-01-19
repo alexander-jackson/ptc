@@ -1,6 +1,6 @@
+use ast::Context;
 use ast::Generate;
 use ast::Suite;
-use ast::Context;
 
 #[derive(Debug, PartialEq)]
 pub struct Program {
