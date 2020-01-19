@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate lalrpop_util;
 
-mod cli;
+mod app;
 
 pub mod ast;
 pub mod lexer;
@@ -9,7 +9,7 @@ pub mod lexer;
 lalrpop_mod!(pub parser);
 
 pub fn lib_main() {
-    let result = cli::get_arguments().and_then(cli::process_args);
+    let result = app::get_arguments().and_then(app::process_args);
 
     match result {
         Ok(_) => (),
