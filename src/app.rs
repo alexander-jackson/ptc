@@ -74,7 +74,7 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     let code: String = fs::read_to_string(&path)?;
 
     if args.tokens {
-        display_tokens(&code)?;
+        display_tokens(&code);
     }
 
     let ast = get_abstract_syntax_tree(&code, args.abstract_tree);
@@ -93,8 +93,7 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-// TODO: Remove this return type //
-fn display_tokens(program_code: &str) -> Result<(), Box<dyn Error>> {
+fn display_tokens(program_code: &str) {
     let lexer = lexer::Lexer::new(program_code.char_indices());
 
     for t in lexer {
@@ -103,8 +102,6 @@ fn display_tokens(program_code: &str) -> Result<(), Box<dyn Error>> {
             Err(e) => eprintln!("Error: {:?}", e)
         }
     }
-
-    Ok(())
 }
 
 fn get_output_filename(filename: &str) -> Option<String> {
