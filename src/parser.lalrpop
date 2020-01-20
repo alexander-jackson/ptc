@@ -223,8 +223,18 @@ MultExpr: ast::expression::Expression = {
         },
 };
 
+UnaryOperator: ast::operator::Operator = {
+    "+" => ast::operator::Operator::Plus,
+    "-" => ast::operator::Operator::Minus,
+};
+
 UnaryExpr: ast::expression::Expression = {
     PowerExpr,
+    <op: UnaryOperator> <e: UnaryExpr> =>
+        ast::expression::Expression::UnaryOperation {
+            op: op,
+            expr: Box::new(e),
+        },
 };
 
 PowerExpr: ast::expression::Expression = {
