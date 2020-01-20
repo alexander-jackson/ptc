@@ -59,6 +59,7 @@ AugmentedAssignOperator: ast::operator::Operator = {
     "-=" => ast::operator::Operator::MinusEquals,
     "*=" => ast::operator::Operator::MultiplyEquals,
     "/=" => ast::operator::Operator::DivideEquals,
+    "%=" => ast::operator::Operator::ModuloEquals,
 };
 
 AugmentedAssignStatement: ast::statement::Statement = {
@@ -211,6 +212,7 @@ ArithmeticExpr: ast::expression::Expression = {
 MultOperator: ast::operator::Operator = {
     "*" => ast::operator::Operator::Multiply,
     "/" => ast::operator::Operator::Divide,
+    "%" => ast::operator::Operator::Modulo,
 };
 
 MultExpr: ast::expression::Expression = {
@@ -303,10 +305,12 @@ extern {
         "-" => lexer::Tok::Minus,
         "*" => lexer::Tok::Multiply,
         "/" => lexer::Tok::Divide,
+        "%" => lexer::Tok::Modulo,
         "+=" => lexer::Tok::PlusEquals,
         "-=" => lexer::Tok::MinusEquals,
         "*=" => lexer::Tok::MultiplyEquals,
         "/=" => lexer::Tok::DivideEquals,
+        "%=" => lexer::Tok::ModuloEquals,
         "<" => lexer::Tok::Less,
         ">" => lexer::Tok::Greater,
         "<=" => lexer::Tok::LessOrEqual,

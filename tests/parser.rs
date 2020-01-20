@@ -36,11 +36,11 @@ macro_rules! parser_failure {
 parser_success! {
     parse_underscores_in_identifiers: "longer_name\n",
     parse_integers: "40\n",
-    parse_expressions: "var = 1 + 1 - 1 * 1 / 1\n",
+    parse_expressions: "var = 1 + 1 - 1 * 1 / 1 % 1\n",
     parse_unary_expressions: "+var\n-var\n",
     parse_bracketed_expressions: "var = (1 - 1) * 1\n",
     parse_comparison_operators: "var = 0 < 1\nvar = 0 > 1\nvar = 0 <= 1\nvar = 0 >= 1\nvar = 0 == 1\nvar = 0 != 1\n",
-    parse_augmented_assignments: "var += 1\nvar -= 1\nvar *= 1\nvar /= 1\n",
+    parse_augmented_assignments: "var += 1\nvar -= 1\nvar *= 1\nvar /= 1\nvar %= 1\n",
     parse_identifier_expression: "var = var_one + var_two\n",
     parse_function_call: "var = add(1, 2)\n",
     parse_logical_expressions: "a and b\na or b\nnot a\n",
