@@ -1,6 +1,8 @@
 use ast::Context;
 use ast::Generate;
+use ast::Infer;
 use ast::Suite;
+use ast::VariableType;
 
 #[derive(Debug, PartialEq)]
 pub struct Program {
@@ -20,5 +22,17 @@ impl Generate for Program {
         code.push(String::from(""));
 
         code.join("\n")
+    }
+}
+
+impl Infer for Program {
+    fn infer(&mut self, context: &mut Context) {
+        for stmt in &mut self.statements {
+            stmt.infer(context);
+        }
+    }
+
+    fn get_type(&mut self, context: &mut Context) -> Option<VariableType> {
+        None
     }
 }

@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::collections::HashSet;
 
 pub mod expression;
@@ -24,23 +25,55 @@ impl Generate for Suite {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum VariableType {
+    Integer,
+}
+
+pub trait Infer {
+    fn infer(&mut self, &mut Context);
+    fn get_type(&mut self, &mut Context) -> Option<VariableType>;
+}
+
+impl Infer for Suite {
+    fn infer(&mut self, context: &mut Context) {
+        for stmt in self {
+            stmt.infer(context);
+        }
+    }
+
+    fn get_type(&mut self, context: &mut Context) -> Option<VariableType> {
+        for stmt in self {
+            if let Some(t) = stmt.get_type(context) {
+                return Some(t);
+            }
+        }
+
+        None
+    }
+}
+
 pub struct Context {
     symbol_table: Vec<HashSet<String>>,
+    variable_types: Vec<HashMap<String, VariableType>>,
 }
 
 impl Context {
     pub fn new() -> Context {
         Context {
             symbol_table: vec![HashSet::new()],
+            variable_types: vec![HashMap::new()],
         }
     }
 
     pub fn push_scope(&mut self) {
         self.symbol_table.push(HashSet::new());
+        self.variable_types.push(HashMap::new());
     }
 
     pub fn pop_scope(&mut self) {
         self.symbol_table.pop();
+        self.variable_types.pop();
     }
 
     pub fn contains(&self, variable: &str) -> bool {
@@ -50,6 +83,21 @@ impl Context {
     pub fn insert(&mut self, variable: &str) {
         let index: usize = self.symbol_table.len() - 1;
         self.symbol_table[index].insert(variable.to_string());
+    }
+
+    pub fn insert_inferred_type(&mut self, variable: &str, inferred: VariableType) {
+        let index: usize = self.variable_types.len() - 1;
+        self.variable_types[index].insert(variable.to_string(), inferred);
+    }
+
+    pub fn get_type(&self, variable: &str) -> Option<VariableType> {
+        for m in self.variable_types.iter().rev() {
+            if let Some(v) = m.get(variable) {
+                return Some(*v);
+            }
+        }
+
+        None
     }
 }
 

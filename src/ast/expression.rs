@@ -1,5 +1,7 @@
 use ast::Context;
 use ast::Generate;
+use ast::Infer;
+use ast::VariableType;
 
 use ast::identifier::Identifier;
 use ast::literal::Literal;
@@ -59,5 +61,12 @@ impl Generate for Expression {
             Expression::Identifier { name } => name.generate(context),
             Expression::Literal { value } => value.generate(context),
         }
+    }
+}
+
+impl Infer for Expression {
+    fn infer(&mut self, context: &mut Context) {}
+    fn get_type(&mut self, context: &mut Context) -> Option<VariableType> {
+        Some(VariableType::Integer)
     }
 }

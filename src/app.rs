@@ -10,6 +10,7 @@ use crate::parser;
 
 use crate::ast::Context;
 use crate::ast::Generate;
+use crate::ast::Infer;
 
 pub struct Args {
     /// Whether the AST should be displayed, specified by --ast
@@ -77,8 +78,10 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
         display_tokens(&code);
     }
 
-    let ast = get_abstract_syntax_tree(&code, args.abstract_tree);
-    let generated = ast.generate(&mut Context::new());
+    let mut ast = get_abstract_syntax_tree(&code, args.abstract_tree);
+    let mut context = Context::new();
+    ast.infer(&mut context);
+    let generated = ast.generate(&mut context);
     let output = get_output_filename(&path);
 
     if args.display {

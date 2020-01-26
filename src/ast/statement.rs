@@ -1,6 +1,8 @@
 use ast::Context;
 use ast::Generate;
+use ast::Infer;
 use ast::Suite;
+use ast::VariableType;
 
 use ast::expression::Expression;
 use ast::identifier::Identifier;
@@ -114,6 +116,35 @@ impl Generate for Statement {
 
                 format!("int {}({}) {{ {} }}", name_gen, arg_str, body_gen,)
             }
+        }
+    }
+}
+
+impl Infer for Statement {
+    fn infer(&mut self, context: &mut Context) {
+        match self {
+            Statement::Assign { ident, expr } => {
+                if let Some(inferred) = expr.get_type(context) {
+                    println!("Inferred type for '{:?}': {:?}", expr, inferred);
+                    let identifier: String = ident.generate(context);
+                    context.insert_inferred_type(&identifier, inferred);
+                }
+            }
+            Statement::FunctionDecl {
+                name: _,
+                args: _,
+                body,
+            } => {
+                body.infer(context);
+            }
+            _ => (),
+        }
+    }
+
+    fn get_type(&mut self, context: &mut Context) -> Option<VariableType> {
+        match self {
+            Statement::ReturnStatement { expr } => expr.get_type(context),
+            _ => None,
         }
     }
 }
