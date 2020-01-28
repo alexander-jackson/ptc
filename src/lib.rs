@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate lalrpop_util;
 
-mod app;
+pub mod app;
 
 pub mod ast;
 pub mod lexer;

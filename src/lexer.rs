@@ -150,6 +150,12 @@ where
 
     /// Reads a number specified in Base10 from the source.
     fn read_number(&mut self) {
+        // TODO: This crashes a lot, if <number> is too large
+        //
+        // Solution could be to read a string and try parsing it. If it is too large,
+        // truncate it or just consider it to be the max value of a u32. For example,
+        // given 3x10^1000, either turn this into 2^31 - 1 or truncate until it's lower
+        // than that //
         let number: u32 = self.read_while(|c| c.is_digit(10)).parse().unwrap();
         self.queue.push_back(Tok::Integer { value: number });
     }
@@ -282,6 +288,7 @@ where
             } else {
                 // See how far back we have gone
                 while self.indentation.pop_length() > indents {
+                    // TODO: This can overflow/underflow //
                     self.indentation.level -= 1;
                     self.queue.push_back(Tok::Unindent);
                 }

@@ -145,7 +145,7 @@ fn write_and_format_output_file(filename: &str, code: &str) -> Result<(), Box<dy
     Ok(())
 }
 
-fn parse(input: &str) -> Result<ast::program::Program, String> {
+pub fn parse(input: &str) -> Result<ast::program::Program, String> {
     let lex_input = input.char_indices();
     let lexer = lexer::Lexer::new(lex_input);
     let parser = parser::ProgramParser::new();
