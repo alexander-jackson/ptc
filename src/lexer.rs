@@ -1,4 +1,6 @@
 use std::collections::VecDeque;
+use std::error::Error;
+use std::fmt;
 
 pub type Spanned<Tok, Loc, Error> = Result<(Loc, Tok, Loc), Error>;
 
@@ -45,11 +47,34 @@ pub enum Tok {
     Newline,
 }
 
-#[derive(Debug)]
 pub enum LexicalError {
-    // Not possible
+    MixedIndentation,
 }
 
+impl Error for LexicalError {}
+
+impl fmt::Display for LexicalError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            LexicalError::MixedIndentation => write!(
+                f,
+                "Encountered mixed indentation in the file. Please use either tabs OR spaces."
+            ),
+        }
+    }
+}
+
+impl fmt::Debug for LexicalError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            LexicalError::MixedIndentation => {
+                write!(f, "Encountered mixed indentation in the file. Please use either tabs or spaces exclusively.")
+            }
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
 enum IndentationChar {
     Unknown,
     Space,
@@ -83,7 +108,7 @@ impl Indentation {
 pub struct Lexer<T: Iterator<Item = (usize, char)>> {
     chars: T,
     lookahead: Option<(usize, char)>,
-    queue: VecDeque<Tok>,
+    queue: VecDeque<Result<Tok, LexicalError>>,
     index: usize,
     line_number: usize,
     start_of_line: bool,
@@ -134,7 +159,7 @@ where
     fn read_identifier_or_keyword(&mut self) {
         let ident: String = self.read_while(|c| c.is_alphabetic() || c == '_');
 
-        self.queue.push_back(match ident.as_ref() {
+        self.push_token(match ident.as_ref() {
             "pass" => Tok::Pass,
             "if" => Tok::If,
             "else" => Tok::Else,
@@ -156,8 +181,9 @@ where
         // truncate it or just consider it to be the max value of a u32. For example,
         // given 3x10^1000, either turn this into 2^31 - 1 or truncate until it's lower
         // than that //
-        let number: u32 = self.read_while(|c| c.is_digit(10)).parse().unwrap();
-        self.queue.push_back(Tok::Integer { value: number });
+        let number: String = self.read_while(|c| c.is_digit(10));
+        let value: u32 = number.parse().unwrap_or_else(|_| u32::max_value());
+        self.push_token(Tok::Integer { value: value });
     }
 
     /// Reads 'punctuation' from the source.
@@ -177,7 +203,7 @@ where
         };
 
         if let Some(tok) = single {
-            self.queue.push_back(tok);
+            self.push_token(tok);
             self.update_lookahead();
             return;
         }
@@ -211,7 +237,7 @@ where
 
             if self.current_char_equals('=') {
                 self.update_lookahead();
-                self.queue.push_back(Tok::NotEqual);
+                self.push_token(Tok::NotEqual);
             }
         }
     }
@@ -229,26 +255,40 @@ where
 
             if self.current_char_equals(c2) {
                 self.update_lookahead();
-                self.queue.push_back(t2);
+                self.push_token(t2);
             } else {
-                self.queue.push_back(t1);
+                self.push_token(t1);
             }
         }
     }
 
     /// Reads a newline character from the source and updates internal variables.
     fn read_newline(&mut self) {
-        self.queue.push_back(Tok::Newline);
+        self.push_token(Tok::Newline);
         self.update_lookahead();
 
         self.start_of_line = true;
         self.line_number += 1;
     }
 
-    /// Reads the indentation for a new line and deals with previous indentation levels.
-    /// Updates the queue with new indents or unindents if needed.
-    fn read_indentation(&mut self) {
-        let indents: usize = match self.indentation.character {
+    fn check_for_mixed_indentation(&self) -> bool {
+        if self.indentation.character == IndentationChar::Space {
+            if self.current_char_equals('\t') {
+                return true;
+            }
+        }
+
+        if self.indentation.character == IndentationChar::Tab {
+            if self.current_char_equals(' ') {
+                return true;
+            }
+        }
+
+        false
+    }
+
+    fn read_indentation_size(&mut self) -> usize {
+        match self.indentation.character {
             IndentationChar::Unknown => {
                 if let Some(c) = self.lookahead.map(|x| x.1) {
                     match c {
@@ -268,8 +308,20 @@ where
             }
             IndentationChar::Space => self.read_while(|c| c == ' ').len(),
             IndentationChar::Tab => self.read_while(|c| c == '\t').len(),
-        };
+        }
+    }
 
+    /// Reads the indentation for a new line and deals with previous indentation levels.
+    /// Updates the queue with new indents or unindents if needed.
+    fn read_indentation(&mut self) {
+        // Check for incorrect indentation characters
+        if self.check_for_mixed_indentation() {
+            self.push_error(LexicalError::MixedIndentation);
+            return;
+        }
+
+        // Check for indentation type
+        let indents: usize = self.read_indentation_size();
         let current: usize = self.indentation.get_current_length();
 
         if self.current_char_equals('\n') {
@@ -284,13 +336,18 @@ where
                 // Push the new indentation level and update
                 self.indentation.length.push(indents);
                 self.indentation.level += 1;
-                self.queue.push_back(Tok::Indent);
+                self.push_token(Tok::Indent);
             } else {
                 // See how far back we have gone
                 while self.indentation.pop_length() > indents {
+                    if self.indentation.level == 0 {
+                        self.push_error(LexicalError::MixedIndentation);
+                        return;
+                    }
+
                     // TODO: This can overflow/underflow //
                     self.indentation.level -= 1;
-                    self.queue.push_back(Tok::Unindent);
+                    self.push_token(Tok::Unindent);
                 }
 
                 self.indentation.length.push(indents);
@@ -333,9 +390,22 @@ where
         }
     }
 
+    fn push_token(&mut self, token: Tok) {
+        self.queue.push_back(Ok(token));
+    }
+
+    fn push_error(&mut self, err: LexicalError) {
+        self.queue.push_back(Err(err));
+    }
+
     /// Formats a token for LALRPOP without the need to write this ugly syntax everywhere.
     fn emit(&self, token: Tok) -> Option<Spanned<Tok, usize, LexicalError>> {
         Some(Ok((self.line_number, token, self.line_number)))
+    }
+
+    /// Formats an error for LALRPOP without the need to write this ugly syntax everywhere.
+    fn emit_error(&self, err: LexicalError) -> Option<Spanned<Tok, usize, LexicalError>> {
+        Some(Err(err))
     }
 }
 
@@ -346,12 +416,19 @@ where
     type Item = Spanned<Tok, usize, LexicalError>;
 
     fn next(&mut self) -> Option<Self::Item> {
+        while let Some(q) = self.queue.pop_front() {
+            return match q {
+                Ok(t) => self.emit(t),
+                Err(e) => self.emit_error(e),
+            };
+        }
+
         match self.lookahead {
             Some(_) => {
                 self.lex_source();
             }
             None => {
-                if let Some(t) = self.queue.pop_front() {
+                if let Some(Ok(t)) = self.queue.pop_front() {
                     return self.emit(t);
                 }
 
@@ -360,7 +437,8 @@ where
         }
 
         match self.queue.pop_front() {
-            Some(t) => self.emit(t),
+            Some(Ok(t)) => self.emit(t),
+            Some(Err(e)) => self.emit_error(e),
             None => None,
         }
     }

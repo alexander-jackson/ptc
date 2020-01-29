@@ -78,7 +78,7 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
         display_tokens(&code);
     }
 
-    let mut ast = get_abstract_syntax_tree(&code, args.abstract_tree);
+    let mut ast = get_abstract_syntax_tree(&code, args.abstract_tree)?;
     let mut context = Context::new();
     ast.infer(&mut context);
     let generated = ast.generate(&mut context);
@@ -153,17 +153,39 @@ pub fn parse(input: &str) -> Result<ast::program::Program, String> {
 
     match result {
         Ok(s) => Ok(s),
-        Err(e) => Err(format!("{:?}", e)),
+        Err(e) => Err(format_parser_error(e)),
     }
 }
 
-fn get_abstract_syntax_tree(code: &str, display: bool) -> ast::program::Program {
-    let ast = parse(&code).expect("Failed to parse the given program");
+fn format_parser_error(
+    error: lalrpop_util::ParseError<usize, lexer::Tok, lexer::LexicalError>,
+) -> String {
+    match error {
+        lalrpop_util::ParseError::User { error } => format!("{}", error),
+        lalrpop_util::ParseError::UnrecognizedToken { token, expected } => {
+            let expected_tokens: Vec<String> =
+                expected.iter().map(|s| s.replace("\"", "")).collect();
+            let expected_tokens = format!("[{}]", expected_tokens.join(", "));
+
+            format!(
+                "Found: {:?} on line {}, Expected: {}",
+                token.1, token.2, expected_tokens
+            )
+        }
+        _ => String::from("Unexpected error occurred"),
+    }
+}
+
+fn get_abstract_syntax_tree(
+    code: &str,
+    display: bool,
+) -> Result<ast::program::Program, Box<dyn Error>> {
+    let ast = parse(&code)?;
 
     if display {
         println!("Abstract syntax tree:");
         println!("{:#?}", &ast);
     }
 
-    ast
+    Ok(ast)
 }
