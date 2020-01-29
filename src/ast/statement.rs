@@ -130,11 +130,7 @@ impl Infer for Statement {
                     context.insert_inferred_type(&identifier, inferred);
                 }
             }
-            Statement::FunctionDecl {
-                name: _,
-                args: _,
-                body,
-            } => {
+            Statement::FunctionDecl { body, .. } => {
                 body.infer(context);
             }
             _ => (),

@@ -13,7 +13,7 @@ pub enum Identifier {
 impl Generate for Identifier {
     fn generate(&self, _context: &mut Context) -> String {
         match self {
-            Identifier::Name { name, var_type: _ } => name.to_string(),
+            Identifier::Name { name, .. } => name.to_string(),
         }
     }
 }

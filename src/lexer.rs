@@ -183,7 +183,7 @@ where
         // than that //
         let number: String = self.read_while(|c| c.is_digit(10));
         let value: u32 = number.parse().unwrap_or_else(|_| u32::max_value());
-        self.push_token(Tok::Integer { value: value });
+        self.push_token(Tok::Integer { value });
     }
 
     /// Reads 'punctuation' from the source.
@@ -272,16 +272,12 @@ where
     }
 
     fn check_for_mixed_indentation(&self) -> bool {
-        if self.indentation.character == IndentationChar::Space {
-            if self.current_char_equals('\t') {
-                return true;
-            }
+        if self.indentation.character == IndentationChar::Space && self.current_char_equals('\t') {
+            return true;
         }
 
-        if self.indentation.character == IndentationChar::Tab {
-            if self.current_char_equals(' ') {
-                return true;
-            }
+        if self.indentation.character == IndentationChar::Tab && self.current_char_equals(' ') {
+            return true;
         }
 
         false
@@ -340,12 +336,6 @@ where
             } else {
                 // See how far back we have gone
                 while self.indentation.pop_length() > indents {
-                    if self.indentation.level == 0 {
-                        self.push_error(LexicalError::MixedIndentation);
-                        return;
-                    }
-
-                    // TODO: This can overflow/underflow //
                     self.indentation.level -= 1;
                     self.push_token(Tok::Unindent);
                 }
@@ -416,7 +406,7 @@ where
     type Item = Spanned<Tok, usize, LexicalError>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some(q) = self.queue.pop_front() {
+        if let Some(q) = self.queue.pop_front() {
             return match q {
                 Ok(t) => self.emit(t),
                 Err(e) => self.emit_error(e),
