@@ -1,6 +1,4 @@
-use ast::Context;
-use ast::Generate;
-use ast::VariableType;
+use ast::{Context, Generate, VariableType};
 
 #[derive(Debug, PartialEq)]
 pub enum Identifier {

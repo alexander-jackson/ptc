@@ -1,11 +1,4 @@
-use ast::Context;
-use ast::Generate;
-use ast::Infer;
-use ast::VariableType;
-
-use ast::identifier::Identifier;
-use ast::literal::Literal;
-use ast::operator::Operator;
+use ast::{Context, Generate, Identifier, Infer, Literal, Operator, VariableType};
 
 #[derive(Debug, PartialEq)]
 pub enum Expression {

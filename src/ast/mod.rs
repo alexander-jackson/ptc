@@ -8,7 +8,10 @@ pub mod operator;
 pub mod program;
 pub mod statement;
 
-use ast::statement::Statement;
+pub use self::{
+    expression::Expression, identifier::Identifier, literal::Literal, operator::Operator,
+    program::Program, statement::Statement,
+};
 
 pub type Suite = Vec<Statement>;
 

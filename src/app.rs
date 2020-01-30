@@ -145,7 +145,7 @@ fn write_and_format_output_file(filename: &str, code: &str) -> Result<(), Box<dy
     Ok(())
 }
 
-pub fn parse(input: &str) -> Result<ast::program::Program, String> {
+pub fn parse(input: &str) -> Result<ast::Program, String> {
     let lex_input = input.char_indices();
     let lexer = lexer::Lexer::new(lex_input);
     let parser = parser::ProgramParser::new();
@@ -176,10 +176,7 @@ fn format_parser_error(
     }
 }
 
-fn get_abstract_syntax_tree(
-    code: &str,
-    display: bool,
-) -> Result<ast::program::Program, Box<dyn Error>> {
+fn get_abstract_syntax_tree(code: &str, display: bool) -> Result<ast::Program, Box<dyn Error>> {
     let ast = parse(&code)?;
 
     if display {

@@ -1,7 +1,6 @@
 extern crate ptc;
 
-use ptc::ast::Context;
-use ptc::ast::Generate;
+use ptc::ast::{Context, Generate};
 
 fn get_output(input: &str) -> String {
     let parser = ptc::parser::ProgramParser::new();

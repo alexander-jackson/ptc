@@ -1,5 +1,4 @@
-use ast::Context;
-use ast::Generate;
+use ast::{Context, Generate};
 
 #[derive(Debug, PartialEq)]
 pub enum Literal {

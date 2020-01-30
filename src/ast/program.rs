@@ -1,8 +1,4 @@
-use ast::Context;
-use ast::Generate;
-use ast::Infer;
-use ast::Suite;
-use ast::VariableType;
+use ast::{Context, Generate, Infer, Suite, VariableType};
 
 #[derive(Debug, PartialEq)]
 pub struct Program {
