@@ -2,20 +2,41 @@ use std::iter::FromIterator;
 
 extern crate ptc;
 
-fn get_lexer_tokens(input: &str) -> Vec<ptc::lexer::Tok> {
-    let lexer = ptc::lexer::Lexer::new(input.char_indices());
+use ptc::lexer::Tok::*;
+use ptc::lexer::*;
+
+macro_rules! lex {
+    ($($name:ident: $input:expr, $expected:expr,)*) => {
+        $(
+            #[test]
+            fn $name() {
+                let input: &str = $input;
+                let tokens = get_lexer_tokens(input);
+                assert_eq!(tokens, $expected);
+            }
+        )*
+    }
+}
+
+fn get_lexer_tokens(input: &str) -> Vec<Tok> {
+    let lexer = Lexer::new(input.char_indices());
 
     Vec::from_iter(lexer.map(|x| x.unwrap().1))
 }
 
+lex! {
+    newline_token: "\n\n", vec![Newline, Newline],
+    identifier: "name", vec![Identifier { name: String::from("name") }],
+    operators: "+-*/%", vec![Plus, Minus, Multiply, Divide, Modulo],
+    augmented_operators: "+=-=*=/=%=", vec![PlusEquals, MinusEquals, MultiplyEquals, DivideEquals, ModuloEquals],
+    keywords: "if else while pass def and or not", vec![If, Else, While, Pass, Def, LogicalAnd, LogicalOr, LogicalNot],
+    simple_indentation: "if condition:\n\tpass\n", vec![If, Identifier { name: String::from("condition") }, Colon, Newline, Indent, Pass, Newline, Unindent],
+    nested_indentation: "if condition:\n\tif other:\n\t\tpass\n", vec![If, Identifier { name: String::from("condition") }, Colon, Newline, Indent, If, Identifier { name: String::from("other") }, Colon, Newline, Indent, Pass, Newline, Unindent, Unindent],
+}
+
 #[test]
-fn lex_all_tokens_test() {
-    let input: &str = "\n\n";
-
-    use ptc::lexer::Tok::*;
-
+#[should_panic]
+fn mixed_indentation() {
+    let input: &str = "if:\n\tpass\n    else:\n    pass";
     let tokens = get_lexer_tokens(input);
-    let expected = vec![Newline, Newline];
-
-    assert_eq!(tokens, expected);
 }
