@@ -1,4 +1,4 @@
-use ast::{Context, Expression, Generate, Identifier, Infer, Operator, Suite, VariableType};
+use ast::{Context, Expression, Generate, Identifier, Infer, Operator, Suite, Type, VariableType};
 
 #[derive(Debug, PartialEq)]
 pub enum Statement {
@@ -116,23 +116,16 @@ impl Infer for Statement {
     fn infer(&mut self, context: &mut Context) {
         match self {
             Statement::Assign { ident, expr } => {
-                if let Some(inferred) = expr.get_type(context) {
-                    println!("Inferred type for '{:?}': {:?}", expr, inferred);
-                    let identifier: String = ident.generate(context);
-                    context.insert_inferred_type(&identifier, inferred);
-                }
+                let inferred = expr.get_type();
+                println!("Inferred type for '{:?}': {:?}", expr, inferred);
+                let identifier: String = ident.generate(context);
+                context.insert_inferred_type(&identifier, inferred);
+                dbg!(&context);
             }
             Statement::FunctionDecl { body, .. } => {
                 body.infer(context);
             }
             _ => (),
-        }
-    }
-
-    fn get_type(&mut self, context: &mut Context) -> Option<VariableType> {
-        match self {
-            Statement::ReturnStatement { expr } => expr.get_type(context),
-            _ => None,
         }
     }
 }

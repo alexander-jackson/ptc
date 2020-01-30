@@ -20,9 +20,9 @@ pub trait Generate {
 }
 
 impl Generate for Suite {
-    fn generate(&self, symbol_table: &mut Context) -> String {
+    fn generate(&self, context: &mut Context) -> String {
         self.iter()
-            .map(|s| s.generate(symbol_table))
+            .map(|s| s.generate(context))
             .collect::<Vec<String>>()
             .join(" ")
     }
@@ -35,7 +35,6 @@ pub enum VariableType {
 
 pub trait Infer {
     fn infer(&mut self, &mut Context);
-    fn get_type(&mut self, &mut Context) -> Option<VariableType>;
 }
 
 impl Infer for Suite {
@@ -44,18 +43,13 @@ impl Infer for Suite {
             stmt.infer(context);
         }
     }
-
-    fn get_type(&mut self, context: &mut Context) -> Option<VariableType> {
-        for stmt in self {
-            if let Some(t) = stmt.get_type(context) {
-                return Some(t);
-            }
-        }
-
-        None
-    }
 }
 
+pub trait Type {
+    fn get_type(&self) -> VariableType;
+}
+
+#[derive(Debug)]
 pub struct Context {
     symbol_table: Vec<HashSet<String>>,
     variable_types: Vec<HashMap<String, VariableType>>,

@@ -3,15 +3,6 @@ use std::iter::FromIterator;
 use lexer;
 use ast;
 
-use ast::{
-    Program,
-    Statement,
-    Expression,
-    Operator,
-    Identifier,
-    Literal,
-};
-
 grammar;
 
 pub Program: ast::Program = {

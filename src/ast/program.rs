@@ -27,8 +27,4 @@ impl Infer for Program {
             stmt.infer(context);
         }
     }
-
-    fn get_type(&mut self, context: &mut Context) -> Option<VariableType> {
-        None
-    }
 }

@@ -1,4 +1,4 @@
-use ast::{Context, Generate};
+use ast::{Context, Generate, Type, VariableType};
 
 #[derive(Debug, PartialEq)]
 pub enum Literal {
@@ -9,6 +9,14 @@ impl Generate for Literal {
     fn generate(&self, _t: &mut Context) -> String {
         match self {
             Literal::Integer { value } => value.to_string(),
+        }
+    }
+}
+
+impl Type for Literal {
+    fn get_type(&self) -> VariableType {
+        match self {
+            Literal::Integer { .. } => VariableType::Integer,
         }
     }
 }
