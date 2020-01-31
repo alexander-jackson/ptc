@@ -1,3 +1,5 @@
+#![allow(unused_parens)]
+
 #[macro_use]
 extern crate lalrpop_util;
 
