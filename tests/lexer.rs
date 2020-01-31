@@ -29,6 +29,7 @@ lex! {
     identifier: "name", vec![Identifier { name: String::from("name") }],
     operators: "+-*/%", vec![Plus, Minus, Multiply, Divide, Modulo],
     augmented_operators: "+=-=*=/=%=", vec![PlusEquals, MinusEquals, MultiplyEquals, DivideEquals, ModuloEquals],
+    punctuation: "()[]:;,", vec![LPar, RPar, LSquare, RSquare, Colon, Semicolon, Comma],
     keywords: "if else while pass def and or not", vec![If, Else, While, Pass, Def, LogicalAnd, LogicalOr, LogicalNot],
     simple_indentation: "if condition:\n\tpass\n", vec![If, Identifier { name: String::from("condition") }, Colon, Newline, Indent, Pass, Newline, Unindent],
     nested_indentation: "if condition:\n\tif other:\n\t\tpass\n", vec![If, Identifier { name: String::from("condition") }, Colon, Newline, Indent, If, Identifier { name: String::from("other") }, Colon, Newline, Indent, Pass, Newline, Unindent, Unindent],

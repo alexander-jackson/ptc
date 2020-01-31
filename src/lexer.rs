@@ -41,6 +41,8 @@ pub enum Tok {
     Integer { value: u32 },
     LPar,
     RPar,
+    LSquare,
+    RSquare,
     Colon,
     Semicolon,
     Comma,
@@ -194,6 +196,8 @@ where
             Some(c) => match c {
                 '(' => Some(Tok::LPar),
                 ')' => Some(Tok::RPar),
+                '[' => Some(Tok::LSquare),
+                ']' => Some(Tok::RSquare),
                 ':' => Some(Tok::Colon),
                 ';' => Some(Tok::Semicolon),
                 ',' => Some(Tok::Comma),
