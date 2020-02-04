@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 pub mod expression;
 pub mod identifier;
 pub mod literal;
@@ -7,10 +5,15 @@ pub mod operator;
 pub mod program;
 pub mod statement;
 
+mod symboltable;
+
 pub use self::{
     expression::Expression, identifier::Identifier, literal::Literal, operator::Operator,
     program::Program, statement::Statement,
 };
+
+use self::symboltable::Variable;
+use self::symboltable::SymbolTable;
 
 pub type Suite = Vec<Statement>;
 
@@ -29,6 +32,7 @@ impl Generate for Suite {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum VariableType {
+    Unknown,
     Integer,
 }
 
@@ -50,46 +54,42 @@ pub trait Type {
 
 #[derive(Debug)]
 pub struct Context {
-    symbol_table: Vec<HashMap<String, Option<VariableType>>>,
+    symbol_table: SymbolTable,
 }
 
 impl Context {
     pub fn new() -> Context {
         Context {
-            symbol_table: vec![HashMap::new()],
+            symbol_table: SymbolTable::new(),
         }
     }
 
     pub fn push_scope(&mut self) {
-        self.symbol_table.push(HashMap::new());
+        self.symbol_table.push_scope();
     }
 
     pub fn pop_scope(&mut self) {
-        self.symbol_table.pop();
+        self.symbol_table.pop_scope();
     }
 
     pub fn contains(&self, variable: &str) -> bool {
-        self.symbol_table.iter().any(|x| x.contains_key(variable))
+        self.symbol_table.variable_defined(variable)
     }
 
     pub fn insert(&mut self, variable: &str) {
-        let index: usize = self.symbol_table.len() - 1;
-        self.symbol_table[index].insert(variable.to_string(), None);
+        self.symbol_table.insert_variable(Variable::new(variable), VariableType::Unknown);
     }
 
     pub fn insert_inferred_type(&mut self, variable: &str, inferred: VariableType) {
-        let index: usize = self.symbol_table.len() - 1;
-        self.symbol_table[index].insert(variable.to_string(), Some(inferred));
+        self.symbol_table.insert_variable(Variable::new(variable), inferred);
     }
 
-    pub fn get_type(&self, variable: &str) -> Option<VariableType> {
-        for m in self.symbol_table.iter().rev() {
-            if let Some(v) = m.get(variable) {
-                return *v;
-            }
-        }
+    pub fn get_type(&mut self, variable: &str) -> Option<&VariableType> {
+        self.symbol_table.get_type(&Variable::new(variable))
+    }
 
-        None
+    pub fn variable_defined(&self, variable: &str) -> bool {
+        self.symbol_table.variable_defined(variable)
     }
 }
 

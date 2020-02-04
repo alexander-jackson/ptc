@@ -41,10 +41,9 @@ impl Generate for Statement {
                 // Check whether the variable is undefined
                 let identifier: String = ident.generate(context);
 
-                let prefix: String = if context.contains(&identifier) {
+                let prefix: String = if context.variable_defined(&identifier) {
                     String::from("")
                 } else {
-                    context.insert(&identifier);
                     String::from("int ")
                 };
 
@@ -120,7 +119,6 @@ impl Infer for Statement {
                 println!("Inferred type for '{:?}': {:?}", expr, inferred);
                 let identifier: String = ident.generate(context);
                 context.insert_inferred_type(&identifier, inferred);
-                dbg!(&context);
             }
             Statement::FunctionDecl { body, .. } => {
                 body.infer(context);
