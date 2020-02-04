@@ -72,7 +72,7 @@ impl Context {
         self.symbol_table.pop_scope();
     }
 
-    pub fn contains(&self, variable: &str) -> bool {
+    pub fn contains(&mut self, variable: &str) -> bool {
         self.symbol_table.variable_defined(variable)
     }
 
@@ -88,7 +88,7 @@ impl Context {
         self.symbol_table.get_type(&Variable::new(variable))
     }
 
-    pub fn variable_defined(&self, variable: &str) -> bool {
+    pub fn variable_defined(&mut self, variable: &str) -> bool {
         self.symbol_table.variable_defined(variable)
     }
 }

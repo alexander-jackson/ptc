@@ -94,8 +94,9 @@ impl Scope {
         }
     }
 
-    pub fn variable_defined(&self, indices: &[usize], variable: &str) -> bool {
+    pub fn variable_defined(&mut self, indices: &[usize], variable: &str) -> bool {
         if let Some((head, tail)) = indices.split_first() {
+            // Check whether it is defined in a scope closer to our current position
             let defined = self.subscopes[*head].variable_defined(tail, variable);
 
             if defined {
@@ -103,10 +104,18 @@ impl Scope {
             }
         }
 
+        // Check if it is defined here
         for key in self.variables.keys() {
-            if key.name == variable {
-                return key.defined;
+            if key.name == variable && key.defined {
+                return true;
             }
+        }
+
+        let mut obj: Variable = Variable::new(variable);
+
+        if let Some(vtype) = self.variables.remove(&obj) {
+            obj.defined = true;
+            self.variables.insert(obj, vtype);
         }
 
         return false;
@@ -156,7 +165,7 @@ impl SymbolTable {
         self.scope.next_scope(0, &mut self.active);
     }
 
-    pub fn variable_defined(&self, variable: &str) -> bool {
+    pub fn variable_defined(&mut self, variable: &str) -> bool {
         self.scope.variable_defined(&self.active, variable)
     }
 }
