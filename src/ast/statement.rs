@@ -64,15 +64,15 @@ impl Generate for Statement {
             } => {
                 let expr_gen = expr.generate(context);
 
-                context.push_scope();
+                context.next_scope();
                 let suite_gen = suite.generate(context);
-                context.pop_scope();
+                context.next_scope();
 
                 let optional_gen = match optional.as_ref() {
                     Some(s) => {
-                        context.push_scope();
+                        context.next_scope();
                         let optional_gen = s.generate(context);
-                        context.pop_scope();
+                        context.next_scope();
                         format!(" else {{ {} }}", &optional_gen)
                     }
                     None => String::from(""),
@@ -83,9 +83,9 @@ impl Generate for Statement {
             Statement::WhileStatement { expr, suite } => {
                 let expr_gen = expr.generate(context);
 
-                context.push_scope();
+                context.next_scope();
                 let suite_gen = suite.generate(context);
-                context.pop_scope();
+                context.next_scope();
 
                 format!("while ({}) {{ {} }}", expr_gen, suite_gen)
             }
@@ -101,9 +101,9 @@ impl Generate for Statement {
                 let arg_str = arg_str.unwrap_or_else(|| String::from(""));
                 let name_gen = name.generate(context);
 
-                context.push_scope();
+                context.next_scope();
                 let body_gen = body.generate(context);
-                context.pop_scope();
+                context.next_scope();
 
                 format!("int {}({}) {{ {} }}", name_gen, arg_str, body_gen,)
             }
@@ -115,13 +115,20 @@ impl Infer for Statement {
     fn infer(&mut self, context: &mut Context) {
         match self {
             Statement::Assign { ident, expr } => {
-                let inferred = expr.get_type();
+                let inferred = expr.get_type(context);
                 println!("Inferred type for '{:?}': {:?}", expr, inferred);
                 let identifier: String = ident.generate(context);
                 context.insert_inferred_type(&identifier, inferred);
             }
+            Statement::IfStatement { suite, .. } => {
+                context.push_scope();
+                suite.infer(context);
+                context.pop_scope();
+            }
             Statement::FunctionDecl { body, .. } => {
+                context.push_scope();
                 body.infer(context);
+                context.pop_scope();
             }
             _ => (),
         }

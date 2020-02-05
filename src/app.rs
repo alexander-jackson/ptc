@@ -81,7 +81,7 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     let mut ast = get_abstract_syntax_tree(&code, args.abstract_tree)?;
     let mut context = Context::new();
     ast.infer(&mut context);
-    dbg!(&context);
+    context.reset_position();
     let generated = ast.generate(&mut context);
     let output = get_output_filename(&path);
 

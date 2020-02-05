@@ -12,8 +12,8 @@ pub use self::{
     program::Program, statement::Statement,
 };
 
-use self::symboltable::Variable;
 use self::symboltable::SymbolTable;
+use self::symboltable::Variable;
 
 pub type Suite = Vec<Statement>;
 
@@ -49,7 +49,7 @@ impl Infer for Suite {
 }
 
 pub trait Type {
-    fn get_type(&self) -> VariableType;
+    fn get_type(&self, &mut Context) -> VariableType;
 }
 
 #[derive(Debug)]
@@ -77,11 +77,13 @@ impl Context {
     }
 
     pub fn insert(&mut self, variable: &str) {
-        self.symbol_table.insert_variable(Variable::new(variable), VariableType::Unknown);
+        self.symbol_table
+            .insert_variable(Variable::new(variable), VariableType::Unknown);
     }
 
     pub fn insert_inferred_type(&mut self, variable: &str, inferred: VariableType) {
-        self.symbol_table.insert_variable(Variable::new(variable), inferred);
+        self.symbol_table
+            .insert_variable(Variable::new(variable), inferred);
     }
 
     pub fn get_type(&mut self, variable: &str) -> Option<&VariableType> {
@@ -90,6 +92,14 @@ impl Context {
 
     pub fn variable_defined(&mut self, variable: &str) -> bool {
         self.symbol_table.variable_defined(variable)
+    }
+
+    pub fn reset_position(&mut self) {
+        self.symbol_table.reset_position();
+    }
+
+    pub fn next_scope(&mut self) {
+        self.symbol_table.next_scope();
     }
 }
 

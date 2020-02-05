@@ -14,7 +14,7 @@ impl Generate for Literal {
 }
 
 impl Type for Literal {
-    fn get_type(&self) -> VariableType {
+    fn get_type(&self, _: &mut Context) -> VariableType {
         match self {
             Literal::Integer { .. } => VariableType::Integer,
         }
