@@ -4,13 +4,8 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 
-use crate::ast;
-use crate::lexer;
-use crate::parser;
-
-use crate::ast::Context;
-use crate::ast::Generate;
-use crate::ast::Infer;
+use crate::ast::{Context, Generate, Infer};
+use crate::{ast, lexer, parser};
 
 pub struct Args {
     /// Whether the AST should be displayed, specified by --ast
@@ -25,6 +20,8 @@ pub struct Args {
     paths: Vec<String>,
 }
 
+/// Display the help message for the compiler, typically upon running the program with no
+/// arguments or supplying the -h or --help flag
 fn display_help_message() {
     println!(
         r#"
@@ -46,6 +43,13 @@ ARGS:
     );
 }
 
+/// Parse the arguments into an Args struct that can then be used to determine what the user wants
+/// the program to do.
+///
+/// # Errors
+///
+/// If any of the free arguments are not UTF-8 encoded or any of the flags are left, this will
+/// return an error variant.
 pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
     let mut args = pico_args::Arguments::from_env();
 
@@ -58,6 +62,8 @@ pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
     })
 }
 
+/// Process the arguments given to the program from get_arguments(). Process each path in turn as
+/// normal.
 pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
     if args.help || args.paths.is_empty() {
         display_help_message();
@@ -71,6 +77,8 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+/// Process a single path to a file. Generates code if required, as well as displaying abstract
+/// syntax trees, tokens and the generated output if needed.
 fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     let code: String = fs::read_to_string(&path)?;
 
@@ -97,6 +105,8 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+/// Display the tokens given by the lexer for the given input. Displays to stdout unless it is an
+/// error token, at which point it will be displayed to stderr and the lexer will stop.
 fn display_tokens(program_code: &str) {
     let lexer = lexer::Lexer::new(program_code.char_indices());
 
@@ -108,6 +118,8 @@ fn display_tokens(program_code: &str) {
     }
 }
 
+/// Get the output filename given the filename of the file we are currently processing. Gets the
+/// stem of the file and its basename, then appends .c to it.
 fn get_output_filename(filename: &str) -> Option<String> {
     let path_struct = Path::new(&filename);
     let stem = path_struct.file_stem()?;
@@ -116,6 +128,8 @@ fn get_output_filename(filename: &str) -> Option<String> {
     Some(format!("{}.c", basename))
 }
 
+/// Check whether clang-format is installed on this system. Searches the path variable for a
+/// version of the program and returns true if it is found.
 fn clang_format_exists() -> bool {
     if let Some(paths) = env::var_os("PATH") {
         for path in env::split_paths(&paths) {
@@ -128,6 +142,7 @@ fn clang_format_exists() -> bool {
     false
 }
 
+/// Write the output code to a file and optionally format it using clang-format.
 fn write_and_format_output_file(filename: &str, code: &str) -> Result<(), Box<dyn Error>> {
     fs::write(&filename, &code)?;
 
@@ -146,6 +161,8 @@ fn write_and_format_output_file(filename: &str, code: &str) -> Result<(), Box<dy
     Ok(())
 }
 
+/// Parse program code specified by the argument and return the abstract syntax tree representation
+/// if it passes, otherwise a string representation of the error that caused the issue.
 pub fn parse(input: &str) -> Result<ast::Program, String> {
     let lex_input = input.char_indices();
     let lexer = lexer::Lexer::new(lex_input);
@@ -158,6 +175,7 @@ pub fn parse(input: &str) -> Result<ast::Program, String> {
     }
 }
 
+/// Format a parser error from the parser into a more human readable version.
 fn format_parser_error(
     error: lalrpop_util::ParseError<usize, lexer::Tok, lexer::LexicalError>,
 ) -> String {
@@ -177,6 +195,8 @@ fn format_parser_error(
     }
 }
 
+/// Get the abstract syntax tree for some program code, displaying it if specified by the --ast
+/// flag on the command line.
 fn get_abstract_syntax_tree(code: &str, display: bool) -> Result<ast::Program, Box<dyn Error>> {
     let ast = parse(&code)?;
 

@@ -275,6 +275,8 @@ where
         self.line_number += 1;
     }
 
+    /// Checks whether the current lookahead character and IndentationChar are conflicting and thus
+    /// mixed indentation has been used in the file.
     fn check_for_mixed_indentation(&self) -> bool {
         if self.indentation.character == IndentationChar::Space && self.current_char_equals('\t') {
             return true;
@@ -287,25 +289,21 @@ where
         false
     }
 
+    /// Reads the indentation size for the current line. Infers the indentation character if it is
+    /// unknown, otherwise just performs a simple match statement.
     fn read_indentation_size(&mut self) -> usize {
-        match self.indentation.character {
-            IndentationChar::Unknown => {
-                if let Some(c) = self.lookahead.map(|x| x.1) {
-                    match c {
-                        ' ' => {
-                            self.indentation.character = IndentationChar::Space;
-                            self.read_while(|c| c == ' ').len()
-                        }
-                        '\t' => {
-                            self.indentation.character = IndentationChar::Tab;
-                            self.read_while(|c| c == '\t').len()
-                        }
-                        _ => 0,
-                    }
-                } else {
-                    0
-                }
+        if self.indentation.character == IndentationChar::Unknown {
+            if self.current_char_equals(' ') {
+                self.indentation.character = IndentationChar::Space;
             }
+
+            if self.current_char_equals('\t') {
+                self.indentation.character = IndentationChar::Tab;
+            }
+        }
+
+        match self.indentation.character {
+            IndentationChar::Unknown => 0,
             IndentationChar::Space => self.read_while(|c| c == ' ').len(),
             IndentationChar::Tab => self.read_while(|c| c == '\t').len(),
         }
@@ -355,6 +353,9 @@ where
         self.index += 1;
     }
 
+    /// Checks whether the current lookahead character is equal to the argument. If lookahead is
+    /// not none, it will do the comparison and return the result, otherwise it will obviously
+    /// return false.
     fn current_char_equals(&self, c: char) -> bool {
         if let Some(l) = self.lookahead.map(|x| x.1) {
             return c == l;
@@ -384,10 +385,12 @@ where
         }
     }
 
+    /// Pushes a token onto the queue.
     fn push_token(&mut self, token: Tok) {
         self.queue.push_back(Ok(token));
     }
 
+    /// Pushes an error onto the queue.
     fn push_error(&mut self, err: LexicalError) {
         self.queue.push_back(Err(err));
     }
@@ -410,6 +413,7 @@ where
     type Item = Spanned<Tok, usize, LexicalError>;
 
     fn next(&mut self) -> Option<Self::Item> {
+        // If there is something on the queue, return it
         if let Some(q) = self.queue.pop_front() {
             return match q {
                 Ok(t) => self.emit(t),
@@ -417,19 +421,14 @@ where
             };
         }
 
+        // Otherwise, see if we need to read from the stream
         match self.lookahead {
-            Some(_) => {
-                self.lex_source();
-            }
-            None => {
-                if let Some(Ok(t)) = self.queue.pop_front() {
-                    return self.emit(t);
-                }
-
-                self.read_indentation();
-            }
+            Some(_) => self.lex_source(),
+            None => self.read_indentation(),
         }
 
+        // There should be at least something in the queue now, so return that
+        // If there isn't, we must have finished lexing the input
         match self.queue.pop_front() {
             Some(Ok(t)) => self.emit(t),
             Some(Err(e)) => self.emit_error(e),
