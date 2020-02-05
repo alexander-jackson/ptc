@@ -1,38 +1,5 @@
-use ast::{Context, DataType, Expression, Generate, Identifier, Infer, Operator, Suite};
-
-#[derive(Debug, PartialEq)]
-pub enum Statement {
-    Assign {
-        ident: Identifier,
-        expr: Expression,
-    },
-    AugmentedAssign {
-        ident: Identifier,
-        op: Operator,
-        expr: Expression,
-    },
-    Expression {
-        expr: Expression,
-    },
-    Pass,
-    IfStatement {
-        expr: Expression,
-        suite: Suite,
-        optional: Option<Suite>,
-    },
-    WhileStatement {
-        expr: Expression,
-        suite: Suite,
-    },
-    ReturnStatement {
-        expr: Expression,
-    },
-    FunctionDecl {
-        name: Identifier,
-        args: Option<Vec<Identifier>>,
-        body: Suite,
-    },
-}
+use ast::Statement;
+use ast::{Context, Generate};
 
 impl Generate for Statement {
     fn generate(&self, context: &mut Context) -> String {
@@ -107,30 +74,6 @@ impl Generate for Statement {
 
                 format!("int {}({}) {{ {} }}", name_gen, arg_str, body_gen,)
             }
-        }
-    }
-}
-
-impl Infer for Statement {
-    fn infer(&mut self, context: &mut Context) {
-        match self {
-            Statement::Assign { ident, expr } => {
-                let inferred = expr.get_type(context);
-                println!("Inferred type for '{:?}': {:?}", expr, inferred);
-                let identifier: String = ident.generate(context);
-                context.insert_inferred_type(&identifier, inferred);
-            }
-            Statement::IfStatement { suite, .. } => {
-                context.push_scope();
-                suite.infer(context);
-                context.pop_scope();
-            }
-            Statement::FunctionDecl { body, .. } => {
-                context.push_scope();
-                body.infer(context);
-                context.pop_scope();
-            }
-            _ => (),
         }
     }
 }
