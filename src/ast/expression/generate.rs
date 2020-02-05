@@ -1,5 +1,5 @@
-use ast::{Generate, Context};
 use ast::Expression;
+use ast::{Context, Generate};
 
 impl Generate for Expression {
     fn generate(&self, context: &mut Context) -> String {

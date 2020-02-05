@@ -1,7 +1,7 @@
-use ast::{Operator, Identifier, Literal};
+use ast::{Identifier, Literal, Operator};
 
-mod generate;
 mod datatype;
+mod generate;
 
 #[derive(Debug, PartialEq)]
 pub enum Expression {

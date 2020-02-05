@@ -1,5 +1,5 @@
-use ast::{Context, DataType, VariableType};
 use ast::Literal;
+use ast::{Context, DataType, VariableType};
 
 impl DataType for Literal {
     fn get_type(&self, _: &mut Context) -> VariableType {

@@ -1,5 +1,5 @@
-use ast::{Context, DataType, VariableType};
 use ast::Expression;
+use ast::{Context, DataType, VariableType};
 
 impl DataType for Expression {
     fn get_type(&self, context: &mut Context) -> VariableType {

@@ -1,5 +1,5 @@
-use ast::{Generate, Context};
 use ast::Literal;
+use ast::{Context, Generate};
 
 impl Generate for Literal {
     fn generate(&self, _t: &mut Context) -> String {
@@ -8,4 +8,3 @@ impl Generate for Literal {
         }
     }
 }
-
