@@ -271,7 +271,7 @@ CallArgs: Vec<ast::Expression> = {
 };
 
 Identifier: ast::Identifier = {
-    <ident: "identifier"> => ast::Identifier::Name { name: ident, var_type: None },
+    <ident: "identifier"> => ast::Identifier::Name { name: ident },
 };
 
 Literal: ast::Literal = {
