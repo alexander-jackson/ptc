@@ -1,4 +1,4 @@
-use ast::{Context, Generate, Type, VariableType};
+use ast::{Context, DataType, Generate, VariableType};
 
 #[derive(Debug, PartialEq)]
 pub enum Identifier {
@@ -16,7 +16,7 @@ impl Generate for Identifier {
     }
 }
 
-impl Type for Identifier {
+impl DataType for Identifier {
     fn get_type(&self, context: &mut Context) -> VariableType {
         match self {
             Identifier::Name { name, .. } => {

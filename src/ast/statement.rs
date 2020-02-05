@@ -1,4 +1,4 @@
-use ast::{Context, Expression, Generate, Identifier, Infer, Operator, Suite, Type};
+use ast::{Context, DataType, Expression, Generate, Identifier, Infer, Operator, Suite};
 
 #[derive(Debug, PartialEq)]
 pub enum Statement {

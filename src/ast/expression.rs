@@ -1,4 +1,4 @@
-use ast::{Context, Generate, Identifier, Infer, Literal, Operator, Type, VariableType};
+use ast::{Context, DataType, Generate, Identifier, Infer, Literal, Operator, VariableType};
 
 #[derive(Debug, PartialEq)]
 pub enum Expression {
@@ -61,7 +61,7 @@ impl Infer for Expression {
     fn infer(&mut self, context: &mut Context) {}
 }
 
-impl Type for Expression {
+impl DataType for Expression {
     fn get_type(&self, context: &mut Context) -> VariableType {
         match self {
             Expression::Literal { value } => value.get_type(context),

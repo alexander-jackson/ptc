@@ -48,7 +48,7 @@ impl Infer for Suite {
     }
 }
 
-pub trait Type {
+pub trait DataType {
     fn get_type(&self, &mut Context) -> VariableType;
 }
 

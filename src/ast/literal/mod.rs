@@ -1,5 +1,5 @@
 mod generate;
-mod r#type;
+mod datatype;
 
 #[derive(Debug, PartialEq)]
 pub enum Literal {
