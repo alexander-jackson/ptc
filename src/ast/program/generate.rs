@@ -1,9 +1,5 @@
-use ast::{Context, Generate, Infer, Suite};
-
-#[derive(Debug, PartialEq)]
-pub struct Program {
-    pub statements: Suite,
-}
+use ast::Program;
+use ast::{Context, Generate};
 
 impl Generate for Program {
     fn generate(&self, context: &mut Context) -> String {
@@ -18,13 +14,5 @@ impl Generate for Program {
         code.push(String::from(""));
 
         code.join("\n")
-    }
-}
-
-impl Infer for Program {
-    fn infer(&mut self, context: &mut Context) {
-        for stmt in &mut self.statements {
-            stmt.infer(context);
-        }
     }
 }
