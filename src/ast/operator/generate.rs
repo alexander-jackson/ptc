@@ -1,31 +1,8 @@
+use ast::Operator;
 use ast::{Context, Generate};
 
-#[derive(Debug, PartialEq)]
-pub enum Operator {
-    LogicalOr,
-    LogicalAnd,
-    LogicalNot,
-    Assign,
-    Plus,
-    Minus,
-    Multiply,
-    Divide,
-    Modulo,
-    PlusEquals,
-    MinusEquals,
-    MultiplyEquals,
-    DivideEquals,
-    ModuloEquals,
-    Less,
-    Greater,
-    LessOrEqual,
-    GreaterOrEqual,
-    Equal,
-    NotEqual,
-}
-
 impl Generate for Operator {
-    fn generate(&self, _context: &mut Context) -> String {
+    fn generate(&self, _: &mut Context) -> String {
         match self {
             Operator::LogicalOr => String::from("||"),
             Operator::LogicalAnd => String::from("&&"),
