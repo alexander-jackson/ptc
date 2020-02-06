@@ -17,8 +17,23 @@ cargo install --path .
 
 ## Usage
 
-The compiler expects input as a file, using the `--filename` flag:
+The compiler can be used as follows:
 
 ```bash
-ptc --filename code.py
+alexander@cinnamon ~/D/U/P/r/ptc> ptc --help
+
+ptc (Python to C Compiler)
+Transpiles code from Python to C
+
+USAGE:
+    ptc [FLAGS] [OPTIONS] [PATH(S)]
+
+FLAGS:
+    --ast               Displays the abstract syntax tree after parsing
+    --tokens            Displays the tokens output by the lexer for the given input
+    --display           Displays the output code to the screen instead of writing to a file
+    -h, --help          Prints this help information
+
+ARGS:
+    <PATH(S)>           Paths of Python files to transpile
 ```
