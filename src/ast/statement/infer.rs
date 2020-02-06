@@ -6,11 +6,21 @@ impl Infer for Statement {
         match self {
             Statement::Assign { ident, expr } => {
                 let inferred = expr.get_type(context);
-                println!("Inferred type for '{:?}': {:?}", expr, inferred);
                 let identifier: String = ident.generate(context);
                 context.insert_inferred_type(&identifier, inferred);
             }
-            Statement::IfStatement { suite, .. } => {
+            Statement::IfStatement { suite, optional, .. } => {
+                context.push_scope();
+                suite.infer(context);
+                context.pop_scope();
+
+                if let Some(s) = optional {
+                    context.push_scope();
+                    s.infer(context);
+                    context.pop_scope();
+                }
+            }
+            Statement::WhileStatement { suite, .. } => {
                 context.push_scope();
                 suite.infer(context);
                 context.pop_scope();

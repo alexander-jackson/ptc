@@ -39,6 +39,7 @@ pub enum Tok {
     NotEqual,
 
     Integer { value: u32 },
+    Float { value: f32 },
     LPar,
     RPar,
     LSquare,
@@ -183,9 +184,23 @@ where
         // truncate it or just consider it to be the max value of a u32. For example,
         // given 3x10^1000, either turn this into 2^31 - 1 or truncate until it's lower
         // than that //
-        let number: String = self.read_while(|c| c.is_digit(10));
-        let value: u32 = number.parse().unwrap_or_else(|_| u32::max_value());
-        self.push_token(Tok::Integer { value });
+        let mut integer: bool = true;
+        let mut number: String = self.read_while(|c| c.is_digit(10));
+
+        if self.current_char_equals('.') {
+            number.push('.');
+            self.update_lookahead();
+            number.push_str(&self.read_while(|c| c.is_digit(10)));
+            integer = false;
+        }
+
+        self.push_token(
+            if integer {
+                Tok::Integer { value: number.parse().unwrap_or_else(|_| u32::max_value()) }
+            } else {
+                Tok::Float { value: number.parse().unwrap_or_else(|_| std::f32::MAX) }
+            }
+        )
     }
 
     /// Reads 'punctuation' from the source.

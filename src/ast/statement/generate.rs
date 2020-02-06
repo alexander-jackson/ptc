@@ -1,5 +1,5 @@
 use ast::Statement;
-use ast::{Context, Generate};
+use ast::{Context, Generate, VariableType};
 
 impl Generate for Statement {
     fn generate(&self, context: &mut Context) -> String {
@@ -8,10 +8,21 @@ impl Generate for Statement {
                 // Check whether the variable is undefined
                 let identifier: String = ident.generate(context);
 
-                let prefix: String = if context.variable_defined(&identifier) {
-                    String::from("")
+                let prefix = if context.variable_defined(&identifier) {
+                    String::new()
                 } else {
-                    String::from("int ")
+                    if let Some(t) = context.get_type(&identifier) {
+                        let str_type = match t {
+                            VariableType::Integer => String::from("int "),
+                            VariableType::Float => String::from("float "),
+                            VariableType::Unknown => String::from("error "),
+                        };
+
+                        context.define_variable(&identifier);
+                        str_type
+                    } else {
+                        String::from("error ")
+                    }
                 };
 
                 format!("{}{} = {};", prefix, identifier, expr.generate(context))

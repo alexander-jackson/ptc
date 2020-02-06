@@ -1,16 +1,17 @@
 extern crate ptc;
 
-use ptc::ast::{Context, Generate};
+use ptc::ast::{Context, Generate, Infer};
 
 fn get_output(input: &str) -> String {
     let parser = ptc::parser::ProgramParser::new();
     let lexer = ptc::lexer::Lexer::new(input.char_indices());
+    let mut ast = parser.parse(lexer).unwrap();
 
-    parser
-        .parse(lexer)
-        .map_err(|e| format!("{:?}", e))
-        .unwrap()
-        .generate(&mut Context::new())
+    let mut context = Context::new();
+    ast.infer(&mut context);
+
+    context.reset_position();
+    ast.generate(&mut context)
 }
 
 macro_rules! generate {

@@ -34,6 +34,7 @@ impl Generate for Suite {
 pub enum VariableType {
     Unknown,
     Integer,
+    Float,
 }
 
 pub trait Infer {
@@ -86,11 +87,11 @@ impl Context {
             .insert_variable(Variable::new(variable), inferred);
     }
 
-    pub fn get_type(&mut self, variable: &str) -> Option<&VariableType> {
+    pub fn get_type(&self, variable: &str) -> Option<&VariableType> {
         self.symbol_table.get_type(&Variable::new(variable))
     }
 
-    pub fn variable_defined(&mut self, variable: &str) -> bool {
+    pub fn variable_defined(&self, variable: &str) -> bool {
         self.symbol_table.variable_defined(variable)
     }
 
@@ -100,6 +101,14 @@ impl Context {
 
     pub fn next_scope(&mut self) {
         self.symbol_table.next_scope();
+    }
+
+    pub fn display_active_scope(&self) {
+        self.symbol_table.display_active_scope();
+    }
+
+    pub fn define_variable(&mut self, variable: &str) {
+        self.symbol_table.define_variable(variable);
     }
 }
 

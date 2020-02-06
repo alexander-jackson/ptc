@@ -276,6 +276,7 @@ Identifier: ast::Identifier = {
 
 Literal: ast::Literal = {
     <i: "integer"> => ast::Literal::Integer { value: i },
+    <f: "float"> => ast::Literal::Float { value: f },
 };
 
 Enclosure: ast::Expression = {
@@ -318,6 +319,7 @@ extern {
         "==" => lexer::Tok::Equal,
         "!=" => lexer::Tok::NotEqual,
         "integer" => lexer::Tok::Integer { value: <u32> },
+        "float" => lexer::Tok::Float { value: <f32> },
         "(" => lexer::Tok::LPar,
         ")" => lexer::Tok::RPar,
         ":" => lexer::Tok::Colon,

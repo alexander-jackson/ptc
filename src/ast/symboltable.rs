@@ -64,7 +64,13 @@ impl Scope {
         //      We are the final scope
         //      The inner scopes returned nothing
         // Thus, check whether we contain <variable>
-        self.variables.get(&variable)
+        for (key, value) in self.variables.iter() {
+            if key.name == variable.name {
+                return Some(value);
+            }
+        }
+
+        None
     }
 
     pub fn display_active_scope(&self, indices: &[usize]) {
@@ -77,7 +83,7 @@ impl Scope {
 
     pub fn next_scope(&mut self, level: usize, indices: &mut Vec<usize>) {
         if let Some(i) = indices.get(level) {
-            return self.subscopes[indices[*i]].next_scope(level + 1, indices);
+            return self.subscopes[*i].next_scope(level + 1, indices);
         }
 
         // We have now reached the deepest point so far
@@ -94,7 +100,7 @@ impl Scope {
         }
     }
 
-    pub fn variable_defined(&mut self, indices: &[usize], variable: &str) -> bool {
+    pub fn variable_defined(&self, indices: &[usize], variable: &str) -> bool {
         if let Some((head, tail)) = indices.split_first() {
             // Check whether it is defined in a scope closer to our current position
             let defined = self.subscopes[*head].variable_defined(tail, variable);
@@ -111,14 +117,21 @@ impl Scope {
             }
         }
 
-        let mut obj: Variable = Variable::new(variable);
+        false
+    }
 
-        if let Some(vtype) = self.variables.remove(&obj) {
-            obj.defined = true;
-            self.variables.insert(obj, vtype);
+    pub fn define_variable(&mut self, indices: &[usize], variable: &str) {
+        if let Some((head, tail)) = indices.split_first() {
+            return self.subscopes[*head].define_variable(tail, variable);
         }
 
-        return false;
+        // We are in the currently active scope
+        let mut v = Variable::new(variable);
+
+        if let Some(vtype) = self.variables.remove(&v) {
+            v.defined = true;
+            self.variables.insert(v, vtype);
+        }
     }
 }
 
@@ -149,7 +162,7 @@ impl SymbolTable {
         self.scope.insert_variable(&self.active, variable, vtype);
     }
 
-    pub fn get_type(&mut self, variable: &Variable) -> Option<&VariableType> {
+    pub fn get_type(&self, variable: &Variable) -> Option<&VariableType> {
         self.scope.get_type(&self.active, variable)
     }
 
@@ -165,7 +178,11 @@ impl SymbolTable {
         self.scope.next_scope(0, &mut self.active);
     }
 
-    pub fn variable_defined(&mut self, variable: &str) -> bool {
+    pub fn variable_defined(&self, variable: &str) -> bool {
         self.scope.variable_defined(&self.active, variable)
+    }
+
+    pub fn define_variable(&mut self, variable: &str) {
+        self.scope.define_variable(&self.active, variable);
     }
 }
