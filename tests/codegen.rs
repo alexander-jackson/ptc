@@ -30,10 +30,13 @@ macro_rules! generate {
 
 generate! {
     generate_integer: "1\n", "1;\n",
+    generate_float: "0.1\n", "0.1;\n",
     generate_identifier: "name\n", "name;\n",
     generate_function_call: "add(1, 2)\n", "add(1, 2);\n",
-    generate_assign_statement: "x = 0\n", "int x = 0;\n",
-    generate_augmented_assign_statement: "x += 1\n", "x += 1;\n",
+    generate_integer_assignment: "x = 0\n", "int x = 0;\n",
+    generate_float_assignment: "x = 0.1\n", "float x = 0.1;\n",
+    generate_integer_augmented_assignment: "x += 1\n", "x += 1;\n",
+    generate_float_augmented_assignment: "x += 0.1\n", "x += 0.1;\n",
     generate_expression_statement: "3 + 4\n", "3 + 4;\n",
     generate_pass_statement: "pass\n", "\n",
     generate_if_statement: "if 1:\n    pass\n", "if (1) {  }\n",
@@ -41,4 +44,5 @@ generate! {
     generate_while_statement: "while 1:\n    pass\n", "while (1) {  }\n",
     generate_return_statement: "return x\n", "return x;\n",
     generate_function_declaration_statement: "def useless():\n    pass\n", "int useless() {  }\n",
+    generate_type_inference: "if 1:\n    x = 0\nelse:\n    x = 0.1\n", "if (1) { int x = 0; } else { float x = 0.1; }\n",
 }

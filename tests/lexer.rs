@@ -28,6 +28,7 @@ lex! {
     newline_token: "\n\n", vec![Newline, Newline],
     identifier: "name", vec![Identifier { name: String::from("name") }],
     operators: "+-*/%", vec![Plus, Minus, Multiply, Divide, Modulo],
+    literals: "1\n1.0", vec![Integer { value: 1 }, Newline, Float { value: 1.0 }],
     augmented_operators: "+=-=*=/=%=", vec![PlusEquals, MinusEquals, MultiplyEquals, DivideEquals, ModuloEquals],
     punctuation: "()[]:;,", vec![LPar, RPar, LSquare, RSquare, Colon, Semicolon, Comma],
     keywords: "if else while pass def and or not", vec![If, Else, While, Pass, Def, LogicalAnd, LogicalOr, LogicalNot],
@@ -39,5 +40,5 @@ lex! {
 #[should_panic]
 fn mixed_indentation() {
     let input: &str = "if:\n\tpass\n    else:\n    pass";
-    let tokens = get_lexer_tokens(input);
+    let _ = get_lexer_tokens(input);
 }
