@@ -45,4 +45,6 @@ generate! {
     return_statement: "return x\n", "return x;\n",
     function_declaration_statement: "def useless():\n    pass\n", "int useless() {  }\n",
     type_inference: "if 1:\n    x = 0\nelse:\n    x = 0.1\n", "if (1) { int x = 0; } else { float x = 0.1; }\n",
+    layered_type_inference: "if 1:\n\tx = 0\nx = 0.0\n", "if (1) { int x = 0; }\nfloat x = 0;\n",
+    preinitialised_layered_type_inference: "x = 0.1\nif 1:\n\tx = 0\n", "float x = 0.1;\nif (1) { x = 0; }\n",
 }
