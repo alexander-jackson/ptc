@@ -9,7 +9,9 @@ impl Infer for Statement {
                 let identifier: String = ident.generate(context);
                 context.insert_inferred_type(&identifier, inferred);
             }
-            Statement::IfStatement { suite, optional, .. } => {
+            Statement::IfStatement {
+                suite, optional, ..
+            } => {
                 context.push_scope();
                 suite.infer(context);
                 context.pop_scope();

@@ -194,13 +194,15 @@ where
             integer = false;
         }
 
-        self.push_token(
-            if integer {
-                Tok::Integer { value: number.parse().unwrap_or_else(|_| u32::max_value()) }
-            } else {
-                Tok::Float { value: number.parse().unwrap_or_else(|_| std::f32::MAX) }
+        self.push_token(if integer {
+            Tok::Integer {
+                value: number.parse().unwrap_or_else(|_| u32::max_value()),
             }
-        )
+        } else {
+            Tok::Float {
+                value: number.parse().unwrap_or_else(|_| std::f32::MAX),
+            }
+        })
     }
 
     /// Reads 'punctuation' from the source.
