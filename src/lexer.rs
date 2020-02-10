@@ -79,7 +79,6 @@ impl fmt::Debug for LexicalError {
 
 #[derive(Debug, PartialEq)]
 enum IndentationChar {
-    Unknown,
     Space,
     Tab,
 }
@@ -87,7 +86,7 @@ enum IndentationChar {
 struct Indentation {
     length: Vec<usize>,
     level: usize,
-    character: IndentationChar,
+    character: Option<IndentationChar>,
 }
 
 impl Indentation {
@@ -95,7 +94,7 @@ impl Indentation {
         Indentation {
             length: vec![0],
             level: 0,
-            character: IndentationChar::Unknown,
+            character: None,
         }
     }
 
@@ -288,12 +287,14 @@ where
     /// Checks whether the current lookahead character and IndentationChar are conflicting and thus
     /// mixed indentation has been used in the file.
     fn check_for_mixed_indentation(&self) -> bool {
-        if self.indentation.character == IndentationChar::Space && self.current_char_equals('\t') {
-            return true;
-        }
+        if let Some(i) = &self.indentation.character {
+            if i == &IndentationChar::Space && self.current_char_equals('\t') {
+                return true;
+            }
 
-        if self.indentation.character == IndentationChar::Tab && self.current_char_equals(' ') {
-            return true;
+            if i == &IndentationChar::Tab && self.current_char_equals(' ') {
+                return true;
+            }
         }
 
         false
@@ -302,21 +303,24 @@ where
     /// Reads the indentation size for the current line. Infers the indentation character if it is
     /// unknown, otherwise just performs a simple match statement.
     fn read_indentation_size(&mut self) -> usize {
-        if self.indentation.character == IndentationChar::Unknown {
+        if self.indentation.character.is_none() {
             if self.current_char_equals(' ') {
-                self.indentation.character = IndentationChar::Space;
+                self.indentation.character = Some(IndentationChar::Space);
             }
 
             if self.current_char_equals('\t') {
-                self.indentation.character = IndentationChar::Tab;
+                self.indentation.character = Some(IndentationChar::Tab);
             }
         }
 
-        match self.indentation.character {
-            IndentationChar::Unknown => 0,
-            IndentationChar::Space => self.read_while(|c| c == ' ').len(),
-            IndentationChar::Tab => self.read_while(|c| c == '\t').len(),
+        if let Some(i) = &self.indentation.character {
+            return match i {
+                IndentationChar::Space => self.read_while(|c| c == ' ').len(),
+                IndentationChar::Tab => self.read_while(|c| c == '\t').len(),
+            }
         }
+
+        0
     }
 
     /// Reads the indentation for a new line and deals with previous indentation levels.
