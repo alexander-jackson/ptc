@@ -1,11 +1,15 @@
 use ast::Statement;
-use ast::{Context, DataType, Generate, Infer};
+use ast::{Context, DataType, Generate, Identifier, Infer};
 
 impl Infer for Statement {
     fn infer(&mut self, context: &mut Context) {
         match self {
             Statement::Assign { ident, expr } => {
-                let inferred = expr.get_type(context);
+                let inferred = match ident {
+                    Identifier::Typed { .. } => ident.get_type(context),
+                    _ => expr.get_type(context),
+                };
+
                 let identifier: String = ident.generate(context);
                 context.insert_inferred_type(&identifier, inferred);
             }

@@ -317,7 +317,7 @@ where
             return match i {
                 IndentationChar::Space => self.read_while(|c| c == ' ').len(),
                 IndentationChar::Tab => self.read_while(|c| c == '\t').len(),
-            }
+            };
         }
 
         0

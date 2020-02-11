@@ -52,6 +52,8 @@ CompoundStatement: ast::Statement = {
 AssignStatement: ast::Statement = {
     <ident: Identifier> "=" <expr: Expression> =>
         ast::Statement::Assign { ident: ident, expr: expr, },
+    <ident: TypedIdentifier> "=" <expr: Expression> =>
+        ast::Statement::Assign { ident: ident, expr: expr, },
 };
 
 AugmentedAssignOperator: ast::Operator = {
@@ -272,6 +274,12 @@ CallArgs: Vec<ast::Expression> = {
 
 Identifier: ast::Identifier = {
     <ident: "identifier"> => ast::Identifier::Name { name: ident },
+};
+
+TypedIdentifier: ast::Identifier = {
+    <ident: "identifier"> ":" <typehint: "identifier"> => {
+        ast::Identifier::Typed { name: ident, typehint: typehint }
+    }
 };
 
 Literal: ast::Literal = {

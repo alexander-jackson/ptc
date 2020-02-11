@@ -47,4 +47,5 @@ generate! {
     type_inference: "if 1:\n    x = 0\nelse:\n    x = 0.1\n", "if (1) { int x = 0; } else { float x = 0.1; }\n",
     layered_type_inference: "if 1:\n\tx = 0\nx = 0.0\n", "if (1) { int x = 0; }\nfloat x = 0;\n",
     preinitialised_layered_type_inference: "x = 0.1\nif 1:\n\tx = 0\n", "float x = 0.1;\nif (1) { x = 0; }\n",
+    basic_type_hints: "x: float = 0\n", "float x = 0;\n",
 }

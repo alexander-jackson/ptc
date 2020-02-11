@@ -11,6 +11,10 @@ impl DataType for Identifier {
 
                 VariableType::Integer
             }
+            Identifier::Typed { typehint, .. } => match typehint.as_ref() {
+                "float" => VariableType::Float,
+                _ => VariableType::Integer,
+            },
         }
     }
 }
