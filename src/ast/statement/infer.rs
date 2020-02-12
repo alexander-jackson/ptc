@@ -31,10 +31,17 @@ impl Infer for Statement {
                 suite.infer(context);
                 context.pop_scope();
             }
-            Statement::FunctionDecl { body, .. } => {
+            Statement::ReturnStatement { expr } => {
+                let datatype = expr.get_type(context);
+                context.set_function_return_type(datatype);
+            }
+            Statement::FunctionDecl { name, body, .. } => {
                 context.push_scope();
+                let function_name = name.generate(context);
+                context.set_current_function(Some(function_name));
                 body.infer(context);
                 context.pop_scope();
+                context.set_current_function(None);
             }
             _ => (),
         }

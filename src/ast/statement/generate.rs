@@ -15,7 +15,7 @@ impl Generate for Statement {
                         let str_type = match t {
                             VariableType::Integer => String::from("int "),
                             VariableType::Float => String::from("float "),
-                            VariableType::Unknown => String::from("error "),
+                            _ => String::from("error "),
                         };
 
                         context.define_variable(&identifier);
@@ -83,7 +83,12 @@ impl Generate for Statement {
                 let body_gen = body.generate(context);
                 context.next_scope();
 
-                format!("int {}({}) {{ {} }}", name_gen, arg_str, body_gen,)
+                let datatype = match context.get_function_return_type(&name_gen) {
+                    Some(v) => String::from(*v),
+                    None => String::from(""),
+                };
+
+                format!("{} {}({}) {{ {} }}", datatype, name_gen, arg_str, body_gen,)
             }
         }
     }

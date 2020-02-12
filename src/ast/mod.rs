@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 pub mod expression;
 pub mod identifier;
 pub mod literal;
@@ -35,6 +37,18 @@ pub enum VariableType {
     Unknown,
     Integer,
     Float,
+    Void,
+}
+
+impl From<VariableType> for String {
+    fn from(v: VariableType) -> String {
+        String::from(match v {
+            VariableType::Unknown => "error",
+            VariableType::Integer => "int",
+            VariableType::Float => "float",
+            VariableType::Void => "void",
+        })
+    }
 }
 
 pub trait Infer {
@@ -56,12 +70,16 @@ pub trait DataType {
 #[derive(Debug)]
 pub struct Context {
     symbol_table: SymbolTable,
+    current_function: Option<String>,
+    function_return_types: HashMap<String, VariableType>,
 }
 
 impl Context {
     pub fn new() -> Context {
         Context {
             symbol_table: SymbolTable::new(),
+            current_function: None,
+            function_return_types: HashMap::new(),
         }
     }
 
@@ -109,6 +127,21 @@ impl Context {
 
     pub fn define_variable(&mut self, variable: &str) {
         self.symbol_table.define_variable(variable);
+    }
+
+    pub fn set_current_function(&mut self, function_name: Option<String>) {
+        self.current_function = function_name;
+        self.set_function_return_type(VariableType::Void);
+    }
+
+    pub fn set_function_return_type(&mut self, datatype: VariableType) {
+        if let Some(f) = &self.current_function {
+            self.function_return_types.insert(f.to_string(), datatype);
+        }
+    }
+
+    pub fn get_function_return_type(&self, function_name: &str) -> Option<&VariableType> {
+        self.function_return_types.get(function_name)
     }
 }
 

@@ -43,7 +43,7 @@ generate! {
     if_else_statement: "if 1:\n    pass\nelse:\n    pass\n", "if (1) {  } else {  }\n",
     while_statement: "while 1:\n    pass\n", "while (1) {  }\n",
     return_statement: "return x\n", "return x;\n",
-    function_declaration_statement: "def useless():\n    pass\n", "int useless() {  }\n",
+    function_declaration_statement: "def useless():\n    pass\n", "void useless() {  }\n",
     type_inference: "if 1:\n    x = 0\nelse:\n    x = 0.1\n", "if (1) { int x = 0; } else { float x = 0.1; }\n",
     layered_type_inference: "if 1:\n\tx = 0\nx = 0.0\n", "if (1) { int x = 0; }\nfloat x = 0;\n",
     preinitialised_layered_type_inference: "x = 0.1\nif 1:\n\tx = 0\n", "float x = 0.1;\nif (1) { x = 0; }\n",
