@@ -48,4 +48,8 @@ generate! {
     layered_type_inference: "if 1:\n\tx = 0\nx = 0.0\n", "if (1) { int x = 0; } float x = 0;\n",
     preinitialised_layered_type_inference: "x = 0.1\nif 1:\n\tx = 0\n", "float x = 0.1; if (1) { x = 0; }\n",
     basic_type_hints: "x: float = 0\n", "float x = 0;\n",
+    integer_return_inference: "def one():\n    return 1\n", "int one() { return 1; }\n",
+    float_return_inference: "def float_half():\n    return 0.5\n", "float float_half() { return 0.5; }\n",
+    variable_return_inference: "def variable_return_inference():\n    x = 0\n    return x\n", "int variable_return_inference() { int x = 0; return x; }\n",
+    float_variable_return_inference: "def float_variable_return():\n    x = 0.1\n    return x\n", "float float_variable_return() { float x = 0.1; return x; }\n",
 }
