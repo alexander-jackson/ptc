@@ -94,7 +94,7 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     let output = get_output_filename(&path);
 
     if args.display {
-        println!("{}", &generated);
+        print!("{}", &generated);
     } else {
         match output {
             Some(s) => write_and_format_output_file(&s, &generated)?,
