@@ -15,6 +15,7 @@ pub enum Tok {
     While,
     Def,
     Return,
+    Global,
 
     // Operators
     Assign,
@@ -168,6 +169,7 @@ where
             "while" => Tok::While,
             "def" => Tok::Def,
             "return" => Tok::Return,
+            "global" => Tok::Global,
             "or" => Tok::LogicalOr,
             "and" => Tok::LogicalAnd,
             "not" => Tok::LogicalNot,

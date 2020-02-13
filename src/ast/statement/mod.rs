@@ -30,6 +30,9 @@ pub enum Statement {
     ReturnStatement {
         expr: Expression,
     },
+    GlobalStatement {
+        ident: Identifier,
+    },
     FunctionDecl {
         name: Identifier,
         args: Option<Vec<Identifier>>,

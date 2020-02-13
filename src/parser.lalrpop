@@ -41,6 +41,7 @@ SmallStatement: ast::Statement = {
     ExpressionStatement,
     PassStatement,
     ReturnStatement,
+    GlobalStatement,
 };
 
 CompoundStatement: ast::Statement = {
@@ -81,6 +82,11 @@ PassStatement: ast::Statement = {
 ReturnStatement: ast::Statement = {
     "return" <expr: Expression> =>
         ast::Statement::ReturnStatement { expr: expr },
+};
+
+GlobalStatement: ast::Statement = {
+    "global" <ident: Identifier> =>
+        ast::Statement::GlobalStatement { ident: ident },
 };
 
 IfStatement: ast::Statement = {
@@ -306,6 +312,7 @@ extern {
         "while" => lexer::Tok::While,
         "def" => lexer::Tok::Def,
         "return" => lexer::Tok::Return,
+        "global" => lexer::Tok::Global,
         "or" => lexer::Tok::LogicalOr,
         "and" => lexer::Tok::LogicalAnd,
         "not" => lexer::Tok::LogicalNot,

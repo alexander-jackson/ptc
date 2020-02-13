@@ -68,6 +68,7 @@ impl Generate for Statement {
                 format!("while ({}) {{ {} }}", expr_gen, suite_gen)
             }
             Statement::ReturnStatement { expr } => format!("return {};", expr.generate(context)),
+            Statement::GlobalStatement { .. } => String::from(""),
             Statement::FunctionDecl { name, args, body } => {
                 let arg_str: Option<String> = args.as_ref().map(|s| {
                     s.iter()
