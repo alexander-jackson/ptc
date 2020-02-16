@@ -283,9 +283,16 @@ Identifier: ast::Identifier = {
 };
 
 TypedIdentifier: ast::Identifier = {
-    <ident: "identifier"> ":" <typehint: "identifier"> => {
+    <ident: "identifier"> ":" <typehint: CompoundTypehint> => {
         ast::Identifier::Typed { name: ident, typehint: typehint }
     }
+};
+
+CompoundTypehint: String = {
+    <typehint: "identifier"> => typehint,
+    <compound: "identifier"> "[" <inner: CompoundTypehint> "]" => {
+        format!("{}[{}]", compound, inner)
+    },
 };
 
 Literal: ast::Literal = {
@@ -337,6 +344,8 @@ extern {
         "float" => lexer::Tok::Float { value: <f32> },
         "(" => lexer::Tok::LPar,
         ")" => lexer::Tok::RPar,
+        "[" => lexer::Tok::LSquare,
+        "]" => lexer::Tok::RSquare,
         ":" => lexer::Tok::Colon,
         ";" => lexer::Tok::Semicolon,
         "," => lexer::Tok::Comma,

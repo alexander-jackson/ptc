@@ -13,9 +13,13 @@ impl Generate for Statement {
                 } else {
                     if let Some(t) = context.get_type(&identifier) {
                         let str_type = match t {
+                            VariableType::Unknown => String::from("error "),
                             VariableType::Integer => String::from("int "),
                             VariableType::Float => String::from("float "),
-                            _ => String::from("error "),
+                            VariableType::Void => String::from("error "),
+                            VariableType::List { elements } => {
+                                format!("{}* ", String::from(*elements.clone()))
+                            }
                         };
 
                         context.define_variable(&identifier);
@@ -85,7 +89,7 @@ impl Generate for Statement {
                 context.next_scope();
 
                 let datatype = match context.get_function_return_type(&name_gen) {
-                    Some(v) => String::from(*v),
+                    Some(v) => String::from(v.clone()),
                     None => String::from(""),
                 };
 

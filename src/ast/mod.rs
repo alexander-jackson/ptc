@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use regex::Regex;
+
 pub mod expression;
 pub mod identifier;
 pub mod literal;
@@ -32,22 +34,46 @@ impl Generate for Suite {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum VariableType {
     Unknown,
     Integer,
     Float,
     Void,
+    List { elements: Box<VariableType> },
 }
 
 impl From<VariableType> for String {
     fn from(v: VariableType) -> String {
-        String::from(match v {
-            VariableType::Unknown => "error",
-            VariableType::Integer => "int",
-            VariableType::Float => "float",
-            VariableType::Void => "void",
-        })
+        match v {
+            VariableType::Unknown => String::from("error"),
+            VariableType::Integer => String::from("int"),
+            VariableType::Float => String::from("float"),
+            VariableType::Void => String::from("void"),
+            VariableType::List { elements } => format!("{}*", String::from(*elements)),
+        }
+    }
+}
+
+impl From<String> for VariableType {
+    fn from(s: String) -> VariableType {
+        if s == "int" {
+            return VariableType::Integer;
+        } else if s == "float" {
+            return VariableType::Float;
+        }
+
+        let re = Regex::new(r"^List\[(.*)\]$").unwrap();
+
+        if let Some(caps) = re.captures(&s) {
+            let inner = caps.get(1).unwrap().as_str();
+
+            return VariableType::List {
+                elements: Box::new(VariableType::from(String::from(inner))),
+            };
+        }
+
+        VariableType::Unknown
     }
 }
 
