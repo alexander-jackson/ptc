@@ -254,6 +254,7 @@ PowerExpr: ast::Expression = {
 Primary: ast::Expression = {
     Atom,
     Call,
+    AttributeRef,
 };
 
 Atom: ast::Expression = {
@@ -263,11 +264,18 @@ Atom: ast::Expression = {
 };
 
 Call: ast::Expression = {
-    <ident: Identifier> "(" <args: CallArgs?> ")" =>
+    <primary: Primary> "(" <args: CallArgs?> ")" =>
         ast::Expression::FunctionCall {
-            name: ident,
+            name: Box::new(primary),
             args: args,
         },
+};
+
+AttributeRef: ast::Expression = {
+    <primary: Primary> "." <attribute: Identifier> => ast::Expression::AttributeRef {
+        primary: Box::new(primary),
+        attribute: attribute,
+    }
 };
 
 CallArgs: Vec<ast::Expression> = {
@@ -301,8 +309,17 @@ Literal: ast::Literal = {
 };
 
 Enclosure: ast::Expression = {
+    ParenthForm,
+    ListDisplay,
+};
+
+ParenthForm: ast::Expression = {
     "(" <expr: Expression> ")" =>
         ast::Expression::ParenExpression { expr: Box::new(expr) },
+};
+
+ListDisplay: ast::Expression = {
+    "[" "]" => ast::Expression::ListDisplay,
 };
 
 extern {
@@ -349,6 +366,7 @@ extern {
         ":" => lexer::Tok::Colon,
         ";" => lexer::Tok::Semicolon,
         "," => lexer::Tok::Comma,
+        "." => lexer::Tok::Dot,
         "\n" => lexer::Tok::Newline,
     }
 }

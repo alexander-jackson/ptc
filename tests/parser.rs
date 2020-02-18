@@ -54,6 +54,11 @@ parser_success! {
     parse_return_statement: "def add(x, y):\n    return x + y\n",
     parse_empty_function_declaration: "def useless():\n    pass\n",
     parse_empty_function_call: "useless()\n",
+    parse_basic_type_hints: "x: int = 0; y: float = 0;\n",
+    parse_list_creation: "x = []\n",
+    parse_list_type_hints: "x: List[int] = []; y: List[float] = [];\n",
+    parse_attribute_access: "x.y\n",
+    parse_attribute_function_call: "x.y()\n",
 }
 
 parser_failure! {

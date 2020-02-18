@@ -17,9 +17,14 @@ pub enum Expression {
     ParenExpression {
         expr: Box<Expression>,
     },
+    ListDisplay,
     FunctionCall {
-        name: Identifier,
+        name: Box<Expression>,
         args: Option<Vec<Expression>>,
+    },
+    AttributeRef {
+        primary: Box<Expression>,
+        attribute: Identifier,
     },
     Identifier {
         name: Identifier,

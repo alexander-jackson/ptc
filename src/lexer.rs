@@ -48,6 +48,7 @@ pub enum Tok {
     Colon,
     Semicolon,
     Comma,
+    Dot,
     Newline,
 }
 
@@ -212,6 +213,7 @@ where
                 ':' => Some(Tok::Colon),
                 ';' => Some(Tok::Semicolon),
                 ',' => Some(Tok::Comma),
+                '.' => Some(Tok::Dot),
                 _ => None,
             },
             None => None,

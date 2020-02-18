@@ -50,7 +50,7 @@ impl From<VariableType> for String {
             VariableType::Integer => String::from("int"),
             VariableType::Float => String::from("float"),
             VariableType::Void => String::from("void"),
-            VariableType::List { elements } => format!("{}*", String::from(*elements)),
+            VariableType::List { elements } => format!("list_{}*", String::from(*elements)),
         }
     }
 }

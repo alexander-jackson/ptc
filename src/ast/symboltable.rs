@@ -54,9 +54,8 @@ impl Scope {
         if let Some((head, tail)) = indices.split_first() {
             let vtype = self.subscopes[*head].get_type(tail, variable);
 
-            match vtype {
-                Some(v) => return Some(v),
-                None => (),
+            if let Some(v) = vtype {
+                return Some(v);
             }
         }
 

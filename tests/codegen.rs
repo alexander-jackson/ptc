@@ -53,4 +53,7 @@ generate! {
     variable_return_inference: "def variable_return_inference():\n    x = 0\n    return x\n", "int variable_return_inference() { int x = 0; return x; }\n",
     float_variable_return_inference: "def float_variable_return():\n    x = 0.1\n    return x\n", "float float_variable_return() { float x = 0.1; return x; }\n",
     global_statements: "x = 1\n\ndef float_variable_return():\n    global x\n    x = 2\n    return x\n", "int x = 1; int float_variable_return() {  x = 2; return x; }\n",
+    empty_list_creation: "def main():\n    x: List[int] = []\n", "void main() { list_int* x = list_int_new(); }\n",
+    list_append: "def main():\n    x: List[int] = []\n    x.append(1)\n", "void main() { list_int* x = list_int_new(); list_int_append(x, 1); }\n",
+    function_return_type_propagation: "def create_list():\n    x: List[int] = []\n    return x\n\ndef main():\n    x = create_list()\n    x.append(1)\n", "list_int* create_list() { list_int* x = list_int_new(); return x; } void main() { list_int* x = create_list(); list_int_append(x, 1); }\n",
 }

@@ -1,5 +1,5 @@
 use ast::Statement;
-use ast::{Context, Generate, VariableType};
+use ast::{Context, Generate};
 
 impl Generate for Statement {
     fn generate(&self, context: &mut Context) -> String {
@@ -10,26 +10,20 @@ impl Generate for Statement {
 
                 let prefix = if context.variable_defined(&identifier) {
                     String::new()
+                } else if let Some(t) = context.get_type(&identifier) {
+                    let str_type = String::from(t.clone());
+                    context.define_variable(&identifier);
+                    str_type
                 } else {
-                    if let Some(t) = context.get_type(&identifier) {
-                        let str_type = match t {
-                            VariableType::Unknown => String::from("error "),
-                            VariableType::Integer => String::from("int "),
-                            VariableType::Float => String::from("float "),
-                            VariableType::Void => String::from("error "),
-                            VariableType::List { elements } => {
-                                format!("{}* ", String::from(*elements.clone()))
-                            }
-                        };
-
-                        context.define_variable(&identifier);
-                        str_type
-                    } else {
-                        String::from("error ")
-                    }
+                    String::from("error ")
                 };
 
-                format!("{}{} = {};", prefix, identifier, expr.generate(context))
+                if prefix.is_empty() {
+                    format!("{}{} = {};", prefix, identifier, expr.generate(context))
+                } else {
+                    format!("{} {} = {};", prefix, identifier, expr.generate(context))
+                }
+
             }
             Statement::AugmentedAssign { ident, op, expr } => {
                 let ident_gen = ident.generate(context);
