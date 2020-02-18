@@ -26,6 +26,10 @@ pub enum Expression {
         primary: Box<Expression>,
         attribute: Identifier,
     },
+    Subscription {
+        primary: Box<Expression>,
+        expr: Box<Expression>,
+    },
     Identifier {
         name: Identifier,
     },

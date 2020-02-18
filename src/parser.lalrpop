@@ -253,8 +253,9 @@ PowerExpr: ast::Expression = {
 
 Primary: ast::Expression = {
     Atom,
-    Call,
     AttributeRef,
+    Subscription,
+    Call,
 };
 
 Atom: ast::Expression = {
@@ -263,19 +264,28 @@ Atom: ast::Expression = {
     Enclosure,
 };
 
+AttributeRef: ast::Expression = {
+    <primary: Primary> "." <attribute: Identifier> => ast::Expression::AttributeRef {
+        primary: Box::new(primary),
+        attribute: attribute,
+    }
+};
+
+Subscription: ast::Expression = {
+    <primary: Primary> "[" <expr: Expression> "]" => {
+        ast::Expression::Subscription {
+            primary: Box::new(primary),
+            expr: Box::new(expr),
+        }
+    },
+};
+
 Call: ast::Expression = {
     <primary: Primary> "(" <args: CallArgs?> ")" =>
         ast::Expression::FunctionCall {
             name: Box::new(primary),
             args: args,
         },
-};
-
-AttributeRef: ast::Expression = {
-    <primary: Primary> "." <attribute: Identifier> => ast::Expression::AttributeRef {
-        primary: Box::new(primary),
-        attribute: attribute,
-    }
 };
 
 CallArgs: Vec<ast::Expression> = {

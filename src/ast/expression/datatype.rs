@@ -16,6 +16,17 @@ impl DataType for Expression {
 
                 VariableType::Integer
             }
+            Expression::Subscription { primary, .. } => {
+                let primary_gen = primary.generate(context);
+
+                if let Some(t) = context.get_type(&primary_gen) {
+                    if let VariableType::List { elements } = t {
+                        return (**elements).clone();
+                    }
+                }
+
+                VariableType::Unknown
+            }
             _ => VariableType::Integer,
         }
     }

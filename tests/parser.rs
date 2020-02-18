@@ -60,6 +60,7 @@ parser_success! {
     parse_list_type_hints: "x: List[int] = []; y: List[float] = [];\n",
     parse_attribute_access: "x.y\n",
     parse_attribute_function_call: "x.y()\n",
+    parse_array_index: "x[x]\n",
 }
 
 parser_failure! {
@@ -67,4 +68,6 @@ parser_failure! {
     fail_function_call_with_trailing_comma: "add(1, 2,)\n",
     fail_function_definition_with_trailing_comma: "def add(x, y,):\n    pass\n",
     fail_mixed_indentation: "if 1:\n\tpass\nelse:\n    pass\n",
+    fail_empty_typehint: "x: ",
+    fail_array_indices: "x[x, y]",
 }

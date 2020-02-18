@@ -57,4 +57,6 @@ generate! {
     empty_list_creation: "def main():\n    x: List[int] = []\n", "void main() { list_int* x = list_int_new(); }\n",
     list_append: "def main():\n    x: List[int] = []\n    x.append(1)\n", "void main() { list_int* x = list_int_new(); list_int_append(x, 1); }\n",
     function_return_type_propagation: "def create_list():\n    x: List[int] = []\n    return x\n\ndef main():\n    x = create_list()\n    x.append(1)\n", "list_int* create_list() { list_int* x = list_int_new(); return x; } void main() { list_int* x = create_list(); list_int_append(x, 1); }\n",
+    array_access: "def int():\n    x: List[int] = []\n    y: int = x[0]\n", "void int() { list_int* x = list_int_new(); int y = list_int_get(x, 0); }\n",
+    array_access_type_inference: "def int():\n    x: List[int] = []\n    y = x[0]\n\ndef float():\n    x: List[float] = []\n    y = x[0]\n", "void int() { list_int* x = list_int_new(); int y = list_int_get(x, 0); } void float() { list_float* x = list_int_new(); float y = list_int_get(x, 0); }\n",
 }

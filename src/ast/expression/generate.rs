@@ -41,6 +41,18 @@ impl Generate for Expression {
                 format!("{}({})", name.generate(context), arg_str)
             }
             Expression::AttributeRef { .. } => String::from(""),
+            Expression::Subscription { primary, expr } => {
+                let primary_gen = primary.generate(context);
+                let expr_gen = expr.generate(context);
+
+                if let Some(t) = context.get_type(&primary_gen) {
+                    if let VariableType::List { .. } = t {
+                        return format!("list_int_get({}, {})", primary_gen, expr_gen);
+                    }
+                }
+
+                String::from("")
+            }
             Expression::Identifier { name } => name.generate(context),
             Expression::Literal { value } => value.generate(context),
         }
