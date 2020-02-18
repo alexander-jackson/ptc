@@ -109,63 +109,61 @@ impl Context {
         }
     }
 
+    /// Push a new scope into the SymbolTable.
     pub fn push_scope(&mut self) {
         self.symbol_table.push_scope();
     }
 
+    /// Pop a scope from the SymbolTable.
     pub fn pop_scope(&mut self) {
         self.symbol_table.pop_scope();
     }
 
-    pub fn contains(&mut self, variable: &str) -> bool {
-        self.symbol_table.variable_defined(variable)
-    }
-
-    pub fn insert(&mut self, variable: &str) {
-        self.symbol_table
-            .insert_variable(Variable::new(variable), VariableType::Unknown);
-    }
-
+    /// Insert the inferred type for a variable into the SymbolTable.
     pub fn insert_inferred_type(&mut self, variable: &str, inferred: VariableType) {
         self.symbol_table
             .insert_variable(Variable::new(variable), inferred);
     }
 
+    /// Get the VariableType for a variable if it exists.
     pub fn get_type(&self, variable: &str) -> Option<&VariableType> {
         self.symbol_table.get_type(&Variable::new(variable))
     }
 
+    /// Check whether a variable has been defined in the SymbolTable currently.
     pub fn variable_defined(&self, variable: &str) -> bool {
         self.symbol_table.variable_defined(variable)
     }
 
+    /// Reset the position of the SymbolTable.
     pub fn reset_position(&mut self) {
         self.symbol_table.reset_position();
     }
 
+    /// Move us into the next scope in the depth first traversal of the scopes.
     pub fn next_scope(&mut self) {
         self.symbol_table.next_scope();
     }
 
-    pub fn display_active_scope(&self) {
-        self.symbol_table.display_active_scope();
-    }
-
+    /// Mark a variable as defined in the symbol table.
     pub fn define_variable(&mut self, variable: &str) {
         self.symbol_table.define_variable(variable);
     }
 
+    /// Set the current function that we are parsing and generating code for.
     pub fn set_current_function(&mut self, function_name: Option<String>) {
         self.current_function = function_name;
         self.set_function_return_type(VariableType::Void);
     }
 
+    /// Set the return type for the current function.
     pub fn set_function_return_type(&mut self, datatype: VariableType) {
         if let Some(f) = &self.current_function {
             self.function_return_types.insert(f.to_string(), datatype);
         }
     }
 
+    /// Check whether we know the return type for a function call.
     pub fn get_function_return_type(&self, function_name: &str) -> Option<&VariableType> {
         self.function_return_types.get(function_name)
     }

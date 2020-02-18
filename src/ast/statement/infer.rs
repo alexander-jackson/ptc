@@ -5,6 +5,7 @@ impl Infer for Statement {
     fn infer(&mut self, context: &mut Context) {
         match self {
             Statement::Assign { ident, expr } => {
+                // If the variable has a typehint, use that, otherwise infer
                 let inferred = match ident {
                     Identifier::Typed { .. } => ident.get_type(context),
                     _ => expr.get_type(context),
