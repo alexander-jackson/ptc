@@ -23,7 +23,6 @@ impl Generate for Statement {
                 } else {
                     format!("{} {} = {};", prefix, identifier, expr.generate(context))
                 }
-
             }
             Statement::AugmentedAssign { ident, op, expr } => {
                 let ident_gen = ident.generate(context);

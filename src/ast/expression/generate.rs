@@ -29,7 +29,11 @@ impl Generate for Expression {
                 if let Expression::AttributeRef { primary, attribute } = &**name {
                     if let VariableType::List { .. } = primary.get_type(context) {
                         if let "append" = attribute.generate(context).as_ref() {
-                            return format!("list_int_append({}, {})", primary.generate(context), arg_str);
+                            return format!(
+                                "list_int_append({}, {})",
+                                primary.generate(context),
+                                arg_str
+                            );
                         }
                     }
                 }
