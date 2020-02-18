@@ -161,7 +161,7 @@ where
     /// Reads a string of characters from the source.
     /// Determines whether it is a keyword and adds to the queue accordingly.
     fn read_identifier_or_keyword(&mut self) {
-        let ident: String = self.read_while(|c| c.is_alphabetic() || c == '_');
+        let ident: String = self.read_while(|c| c.is_alphabetic() || c == '_' || c.is_numeric());
 
         self.push_token(match ident.as_ref() {
             "pass" => Tok::Pass,
