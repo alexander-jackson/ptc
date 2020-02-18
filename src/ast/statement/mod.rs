@@ -28,7 +28,7 @@ pub enum Statement {
         suite: Suite,
     },
     ReturnStatement {
-        expr: Expression,
+        expr: Option<Expression>,
     },
     GlobalStatement {
         ident: Identifier,

@@ -64,7 +64,16 @@ impl Generate for Statement {
 
                 format!("while ({}) {{ {} }}", expr_gen, suite_gen)
             }
-            Statement::ReturnStatement { expr } => format!("return {};", expr.generate(context)),
+            Statement::ReturnStatement { expr } => {
+                let ret = expr
+                    .as_ref()
+                    .map_or_else(|| String::from(""), |e| e.generate(context));
+
+                match ret.is_empty() {
+                    true => format!("return;"),
+                    false => format!("return {};", ret),
+                }
+            }
             Statement::GlobalStatement { .. } => String::from(""),
             Statement::FunctionDecl { name, args, body } => {
                 let arg_str: Option<String> = args.as_ref().map(|s| {

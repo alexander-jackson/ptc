@@ -32,8 +32,11 @@ impl Infer for Statement {
                 context.pop_scope();
             }
             Statement::ReturnStatement { expr } => {
-                let datatype = expr.get_type(context);
-                context.set_function_return_type(datatype);
+                // If the statement returns a value, get the type of it
+                if let Some(e) = expr {
+                    let datatype = e.get_type(context);
+                    context.set_function_return_type(datatype);
+                }
             }
             Statement::FunctionDecl { name, body, .. } => {
                 context.push_scope();

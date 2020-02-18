@@ -80,7 +80,7 @@ PassStatement: ast::Statement = {
 };
 
 ReturnStatement: ast::Statement = {
-    "return" <expr: Expression> =>
+    "return" <expr: Expression?> =>
         ast::Statement::ReturnStatement { expr: expr },
 };
 
