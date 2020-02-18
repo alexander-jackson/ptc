@@ -69,10 +69,11 @@ impl Generate for Statement {
                     .as_ref()
                     .map_or_else(|| String::from(""), |e| e.generate(context));
 
-                match ret.is_empty() {
-                    true => format!("return;"),
-                    false => format!("return {};", ret),
+                if ret.is_empty() {
+                    return String::from("return;");
                 }
+
+                format!("return {};", ret)
             }
             Statement::GlobalStatement { .. } => String::from(""),
             Statement::FunctionDecl { name, args, body } => {
