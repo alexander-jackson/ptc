@@ -1,5 +1,5 @@
 use ast::Statement;
-use ast::{Context, Generate};
+use ast::{Context, Expression, Generate, VariableType};
 
 impl Generate for Statement {
     fn generate(&self, context: &mut Context) -> String {
@@ -21,10 +21,16 @@ impl Generate for Statement {
                     String::from("error ")
                 };
 
+                let dtype = context.get_type(&identifier);
+                let expr_gen = match check_list_display(&expr, dtype) {
+                    None => expr.generate(context),
+                    Some(g) => g,
+                };
+
                 if prefix.is_empty() {
-                    format!("{}{} = {};", prefix, identifier, expr.generate(context))
+                    format!("{}{} = {};", prefix, identifier, expr_gen)
                 } else {
-                    format!("{} {} = {};", prefix, identifier, expr.generate(context))
+                    format!("{} {} = {};", prefix, identifier, expr_gen)
                 }
             }
             Statement::AugmentedAssign { ident, op, expr } => {
@@ -107,4 +113,16 @@ impl Generate for Statement {
             }
         }
     }
+}
+
+fn check_list_display(expr: &Expression, dtype: Option<&VariableType>) -> Option<String> {
+    if let Expression::ListDisplay = expr {
+        if let Some(t) = dtype {
+            if let VariableType::List { elements } = t {
+                return Some(format!("list_{}_new()", String::from(*elements.clone())));
+            }
+        }
+    }
+
+    None
 }
