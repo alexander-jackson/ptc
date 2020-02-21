@@ -96,14 +96,30 @@ impl Generate for Statement {
                     None => String::from(""),
                 };
 
-                let arg_str: Option<String> = args.as_ref().map(|s| {
-                    s.iter()
-                        .map(|a| format!("int {}", a.generate(context)))
-                        .collect::<Vec<String>>()
-                        .join(", ")
-                });
+                let arg_str = match args {
+                    Some(args) => {
+                        let mut arguments: Vec<String> = Vec::new();
+                        let f_args = context.get_function_argument_types(&name_gen);
 
-                let arg_str = arg_str.unwrap_or_else(|| String::from(""));
+                        if let Some(v) = f_args {
+                            for (t, a) in v.iter().zip(args.iter()) {
+                                let str_type = match t {
+                                    Some(vtype) => String::from(vtype.clone()),
+                                    None => String::from(""),
+                                };
+
+                                arguments.push(format!("{} {}", str_type, a.get_identifier()));
+                            }
+                        } else {
+                            for a in args.iter() {
+                                arguments.push(format!("int {}", a.generate(context)));
+                            }
+                        }
+
+                        arguments.join(", ")
+                    }
+                    None => String::from(""),
+                };
 
                 context.next_scope();
                 let body_gen = body.generate(context);

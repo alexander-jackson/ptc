@@ -2,6 +2,7 @@ use ast::{Identifier, Literal, Operator};
 
 mod datatype;
 mod generate;
+mod infer;
 
 #[derive(Debug, PartialEq)]
 pub enum Expression {

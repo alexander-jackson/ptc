@@ -14,6 +14,7 @@ impl Infer for Statement {
                 let identifier: String = ident.generate(context);
                 context.insert_inferred_type(&identifier, inferred);
             }
+            Statement::Expression { expr } => expr.infer(context),
             Statement::IfStatement {
                 suite, optional, ..
             } => {

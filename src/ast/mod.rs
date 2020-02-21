@@ -98,6 +98,7 @@ pub struct Context {
     symbol_table: SymbolTable,
     current_function: Option<String>,
     function_return_types: HashMap<String, VariableType>,
+    function_argument_types: HashMap<String, Vec<Option<VariableType>>>,
 }
 
 impl Context {
@@ -106,6 +107,7 @@ impl Context {
             symbol_table: SymbolTable::new(),
             current_function: None,
             function_return_types: HashMap::new(),
+            function_argument_types: HashMap::new(),
         }
     }
 
@@ -166,6 +168,39 @@ impl Context {
     /// Check whether we know the return type for a function call.
     pub fn get_function_return_type(&self, function_name: &str) -> Option<&VariableType> {
         self.function_return_types.get(function_name)
+    }
+
+    /// Set the argument type of a given function based on the index it occurred at in the function
+    /// call.
+    pub fn set_function_argument_type(
+        &mut self,
+        function_name: &str,
+        pos: usize,
+        datatype: VariableType,
+    ) {
+        match self.function_argument_types.get_mut(function_name) {
+            Some(v) => {
+                // Make sure we resize the vector so it definitely has this index
+                v.resize(pos + 1, None);
+                v[pos] = Some(datatype);
+            }
+            None => {
+                // Create a vector with enough space
+                let mut v: Vec<Option<VariableType>> = Vec::new();
+                v.resize(pos + 1, None);
+                v[pos] = Some(datatype);
+                self.function_argument_types
+                    .insert(String::from(function_name), v);
+            }
+        }
+    }
+
+    /// Get the argument types of a given function after we have inferred them previously.
+    pub fn get_function_argument_types(
+        &self,
+        function_name: &str,
+    ) -> Option<&Vec<Option<VariableType>>> {
+        self.function_argument_types.get(function_name)
     }
 }
 
