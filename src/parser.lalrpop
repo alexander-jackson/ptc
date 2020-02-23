@@ -68,8 +68,10 @@ AugmentedAssignOperator: ast::Operator = {
 };
 
 AugmentedAssignStatement: ast::Statement = {
-    <ident: Identifier> <op: AugmentedAssignOperator> <expr: Expression> =>
-        ast::Statement::AugmentedAssign { ident: ident, op: op, expr: expr, },
+    <target: Identifier> <op: AugmentedAssignOperator> <expr: Expression> =>
+        ast::Statement::AugmentedAssign { target: ast::Expression::Identifier { name: target }, op: op, expr: expr },
+    <target: Subscription> <op: AugmentedAssignOperator> <expr: Expression> =>
+        ast::Statement::AugmentedAssign { target: target, op: op, expr: expr },
 };
 
 ExpressionStatement: ast::Statement = {

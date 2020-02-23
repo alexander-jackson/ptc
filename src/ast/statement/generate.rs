@@ -33,11 +33,11 @@ impl Generate for Statement {
                     format!("{} {} = {};", prefix, identifier, expr_gen)
                 }
             }
-            Statement::AugmentedAssign { ident, op, expr } => {
-                let ident_gen = ident.generate(context);
+            Statement::AugmentedAssign { target, op, expr } => {
+                let target_gen = target.generate(context);
                 let op_gen = op.generate(context);
                 let expr_gen = expr.generate(context);
-                format!("{} {} {};", ident_gen, op_gen, expr_gen)
+                format!("{} {} {};", target_gen, op_gen, expr_gen)
             }
             Statement::Expression { expr } => format!("{};", expr.generate(context)),
             Statement::Pass => String::from(""),

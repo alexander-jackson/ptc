@@ -10,7 +10,7 @@ pub enum Statement {
         expr: Expression,
     },
     AugmentedAssign {
-        ident: Identifier,
+        target: Expression,
         op: Operator,
         expr: Expression,
     },
