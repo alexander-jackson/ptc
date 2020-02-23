@@ -5,19 +5,17 @@ impl Infer for Statement {
     fn infer(&mut self, context: &mut Context) {
         match self {
             Statement::Assign { target, expr } => {
-                // If the variable has a typehint, use that, otherwise infer
-                let inferred = match target {
-                    Expression::Identifier { name } => {
-                        match name {
-                            Identifier::Typed { .. } => name.get_type(context),
-                            _ => expr.get_type(context),
-                        }
-                    }
-                    _ => expr.get_type(context),
-                };
+                // If the target is a variable, we can infer the type of it
+                if let Expression::Identifier { name } = target {
+                    let identifier: String = name.get_identifier();
 
-                let identifier: String = target.generate(context);
-                context.insert_inferred_type(&identifier, inferred);
+                    let inferred = match name {
+                        Identifier::Name { .. } => expr.get_type(context),
+                        Identifier::Typed { .. } => name.get_type(context),
+                    };
+
+                    context.insert_inferred_type(&identifier, inferred);
+                }
             }
             Statement::Expression { expr } => expr.infer(context),
             Statement::IfStatement {
