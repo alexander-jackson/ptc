@@ -6,7 +6,7 @@ mod infer;
 #[derive(Debug, PartialEq)]
 pub enum Statement {
     Assign {
-        ident: Identifier,
+        target: Expression,
         expr: Expression,
     },
     AugmentedAssign {

@@ -1,17 +1,22 @@
 use ast::Statement;
-use ast::{Context, DataType, Generate, Identifier, Infer};
+use ast::{Context, DataType, Expression, Generate, Identifier, Infer};
 
 impl Infer for Statement {
     fn infer(&mut self, context: &mut Context) {
         match self {
-            Statement::Assign { ident, expr } => {
+            Statement::Assign { target, expr } => {
                 // If the variable has a typehint, use that, otherwise infer
-                let inferred = match ident {
-                    Identifier::Typed { .. } => ident.get_type(context),
+                let inferred = match target {
+                    Expression::Identifier { name } => {
+                        match name {
+                            Identifier::Typed { .. } => name.get_type(context),
+                            _ => expr.get_type(context),
+                        }
+                    }
                     _ => expr.get_type(context),
                 };
 
-                let identifier: String = ident.generate(context);
+                let identifier: String = target.generate(context);
                 context.insert_inferred_type(&identifier, inferred);
             }
             Statement::Expression { expr } => expr.infer(context),

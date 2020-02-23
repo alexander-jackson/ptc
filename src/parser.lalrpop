@@ -51,10 +51,12 @@ CompoundStatement: ast::Statement = {
 };
 
 AssignStatement: ast::Statement = {
-    <ident: Identifier> "=" <expr: Expression> =>
-        ast::Statement::Assign { ident: ident, expr: expr, },
-    <ident: TypedIdentifier> "=" <expr: Expression> =>
-        ast::Statement::Assign { ident: ident, expr: expr, },
+    <target: Identifier> "=" <expr: Expression> =>
+        ast::Statement::Assign { target: ast::Expression::Identifier { name: target }, expr: expr, },
+    <target: TypedIdentifier> "=" <expr: Expression> =>
+        ast::Statement::Assign { target: ast::Expression::Identifier { name: target }, expr: expr, },
+    <target: Subscription> "=" <expr: Expression> =>
+        ast::Statement::Assign { target: target, expr: expr },
 };
 
 AugmentedAssignOperator: ast::Operator = {

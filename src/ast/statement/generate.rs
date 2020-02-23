@@ -4,9 +4,9 @@ use ast::{Context, Expression, Generate, VariableType};
 impl Generate for Statement {
     fn generate(&self, context: &mut Context) -> String {
         match self {
-            Statement::Assign { ident, expr } => {
+            Statement::Assign { target, expr } => {
                 // Generate the string for the identifier
-                let identifier: String = ident.generate(context);
+                let identifier: String = target.generate(context);
 
                 // If the variable is defined, we need no prefix
                 let prefix = if context.variable_defined(&identifier) {
