@@ -16,14 +16,17 @@ impl Generate for Expression {
             Expression::ParenExpression { expr } => format!("({})", expr.generate(context)),
             Expression::ListDisplay => String::from("list_int_new()"),
             Expression::FunctionCall { name, args } => {
-                let arg_str: Option<String> = args.as_ref().map(|s| {
-                    s.iter()
+                let arg_str = match args {
+                    Some(s) => s.iter()
                         .map(|a| a.generate(context))
                         .collect::<Vec<String>>()
-                        .join(", ")
-                });
+                        .join(", "),
+                    None => String::new(),
+                };
 
-                let arg_str = arg_str.unwrap_or_else(|| String::from(""));
+                if let Some(s) = check_builtin(name, &arg_str) {
+                    return s;
+                }
 
                 // Check for <list>.append(<args>)
                 if let Expression::AttributeRef { primary, attribute } = &**name {
@@ -58,4 +61,17 @@ impl Generate for Expression {
             Expression::Literal { value } => value.generate(context),
         }
     }
+}
+
+fn check_builtin(name: &Expression, args: &str) -> Option<String> {
+    if let Expression::Identifier { name } = name {
+        match name.get_identifier().as_ref() {
+            "len" => {
+                return Some(format!("{}->size", args));
+            }
+            _ => (),
+        }
+    }
+
+    None
 }

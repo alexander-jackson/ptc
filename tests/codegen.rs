@@ -64,4 +64,5 @@ generate! {
     function_argument_type_inference: "def process(data, index):\n    pass\n\ndef main():\n    integers: List[int] = []\n    i = 0.1\n    process(integers, i)\n", "void process(list_int* data, float index) {  } void main() { list_int* integers = list_int_new(); float i = 0.1; process(integers, i); }\n",
     list_subscription_assign: "integers: List[int] = []\nintegers[0] = 0\n", "list_int* integers = list_int_new(); integers->data[0] = 0;\n",
     list_subscription_augmented_assign: "integers: List[int] = []\nintegers[0] += 0\n", "list_int* integers = list_int_new(); integers->data[0] += 0;\n",
+    built_in_len_function: "integers: List[int] = []\nlen(integers)\n", "list_int* integers = list_int_new(); integers->size;\n",
 }
