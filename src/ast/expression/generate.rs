@@ -52,7 +52,7 @@ impl Generate for Expression {
 
                 if let Some(t) = context.get_type(&primary_gen) {
                     if let VariableType::List { .. } = t {
-                        return format!("list_int_get({}, {})", primary_gen, expr_gen);
+                        return format!("{}->data[{}]", primary_gen, expr_gen);
                     }
                 }
 
