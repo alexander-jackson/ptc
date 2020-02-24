@@ -12,6 +12,7 @@ impl DataType for Expression {
                     _ => VariableType::Unknown,
                 }
             }
+            Expression::ParenExpression { expr } => expr.get_type(context),
             Expression::Literal { value } => value.get_type(context),
             Expression::Identifier { name } => name.get_type(context),
             Expression::FunctionCall { name, .. } => {
