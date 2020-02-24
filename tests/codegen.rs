@@ -62,4 +62,5 @@ generate! {
     list_display_type_inference: "x: List[float] = []\n", "list_float* x = list_float_new();\n",
     list_index_type_inference: "x: List[float] = []\nx.append(0.1)\n", "list_float* x = list_float_new(); list_float_append(x, 0.1);\n",
     function_argument_type_inference: "def process(data, index):\n    pass\n\ndef main():\n    integers: List[int] = []\n    i = 0.1\n    process(integers, i)\n", "void process(list_int* data, float index) {  } void main() { list_int* integers = list_int_new(); float i = 0.1; process(integers, i); }\n",
+    list_subscription: "integers: List[int] = []\nintegers[0] = 0\n", "list_int* integers = list_int_new(); integers->data[0] = 0;\n",
 }

@@ -5,33 +5,40 @@ impl Generate for Statement {
     fn generate(&self, context: &mut Context) -> String {
         match self {
             Statement::Assign { target, expr } => {
-                // Generate the string for the identifier
-                let identifier: String = target.generate(context);
+                // If the LHS is a pure identifier
+                if let Expression::Identifier { name } = target {
+                    let identifier: String = name.get_identifier();
+                    let dtype = context.get_type(&identifier);
+                    let expr_gen = match check_list_display(&expr, dtype) {
+                        None => expr.generate(context),
+                        Some(g) => g,
+                    };
 
-                // If the variable is defined, we need no prefix
-                let prefix = if context.variable_defined(&identifier) {
-                    String::new()
-                } else if let Some(t) = context.get_type(&identifier) {
-                    // If we know its type, we can add the type in the code
-                    let str_type = String::from(t.clone());
-                    context.define_variable(&identifier);
-                    str_type
-                } else {
-                    // The variable wasn't defined and we don't know the type
-                    String::from("error ")
-                };
+                    // Check whether it is defined
+                    if context.variable_defined(&identifier) {
+                        return format!("{} = {};", identifier, expr_gen);
+                    }
 
-                let dtype = context.get_type(&identifier);
-                let expr_gen = match check_list_display(&expr, dtype) {
-                    None => expr.generate(context),
-                    Some(g) => g,
-                };
+                    // Otherwise, we should define it if we have a type for it
+                    if let Some(t) = context.get_type(&identifier) {
+                        let str_type = String::from(t.clone());
+                        context.define_variable(&identifier);
+                        return format!("{} {} = {};", str_type, identifier, expr_gen);
+                    }
 
-                if prefix.is_empty() {
-                    format!("{}{} = {};", prefix, identifier, expr_gen)
-                } else {
-                    format!("{} {} = {};", prefix, identifier, expr_gen)
+                    return format!("error {} = {};", identifier, expr_gen);
                 }
+
+                let expr_gen = expr.generate(context);
+
+                // Check for a subscription
+                if let Expression::Subscription { primary, expr } = target {
+                    let p_ident = primary.generate(context);
+                    let index = expr.generate(context);
+                    return format!("{}->data[{}] = {};", p_ident, index, expr_gen);
+                }
+
+                return format!("unimplemented");
             }
             Statement::AugmentedAssign { target, op, expr } => {
                 let target_gen = target.generate(context);
