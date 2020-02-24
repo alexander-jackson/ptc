@@ -17,7 +17,8 @@ impl Generate for Expression {
             Expression::ListDisplay => String::from("list_int_new()"),
             Expression::FunctionCall { name, args } => {
                 let arg_str = match args {
-                    Some(s) => s.iter()
+                    Some(s) => s
+                        .iter()
                         .map(|a| a.generate(context))
                         .collect::<Vec<String>>()
                         .join(", "),
@@ -65,11 +66,8 @@ impl Generate for Expression {
 
 fn check_builtin(name: &Expression, args: &str) -> Option<String> {
     if let Expression::Identifier { name } = name {
-        match name.get_identifier().as_ref() {
-            "len" => {
-                return Some(format!("{}->size", args));
-            }
-            _ => (),
+        if let "len" = name.get_identifier().as_ref() {
+            return Some(format!("{}->size", args));
         }
     }
 

@@ -38,7 +38,7 @@ impl Generate for Statement {
                     return format!("{}->data[{}] = {};", p_ident, index, expr_gen);
                 }
 
-                return format!("unimplemented");
+                String::from("unimplemented")
             }
             Statement::AugmentedAssign { target, op, expr } => {
                 let op_gen = op.generate(context);
@@ -57,7 +57,7 @@ impl Generate for Statement {
                     return format!("{}->data[{}] {} {};", primary_gen, index, op_gen, expr_gen);
                 }
 
-                return format!("unimplemented");
+                String::from("unimplemented")
             }
             Statement::Expression { expr } => format!("{};", expr.generate(context)),
             Statement::Pass => String::from(""),
