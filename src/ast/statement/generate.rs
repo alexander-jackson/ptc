@@ -41,10 +41,23 @@ impl Generate for Statement {
                 return format!("unimplemented");
             }
             Statement::AugmentedAssign { target, op, expr } => {
-                let target_gen = target.generate(context);
                 let op_gen = op.generate(context);
                 let expr_gen = expr.generate(context);
-                format!("{} {} {};", target_gen, op_gen, expr_gen)
+
+                // Check if this is an identifier so we can early return
+                if let Expression::Identifier { name } = target {
+                    let ident = name.get_identifier();
+                    return format!("{} {} {};", ident, op_gen, expr_gen);
+                }
+
+                // Check whether this is a subscription on the LHS
+                if let Expression::Subscription { primary, expr } = target {
+                    let primary_gen = primary.generate(context);
+                    let index = expr.generate(context);
+                    return format!("{}->data[{}] {} {};", primary_gen, index, op_gen, expr_gen);
+                }
+
+                return format!("unimplemented");
             }
             Statement::Expression { expr } => format!("{};", expr.generate(context)),
             Statement::Pass => String::from(""),

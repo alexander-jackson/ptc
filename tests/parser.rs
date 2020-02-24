@@ -61,6 +61,8 @@ parser_success! {
     parse_attribute_access: "x.y\n",
     parse_attribute_function_call: "x.y()\n",
     parse_array_index: "x[x]\n",
+    parse_lhs_assign_array_index: "x[x] = x\n",
+    parse_lhs_augmented_assign_array_index: "x[x] = x\n",
 }
 
 parser_failure! {
