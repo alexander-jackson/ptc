@@ -68,4 +68,5 @@ generate! {
     list_subscription_augmented_assign: "integers: List[int] = []\nintegers[0] += 0\n", "list_int* integers = list_int_new(); integers->data[0] += 0;\n",
     built_in_len_function: "integers: List[int] = []\nlen(integers)\n", "list_int* integers = list_int_new(); integers->size;\n",
     binary_expression_type_inference: "a = 0.1\nb = 0.1\nc = a + b\n\nx = 0\ny = 0.1\nz = x + y\n\nd = 0\ne = 0\nf = d + e\n", "float a = 0.1; float b = 0.1; float c = a + b; int x = 0; float y = 0.1; float z = x + y; int d = 0; int e = 0; int f = d + e;\n",
+    division_expression_type_inference: "x = 1 / 2\n", "float x = 1 / 2;\n",
 }
