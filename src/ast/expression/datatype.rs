@@ -4,6 +4,11 @@ use ast::{Context, DataType, Generate, Operator, VariableType};
 impl DataType for Expression {
     fn get_type(&self, context: &mut Context) -> VariableType {
         match self {
+            Expression::BinaryOperation { left, op, right } => {
+                let ltype = left.get_type(context);
+                let rtype = right.get_type(context);
+                return op.resulting_type(ltype, rtype);
+            }
             Expression::UnaryOperation { op, expr } => {
                 match op {
                     Operator::Plus => expr.get_type(context),
