@@ -16,6 +16,8 @@ impl Infer for Statement {
 
                     context.insert_inferred_type(&identifier, inferred);
                 }
+
+                expr.infer(context);
             }
             Statement::Expression { expr } => expr.infer(context),
             Statement::IfStatement {
