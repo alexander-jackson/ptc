@@ -6,3 +6,4 @@
 *.c
 
 .clang-format
+clippy.rs
