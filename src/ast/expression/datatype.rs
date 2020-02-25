@@ -9,14 +9,12 @@ impl DataType for Expression {
                 let rtype = right.get_type(context);
                 return op.resulting_type(ltype, rtype);
             }
-            Expression::UnaryOperation { op, expr } => {
-                match op {
-                    Operator::Plus => expr.get_type(context),
-                    Operator::Minus => expr.get_type(context),
-                    Operator::LogicalNot => VariableType::Integer,
-                    _ => VariableType::Unknown,
-                }
-            }
+            Expression::UnaryOperation { op, expr } => match op {
+                Operator::Plus => expr.get_type(context),
+                Operator::Minus => expr.get_type(context),
+                Operator::LogicalNot => VariableType::Integer,
+                _ => VariableType::Unknown,
+            },
             Expression::ParenExpression { expr } => expr.get_type(context),
             Expression::Literal { value } => value.get_type(context),
             Expression::Identifier { name } => name.get_type(context),
