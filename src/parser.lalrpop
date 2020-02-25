@@ -120,7 +120,7 @@ WhileStatement: ast::Statement = {
 };
 
 ArgumentList: Vec<ast::Identifier> = {
-    <l: (<Identifier> ",")*> <e: Identifier> => {
+    <l: (<OptionallyTyped> ",")*> <e: OptionallyTyped> => {
         let mut l = l;
         l.push(e);
         l
@@ -318,6 +318,11 @@ TypedIdentifier: ast::Identifier = {
     <ident: "identifier"> ":" <typehint: CompoundTypehint> => {
         ast::Identifier::Typed { name: ident, typehint: typehint }
     }
+};
+
+OptionallyTyped: ast::Identifier = {
+    Identifier,
+    TypedIdentifier,
 };
 
 CompoundTypehint: String = {

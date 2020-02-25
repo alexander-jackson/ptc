@@ -120,12 +120,19 @@ impl Generate for Statement {
                 format!("return {};", ret)
             }
             Statement::GlobalStatement { .. } => String::from(""),
-            Statement::FunctionDecl { name, args, body, .. } => {
+            Statement::FunctionDecl {
+                name, args, body, ..
+            } => {
                 let name_gen = name.generate(context);
 
                 // If we know the datatype, add it here
                 let datatype = match context.get_function_return_type(&name_gen) {
-                    Some(v) => String::from(v.clone()),
+                    Some(v) => {
+                        match v {
+                            VariableType::Unknown => String::from("void"),
+                            _ => String::from(v.clone()),
+                        }
+                    },
                     None => String::from(""),
                 };
 
@@ -138,14 +145,14 @@ impl Generate for Statement {
                             for (t, a) in v.iter().zip(args.iter()) {
                                 let str_type = match t {
                                     Some(vtype) => String::from(vtype.clone()),
-                                    None => String::from(""),
+                                    None => String::from("unknown"),
                                 };
 
                                 arguments.push(format!("{} {}", str_type, a.get_identifier()));
                             }
                         } else {
                             for a in args.iter() {
-                                arguments.push(format!("int {}", a.generate(context)));
+                                arguments.push(format!("unknown {}", a.generate(context)));
                             }
                         }
 

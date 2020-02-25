@@ -72,7 +72,10 @@ generate! {
     ignore_del_on_non_lists: "a = 0.1\ndel a\n", "float a = 0.1; \n",
     del_becomes_free_on_lists: "a: List[float] = []\ndel a\n", "list_float* a = list_float_new(); free(a);\n",
     multiple_deletes_become_frees: "a: List[int] = []\nb: List[float] = []\ndel a, b\n", "list_int* a = list_int_new(); list_float* b = list_float_new(); free(a); free(b);\n",
-    always_use_function_return_typehint: "def add(x, y) -> List[int]:\n    return 0\n", "list_int* add(int x, int y) { return 0; }\n",
-    use_typehint_even_without_return: "def add(x, y) -> int:\n    pass\n", "int add(int x, int y) {  }\n",
+    always_use_function_return_typehint: "def add(x, y) -> List[int]:\n    return 0\n", "list_int* add(unknown x, unknown y) { return 0; }\n",
+    use_typehint_even_without_return: "def add(x, y) -> int:\n    pass\n", "int add(unknown x, unknown y) {  }\n",
     allow_specifying_void_return: "def add() -> None:\n    pass\n", "void add() {  }\n",
+    disallow_overriding_void_return: "def add(x, y) -> None:\n    return y\n", "void add(unknown x, unknown y) { return y; }\n",
+    allow_typehints_in_function_declarations: "def add(x: int, y: int) -> None:\n    pass\n", "void add(int x, int y) {  }\n",
+    allow_mixed_typehints_in_function_declarations: "def add(a: int, b: float, c: List[int], d: List[float]) -> None:\n    pass\n", "void add(int a, float b, list_int* c, list_float* d) {  }\n",
 }

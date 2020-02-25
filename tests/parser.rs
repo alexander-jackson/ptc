@@ -66,6 +66,8 @@ parser_success! {
     parse_single_argument_delete: "del x\n",
     parse_multiple_argument_delete: "del x, y, z\n",
     parse_function_return_typehint: "def pi() -> float:\n\tpass\n",
+    parse_function_args_with_typehints: "def add(a: int, b: float, c: List[int], d: List[float]) -> None:\n\tpass\n",
+    parse_function_args_with_some_typehints: "def add(a, b: float, c: List[int], d) -> None:\n\tpass\n",
 }
 
 parser_failure! {

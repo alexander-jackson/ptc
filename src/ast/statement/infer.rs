@@ -45,14 +45,37 @@ impl Infer for Statement {
                     context.set_function_return_type(datatype);
                 }
             }
-            Statement::FunctionDecl { name, ret, body, .. } => {
+            Statement::FunctionDecl {
+                name,
+                args,
+                body,
+                ret,
+            } => {
                 context.push_scope();
                 let function_name = name.get_identifier();
-                context.set_current_function(Some(function_name));
+                context.set_current_function(Some(function_name.clone()));
 
                 if let Some(r) = ret {
                     let rtype = VariableType::from(r.clone());
                     context.set_function_return_type(rtype);
+                }
+
+                if let Some(arguments) = args {
+                    for (index, ident) in arguments.iter().enumerate() {
+                        if let Identifier::Typed { typehint, .. } = ident {
+                            context.set_function_argument_type(
+                                &function_name,
+                                index,
+                                VariableType::from(typehint.clone()),
+                            );
+                        } else {
+                            context.set_function_argument_type(
+                                &function_name,
+                                index,
+                                VariableType::Unknown,
+                            );
+                        }
+                    }
                 }
 
                 body.infer(context);

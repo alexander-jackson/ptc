@@ -46,7 +46,7 @@ pub enum VariableType {
 impl From<VariableType> for String {
     fn from(v: VariableType) -> String {
         match v {
-            VariableType::Unknown => String::from("error"),
+            VariableType::Unknown => String::from("unknown"),
             VariableType::Integer => String::from("int"),
             VariableType::Float => String::from("float"),
             VariableType::Void => String::from("void"),
@@ -158,7 +158,7 @@ impl Context {
     /// Set the current function that we are parsing and generating code for.
     pub fn set_current_function(&mut self, function_name: Option<String>) {
         self.current_function = function_name;
-        self.set_function_return_type(VariableType::Void);
+        self.set_function_return_type(VariableType::Unknown);
     }
 
     /// Set the return type for the current function.
@@ -168,7 +168,7 @@ impl Context {
 
             if current.is_none() {
                 self.function_return_types.insert(f.to_string(), datatype);
-            } else if let Some(VariableType::Void) = current {
+            } else if let Some(VariableType::Unknown) = current {
                 self.function_return_types.insert(f.to_string(), datatype);
             }
         }
