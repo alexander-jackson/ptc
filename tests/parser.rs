@@ -63,6 +63,8 @@ parser_success! {
     parse_array_index: "x[x]\n",
     parse_lhs_assign_array_index: "x[x] = x\n",
     parse_lhs_augmented_assign_array_index: "x[x] = x\n",
+    parse_single_argument_delete: "del x\n",
+    parse_multiple_argument_delete: "del x, y, z\n",
 }
 
 parser_failure! {
@@ -72,4 +74,5 @@ parser_failure! {
     fail_mixed_indentation: "if 1:\n\tpass\nelse:\n    pass\n",
     fail_empty_typehint: "x: ",
     fail_array_indices: "x[x, y]",
+    fail_argumentless_delete: "del\n",
 }

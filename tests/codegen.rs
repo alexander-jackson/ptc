@@ -69,4 +69,7 @@ generate! {
     built_in_len_function: "integers: List[int] = []\nlen(integers)\n", "list_int* integers = list_int_new(); integers->size;\n",
     binary_expression_type_inference: "a = 0.1\nb = 0.1\nc = a + b\n\nx = 0\ny = 0.1\nz = x + y\n\nd = 0\ne = 0\nf = d + e\n", "float a = 0.1; float b = 0.1; float c = a + b; int x = 0; float y = 0.1; float z = x + y; int d = 0; int e = 0; int f = d + e;\n",
     division_expression_type_inference: "x = 1 / 2\n", "float x = 1 / 2;\n",
+    ignore_del_on_non_lists: "a = 0.1\ndel a\n", "float a = 0.1; \n",
+    del_becomes_free_on_lists: "a: List[float] = []\ndel a\n", "list_float* a = list_float_new(); free(a);\n",
+    multiple_deletes_become_frees: "a: List[int] = []\nb: List[float] = []\ndel a, b\n", "list_int* a = list_int_new(); list_float* b = list_float_new(); free(a); free(b);\n",
 }

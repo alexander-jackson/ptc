@@ -40,6 +40,7 @@ SmallStatement: ast::Statement = {
     AugmentedAssignStatement,
     ExpressionStatement,
     PassStatement,
+    DeleteStatement,
     ReturnStatement,
     GlobalStatement,
 };
@@ -81,6 +82,14 @@ ExpressionStatement: ast::Statement = {
 
 PassStatement: ast::Statement = {
     "pass" => ast::Statement::Pass,
+};
+
+DeleteStatement: ast::Statement = {
+    "del" <head: Identifier> <tail: ("," Identifier)*> => {
+        let mut idents = vec![head];
+        idents.extend(tail.into_iter().map(|e| e.1));
+        ast::Statement::DeleteStatement { targets: idents }
+    }
 };
 
 ReturnStatement: ast::Statement = {
@@ -351,6 +360,7 @@ extern {
         "def" => lexer::Tok::Def,
         "return" => lexer::Tok::Return,
         "global" => lexer::Tok::Global,
+        "del" => lexer::Tok::Del,
         "or" => lexer::Tok::LogicalOr,
         "and" => lexer::Tok::LogicalAnd,
         "not" => lexer::Tok::LogicalNot,

@@ -35,7 +35,7 @@ lex! {
     literals: "1\n1.0", vec![Integer { value: 1 }, Newline, Float { value: 1.0 }],
     augmented_operators: "+=-=*=/=%=", vec![PlusEquals, MinusEquals, MultiplyEquals, DivideEquals, ModuloEquals],
     punctuation: "()[]:;,", vec![LPar, RPar, LSquare, RSquare, Colon, Semicolon, Comma],
-    keywords: "if else while pass def and or not", vec![If, Else, While, Pass, Def, LogicalAnd, LogicalOr, LogicalNot],
+    keywords: "if else while pass def global del and or not", vec![If, Else, While, Pass, Def, Global, Del, LogicalAnd, LogicalOr, LogicalNot],
     simple_indentation: "if condition:\n\tpass\n", vec![If, Identifier { name: String::from("condition") }, Colon, Newline, Indent, Pass, Newline, Unindent],
     nested_indentation: "if condition:\n\tif other:\n\t\tpass\n", vec![If, Identifier { name: String::from("condition") }, Colon, Newline, Indent, If, Identifier { name: String::from("other") }, Colon, Newline, Indent, Pass, Newline, Unindent, Unindent],
 }

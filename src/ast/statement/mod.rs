@@ -18,6 +18,9 @@ pub enum Statement {
         expr: Expression,
     },
     Pass,
+    DeleteStatement {
+        targets: Vec<Identifier>,
+    },
     IfStatement {
         expr: Expression,
         suite: Suite,

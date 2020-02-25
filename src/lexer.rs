@@ -16,6 +16,7 @@ pub enum Tok {
     Def,
     Return,
     Global,
+    Del,
 
     // Operators
     Assign,
@@ -171,6 +172,7 @@ where
             "def" => Tok::Def,
             "return" => Tok::Return,
             "global" => Tok::Global,
+            "del" => Tok::Del,
             "or" => Tok::LogicalOr,
             "and" => Tok::LogicalAnd,
             "not" => Tok::LogicalNot,

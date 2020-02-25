@@ -61,6 +61,19 @@ impl Generate for Statement {
             }
             Statement::Expression { expr } => format!("{};", expr.generate(context)),
             Statement::Pass => String::from(""),
+            Statement::DeleteStatement { targets } => {
+                let mut strs: Vec<String> = Vec::new();
+
+                for ident in targets {
+                    let identifier = ident.get_identifier();
+
+                    if let Some(VariableType::List { .. }) = context.get_type(&identifier) {
+                        strs.push(format!("free({});", identifier));
+                    }
+                }
+
+                strs.join(" ")
+            }
             Statement::IfStatement {
                 expr,
                 suite,
