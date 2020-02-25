@@ -63,11 +63,15 @@ impl Infer for Statement {
                 if let Some(arguments) = args {
                     for (index, ident) in arguments.iter().enumerate() {
                         if let Identifier::Typed { typehint, .. } = ident {
+                            let vtype = VariableType::from(typehint.clone());
+
                             context.set_function_argument_type(
                                 &function_name,
                                 index,
-                                VariableType::from(typehint.clone()),
+                                vtype.clone(),
                             );
+
+                            context.insert_inferred_type(&ident.get_identifier(), vtype);
                         } else {
                             context.set_function_argument_type(
                                 &function_name,

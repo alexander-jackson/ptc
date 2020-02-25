@@ -127,11 +127,9 @@ impl Generate for Statement {
 
                 // If we know the datatype, add it here
                 let datatype = match context.get_function_return_type(&name_gen) {
-                    Some(v) => {
-                        match v {
-                            VariableType::Unknown => String::from("void"),
-                            _ => String::from(v.clone()),
-                        }
+                    Some(v) => match v {
+                        VariableType::Unknown => String::from("void"),
+                        _ => String::from(v.clone()),
                     },
                     None => String::from(""),
                 };

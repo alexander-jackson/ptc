@@ -78,4 +78,5 @@ generate! {
     disallow_overriding_void_return: "def add(x, y) -> None:\n    return y\n", "void add(unknown x, unknown y) { return y; }\n",
     allow_typehints_in_function_declarations: "def add(x: int, y: int) -> None:\n    pass\n", "void add(int x, int y) {  }\n",
     allow_mixed_typehints_in_function_declarations: "def add(a: int, b: float, c: List[int], d: List[float]) -> None:\n    pass\n", "void add(int a, float b, list_int* c, list_float* d) {  }\n",
+    use_typehints_in_function_body: "def add_integers(x: int, y: int):\n    return x + y\n\ndef add_mixed(x: int, y: float):\n    return x + y\n", "int add_integers(int x, int y) { return x + y; } float add_mixed(int x, float y) { return x + y; }\n",
 }
