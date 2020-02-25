@@ -120,7 +120,7 @@ impl Generate for Statement {
                 format!("return {};", ret)
             }
             Statement::GlobalStatement { .. } => String::from(""),
-            Statement::FunctionDecl { name, args, body } => {
+            Statement::FunctionDecl { name, args, body, .. } => {
                 let name_gen = name.generate(context);
 
                 // If we know the datatype, add it here

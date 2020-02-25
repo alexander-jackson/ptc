@@ -128,11 +128,12 @@ ArgumentList: Vec<ast::Identifier> = {
 };
 
 FunctionDeclStatement: ast::Statement = {
-    "def" <ident: Identifier> "(" <args: ArgumentList?> ")" ":" <body: Suite> =>
+    "def" <ident: Identifier> "(" <args: ArgumentList?> ")" <hint: ("->" CompoundTypehint)?>":" <body: Suite>  =>
         ast::Statement::FunctionDecl {
             name: ident,
             args: args,
             body: body,
+            ret: hint.map(|x| x.1),
         },
 };
 
@@ -391,6 +392,7 @@ extern {
         ";" => lexer::Tok::Semicolon,
         "," => lexer::Tok::Comma,
         "." => lexer::Tok::Dot,
+        "->" => lexer::Tok::Arrow,
         "\n" => lexer::Tok::Newline,
     }
 }

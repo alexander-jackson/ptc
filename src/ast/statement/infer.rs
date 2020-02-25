@@ -1,5 +1,5 @@
 use ast::Statement;
-use ast::{Context, DataType, Expression, Generate, Identifier, Infer};
+use ast::{Context, DataType, Expression, Identifier, Infer, VariableType};
 
 impl Infer for Statement {
     fn infer(&mut self, context: &mut Context) {
@@ -45,10 +45,16 @@ impl Infer for Statement {
                     context.set_function_return_type(datatype);
                 }
             }
-            Statement::FunctionDecl { name, body, .. } => {
+            Statement::FunctionDecl { name, ret, body, .. } => {
                 context.push_scope();
-                let function_name = name.generate(context);
+                let function_name = name.get_identifier();
                 context.set_current_function(Some(function_name));
+
+                if let Some(r) = ret {
+                    let rtype = VariableType::from(r.clone());
+                    context.set_function_return_type(rtype);
+                }
+
                 body.infer(context);
                 context.pop_scope();
                 context.set_current_function(None);

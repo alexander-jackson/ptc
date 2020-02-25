@@ -40,5 +40,6 @@ pub enum Statement {
         name: Identifier,
         args: Option<Vec<Identifier>>,
         body: Suite,
+        ret: Option<String>,
     },
 }

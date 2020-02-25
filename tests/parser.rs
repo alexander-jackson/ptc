@@ -65,6 +65,7 @@ parser_success! {
     parse_lhs_augmented_assign_array_index: "x[x] = x\n",
     parse_single_argument_delete: "del x\n",
     parse_multiple_argument_delete: "del x, y, z\n",
+    parse_function_return_typehint: "def pi() -> float:\n\tpass\n",
 }
 
 parser_failure! {

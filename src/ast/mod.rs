@@ -61,6 +61,9 @@ impl From<String> for VariableType {
             return VariableType::Integer;
         } else if s == "float" {
             return VariableType::Float;
+        } else if s == "None" {
+            // Used for function return typehints
+            return VariableType::Void;
         }
 
         let re = Regex::new(r"^List\[(.*)\]$").unwrap();
@@ -161,7 +164,13 @@ impl Context {
     /// Set the return type for the current function.
     pub fn set_function_return_type(&mut self, datatype: VariableType) {
         if let Some(f) = &self.current_function {
-            self.function_return_types.insert(f.to_string(), datatype);
+            let current = self.get_function_return_type(f);
+
+            if current.is_none() {
+                self.function_return_types.insert(f.to_string(), datatype);
+            } else if let Some(VariableType::Void) = current {
+                self.function_return_types.insert(f.to_string(), datatype);
+            }
         }
     }
 

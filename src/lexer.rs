@@ -50,6 +50,7 @@ pub enum Tok {
     Semicolon,
     Comma,
     Dot,
+    Arrow,
     Newline,
 }
 
@@ -238,7 +239,6 @@ where
         let multichars: Vec<(char, char, Tok, Tok)> = vec![
             ('=', '=', Tok::Assign, Tok::Equal),
             ('+', '=', Tok::Plus, Tok::PlusEquals),
-            ('-', '=', Tok::Minus, Tok::MinusEquals),
             ('*', '=', Tok::Multiply, Tok::MultiplyEquals),
             ('/', '=', Tok::Divide, Tok::DivideEquals),
             ('%', '=', Tok::Modulo, Tok::ModuloEquals),
@@ -257,6 +257,20 @@ where
             if self.current_char_equals('=') {
                 self.update_lookahead();
                 self.push_token(Tok::NotEqual);
+            }
+        }
+
+        if self.current_char_equals('-') {
+            self.update_lookahead();
+
+            if self.current_char_equals('=') {
+                self.update_lookahead();
+                self.push_token(Tok::MinusEquals);
+            } else if self.current_char_equals('>') {
+                self.update_lookahead();
+                self.push_token(Tok::Arrow);
+            } else {
+                self.push_token(Tok::Minus);
             }
         }
     }

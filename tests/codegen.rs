@@ -72,4 +72,7 @@ generate! {
     ignore_del_on_non_lists: "a = 0.1\ndel a\n", "float a = 0.1; \n",
     del_becomes_free_on_lists: "a: List[float] = []\ndel a\n", "list_float* a = list_float_new(); free(a);\n",
     multiple_deletes_become_frees: "a: List[int] = []\nb: List[float] = []\ndel a, b\n", "list_int* a = list_int_new(); list_float* b = list_float_new(); free(a); free(b);\n",
+    always_use_function_return_typehint: "def add(x, y) -> List[int]:\n    return 0\n", "list_int* add(int x, int y) { return 0; }\n",
+    use_typehint_even_without_return: "def add(x, y) -> int:\n    pass\n", "int add(int x, int y) {  }\n",
+    allow_specifying_void_return: "def add() -> None:\n    pass\n", "void add() {  }\n",
 }
