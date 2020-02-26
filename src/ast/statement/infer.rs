@@ -60,6 +60,7 @@ impl Infer for Statement {
                     context.set_function_return_type(rtype);
                 }
 
+                // If the function has any arguments, check whether they have typehints
                 if let Some(arguments) = args {
                     for (index, ident) in arguments.iter().enumerate() {
                         if let Identifier::Typed { typehint, .. } = ident {
@@ -70,15 +71,27 @@ impl Infer for Statement {
                                 index,
                                 vtype.clone(),
                             );
-
-                            context.insert_inferred_type(&ident.get_identifier(), vtype);
-                        } else {
-                            context.set_function_argument_type(
-                                &function_name,
-                                index,
-                                VariableType::Unknown,
-                            );
                         }
+                    }
+
+                    let ftypes = context.get_function_argument_types(&function_name);
+                    let mut insertions: Vec<(String, VariableType)> = Vec::new();
+
+                    // Load all the inferred types that we know so far
+                    // These are either inferred or typehints
+                    if let Some(types) = ftypes {
+                        // Iterate the types and argument names
+                        for (dtype, arg) in types.iter().zip(arguments.iter()) {
+                            // If we have a type for this argument
+                            if let Some(t) = dtype {
+                                let identifier = arg.get_identifier();
+                                insertions.push((identifier, t.clone()));
+                            }
+                        }
+                    }
+
+                    for (name, dtype) in insertions {
+                        context.insert_inferred_type(&name, dtype);
                     }
                 }
 

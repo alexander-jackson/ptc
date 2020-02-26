@@ -79,4 +79,7 @@ generate! {
     allow_typehints_in_function_declarations: "def add(x: int, y: int) -> None:\n    pass\n", "void add(int x, int y) {  }\n",
     allow_mixed_typehints_in_function_declarations: "def add(a: int, b: float, c: List[int], d: List[float]) -> None:\n    pass\n", "void add(int a, float b, list_int* c, list_float* d) {  }\n",
     use_typehints_in_function_body: "def add_integers(x: int, y: int):\n    return x + y\n\ndef add_mixed(x: int, y: float):\n    return x + y\n", "int add_integers(int x, int y) { return x + y; } float add_mixed(int x, float y) { return x + y; }\n",
+    previous_type_inference_used_in_function_body: "add_integers(1, 1.0)\n\ndef add_integers(x, y):\n    return x + y\n", "add_integers(1, 1); float add_integers(int x, float y) { return x + y; }\n",
+    previous_inferred_type_overwritten: "add_integers(1, 0.5)\n\ndef add_integers(x, y: int):\n    return x + y\n", "add_integers(1, 0.5); int add_integers(int x, int y) { return x + y; }\n",
+    unknown_types_ignored_for_typehint: "value_pi = pi()\nadd_pi(0.5, value_pi)\n\ndef add_pi(x: float, y: float):\n    return x + y\n", "int value_pi = pi(); add_pi(0.5, value_pi); float add_pi(float x, float y) { return x + y; }\n",
 }
