@@ -63,6 +63,12 @@ impl Infer for Statement {
                 // If the function has any arguments, check whether they have typehints
                 if let Some(arguments) = args {
                     for (index, ident) in arguments.iter().enumerate() {
+                        context.set_function_argument_name(
+                            &function_name,
+                            index,
+                            &ident.get_identifier(),
+                        );
+
                         if let Identifier::Typed { typehint, .. } = ident {
                             let vtype = VariableType::from(typehint.clone());
 

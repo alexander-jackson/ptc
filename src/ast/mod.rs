@@ -102,6 +102,7 @@ pub struct Context {
     current_function: Option<String>,
     function_return_types: HashMap<String, VariableType>,
     function_argument_types: HashMap<String, Vec<Option<VariableType>>>,
+    function_argument_names: HashMap<String, Vec<String>>,
 }
 
 impl Context {
@@ -111,6 +112,7 @@ impl Context {
             current_function: None,
             function_return_types: HashMap::new(),
             function_argument_types: HashMap::new(),
+            function_argument_names: HashMap::new(),
         }
     }
 
@@ -204,12 +206,73 @@ impl Context {
         }
     }
 
+    /// Get the argument names of a given function after we have seen the function.
+    pub fn get_function_argument_names(
+        &self,
+        function_name: &str,
+    ) -> Option<&Vec<String>> {
+        self.function_argument_names.get(function_name)
+    }
+
+    /// Set the argument name of a given function based on the index it occurred at in the function
+    /// definition.
+    pub fn set_function_argument_name(
+        &mut self,
+        function_name: &str,
+        pos: usize,
+        argument_name: &str,
+    ) {
+        match self.function_argument_names.get_mut(function_name) {
+            Some(v) => {
+                // Make sure we resize the vector so it definitely has this index
+                v.resize(pos + 1, String::new());
+                v[pos] = argument_name.to_string();
+            }
+            None => {
+                // Create a vector with enough space
+                let mut v: Vec<String> = Vec::new();
+                v.resize(pos + 1, String::new());
+                v[pos] = argument_name.to_string();
+                self.function_argument_names
+                    .insert(String::from(function_name), v);
+            }
+        }
+    }
+
     /// Get the argument types of a given function after we have inferred them previously.
     pub fn get_function_argument_types(
         &self,
         function_name: &str,
     ) -> Option<&Vec<Option<VariableType>>> {
         self.function_argument_types.get(function_name)
+    }
+
+    pub fn generate_header_file(&self) -> String {
+        let mut prototypes: Vec<String> = Vec::new();
+
+        // function_return_types contains all functions we saw
+        for (name, return_type) in self.function_return_types.iter() {
+            let (types, names) = (self.get_function_argument_types(name), self.get_function_argument_names(name));
+
+            let arguments = match (types, names) {
+                (Some(types), Some(names)) => {
+                    // We have both types and names
+                    types.iter().zip(names.iter())
+                        .map(|(t, n)| match t {
+                            Some(t) => format!("{} {}", String::from(t.clone()), n),
+                            None => format!("{} {}", String::from(VariableType::Unknown), n),
+                        })
+                        .collect::<Vec<String>>()
+                        .join(", ")
+                }
+                _ => String::new()
+            };
+
+            let prototype = format!("{} {}({});", String::from(return_type.clone()), name, arguments);
+            prototypes.push(prototype);
+        }
+
+        prototypes.join("\n")
     }
 }
 
