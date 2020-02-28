@@ -93,7 +93,6 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     let generated = ast.generate(&mut context);
     let output = get_output_filename(&path);
     let header = context.generate_header_file();
-    dbg!(&header);
 
     if args.display {
         print!("{}", &generated);

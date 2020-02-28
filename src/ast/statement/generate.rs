@@ -11,7 +11,10 @@ impl Generate for Statement {
                     let dtype = context.get_type(&identifier);
                     let expr_gen = match check_list_display(&expr, dtype) {
                         None => expr.generate(context),
-                        Some(g) => g,
+                        Some(g) => {
+                            context.add_include("list.h");
+                            g
+                        },
                     };
 
                     // Check whether it is defined

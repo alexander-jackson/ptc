@@ -3,6 +3,14 @@ use ast::{Context, Generate};
 
 impl Generate for Program {
     fn generate(&self, context: &mut Context) -> String {
-        format!("{}\n", self.statements.generate(context))
+        let code = self.statements.generate(context);
+        // Must run 2nd, otherwise no includes exist yet
+        let includes = context.generate_includes();
+
+        if includes.is_empty() {
+            format!("{}\n", code)
+        } else {
+            format!("{}\n{}\n", includes, code)
+        }
     }
 }

@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 use regex::Regex;
 
@@ -103,6 +104,7 @@ pub struct Context {
     function_return_types: HashMap<String, VariableType>,
     function_argument_types: HashMap<String, Vec<Option<VariableType>>>,
     function_argument_names: HashMap<String, Vec<String>>,
+    includes: HashSet<String>,
 }
 
 impl Context {
@@ -113,6 +115,7 @@ impl Context {
             function_return_types: HashMap::new(),
             function_argument_types: HashMap::new(),
             function_argument_names: HashMap::new(),
+            includes: HashSet::new(),
         }
     }
 
@@ -260,7 +263,7 @@ impl Context {
                     types.iter().zip(names.iter())
                         .map(|(t, n)| match t {
                             Some(t) => format!("{} {}", String::from(t.clone()), n),
-                            None => format!("{} {}", String::from(VariableType::Unknown), n),
+                            None => format!("{} {}", String::from(VariableType::Void), n),
                         })
                         .collect::<Vec<String>>()
                         .join(", ")
@@ -268,11 +271,27 @@ impl Context {
                 _ => String::new()
             };
 
-            let prototype = format!("{} {}({});", String::from(return_type.clone()), name, arguments);
+            let rtype = match return_type {
+                VariableType::Unknown => String::from(VariableType::Void),
+                _ => String::from(return_type.clone()),
+            };
+
+            let prototype = format!("{} {}({});", rtype, name, arguments);
             prototypes.push(prototype);
         }
 
         prototypes.join("\n")
+    }
+
+    pub fn add_include(&mut self, include: &str) {
+        self.includes.insert(include.to_string());
+    }
+
+    pub fn generate_includes(&self) -> String {
+        self.includes.iter()
+            .map(|i| format!(r#"#include "{}""#, i))
+            .collect::<Vec<String>>()
+            .join("'\n")
     }
 }
 
