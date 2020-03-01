@@ -90,17 +90,27 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     let mut context = Context::new();
     ast.infer(&mut context);
     context.reset_position();
+
     let generated = ast.generate(&mut context);
-    let output = get_output_filename(&path);
     let header = context.generate_header_file();
 
-    if args.display {
-        print!("{}", &generated);
-    } else {
-        match output {
-            Some(s) => write_and_format_output_file(&s, &generated)?,
-            None => eprintln!("Failed to get the output filename."),
-        }
+    let basename = get_output_filename(&path);
+
+    match basename {
+        Some(basename) => {
+            let header_contents = add_if_guards(&basename, &header);
+
+            if args.display {
+                print!("Header:\n{}\n\nSource:\n{}", &header_contents, &generated);
+            } else {
+                let source_filename = format!("{}.c", basename);
+                let header_filename = format!("{}.h", basename);
+
+                write_and_format_output_file(&source_filename, &generated)?;
+                write_and_format_output_file(&header_filename, &header_contents)?;
+            }
+        },
+        None => eprintln!("Failed to get the output filename.")
     }
 
     Ok(())
@@ -120,13 +130,13 @@ fn display_tokens(program_code: &str) {
 }
 
 /// Get the output filename given the filename of the file we are currently processing. Gets the
-/// stem of the file and its basename, then appends .c to it.
+/// stem of the file and its basename
 fn get_output_filename(filename: &str) -> Option<String> {
     let path_struct = Path::new(&filename);
     let stem = path_struct.file_stem()?;
     let basename = stem.to_str()?;
 
-    Some(format!("{}.c", basename))
+    Some(basename.to_string())
 }
 
 /// Check whether clang-format is installed on this system. Searches the path variable for a
@@ -207,4 +217,13 @@ fn get_abstract_syntax_tree(code: &str, display: bool) -> Result<ast::Program, B
     }
 
     Ok(ast)
+}
+
+fn add_if_guards(basename: &str, header: &str) -> String {
+    let uppercase = basename.to_uppercase();
+
+    format!(
+        "#ifndef {}_H\n#define {}_H\n\n{}\n\n#endif /* END OF INCLUDE GUARD: {}_H",
+        uppercase, uppercase, header, uppercase,
+    )
 }

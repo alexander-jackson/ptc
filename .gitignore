@@ -4,6 +4,7 @@
 *.txt
 *.py
 *.c
+*.h
 
 .clang-format
 clippy.rs
