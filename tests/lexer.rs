@@ -39,6 +39,8 @@ lex! {
     keywords: "if else while pass def global del and or not", vec![If, Else, While, Pass, Def, Global, Del, LogicalAnd, LogicalOr, LogicalNot],
     simple_indentation: "if condition:\n\tpass\n", vec![If, Identifier { name: String::from("condition") }, Colon, Newline, Indent, Pass, Newline, Unindent],
     nested_indentation: "if condition:\n\tif other:\n\t\tpass\n", vec![If, Identifier { name: String::from("condition") }, Colon, Newline, Indent, If, Identifier { name: String::from("other") }, Colon, Newline, Indent, Pass, Newline, Unindent, Unindent],
+    allow_comments: "# comment goes here\n", vec![Newline],
+    allow_comment_after_code: "if x == 1: # check whether x is one\n\tpass\n", vec![If, Identifier { name: String::from("x") }, Equal, Integer { value: 1 }, Colon, Newline, Indent, Pass, Newline, Unindent],
 }
 
 #[test]

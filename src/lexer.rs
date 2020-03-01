@@ -381,6 +381,13 @@ where
         }
     }
 
+    fn read_comment(&mut self) {
+        // Read the hash
+        self.update_lookahead();
+        // Read while we are not at a newline
+        self.read_while(|c| c != '\n');
+    }
+
     /// Updates the lexer lookahead.
     fn update_lookahead(&mut self) {
         self.lookahead = self.chars.next();
@@ -404,6 +411,10 @@ where
             self.start_of_line = false;
         } else {
             self.read_while(|c| c == ' ');
+        }
+
+        if self.current_char_equals('#') {
+            self.read_comment();
         }
 
         if let Some(c) = self.lookahead.map(|x| x.1) {
