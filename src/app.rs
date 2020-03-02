@@ -223,7 +223,7 @@ fn add_if_guards(basename: &str, header: &str) -> String {
     let uppercase = basename.to_uppercase();
 
     format!(
-        "#ifndef {}_H\n#define {}_H\n\n{}\n\n#endif /* END OF INCLUDE GUARD: {}_H",
+        "#ifndef {}_H\n#define {}_H\n\n{}\n\n#endif /* END OF INCLUDE GUARD: {}_H */",
         uppercase, uppercase, header, uppercase,
     )
 }
