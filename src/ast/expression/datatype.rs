@@ -7,7 +7,7 @@ impl DataType for Expression {
             Expression::BinaryOperation { left, op, right } => {
                 let ltype = left.get_type(context);
                 let rtype = right.get_type(context);
-                return op.resulting_type(ltype, rtype);
+                op.resulting_type(ltype, rtype)
             }
             Expression::UnaryOperation { op, expr } => match op {
                 Operator::Plus => expr.get_type(context),
