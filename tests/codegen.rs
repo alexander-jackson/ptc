@@ -84,4 +84,7 @@ generate! {
     unknown_types_ignored_for_typehint: "value_pi = pi()\nadd_pi(0.5, value_pi)\n\ndef add_pi(x: float, y: float):\n    return x + y\n", "int value_pi = pi(); add_pi(0.5, value_pi); float add_pi(float x, float y) { return x + y; }\n",
     duck_typing_for_integer_lists: "a = []\na.append(0)\n", "#include \"list.h\"\nlist_int* a = list_int_new(); list_int_append(a, 0);\n",
     duck_typing_for_float_expressions: "a = []\na.append(b / c)\n", "#include \"list.h\"\nlist_float* a = list_float_new(); list_float_append(a, b / c);\n",
+    shallow_duck_typing_for_literals: "a = []\ndef main():\n    a.append(0)\n", "#include \"list.h\"\nlist_int* a = list_int_new(); void main() { list_int_append(a, 0); }\n",
+    shallow_duck_typing_for_variables: "a = []\n\ndef main():\n    value = 0.5\n    a.append(value)\n", "#include \"list.h\"\nlist_float* a = list_float_new(); void main() { float value = 0.5; list_float_append(a, value); }\n",
+    shallow_duck_typing_for_expressions: "a = []\n\ndef main():\n    b = 10\n    c = 3\n    a.append(b / c)\n", "#include \"list.h\"\nlist_float* a = list_float_new(); void main() { int b = 10; int c = 3; list_float_append(a, b / c); }\n",
 }

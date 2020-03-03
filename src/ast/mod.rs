@@ -135,6 +135,13 @@ impl Context {
             .insert_variable(Variable::new(variable), inferred);
     }
 
+    /// Insert the inferred type for a variable into the SymbolTable at a shallower level than the
+    /// current scope.
+    pub fn insert_shallow_inferred_type(&mut self, variable: &str, inferred: VariableType) {
+        self.symbol_table
+            .insert_shallow_variable(Variable::new(variable), inferred);
+    }
+
     /// Get the VariableType for a variable if it exists.
     pub fn get_type(&self, variable: &str) -> Option<&VariableType> {
         self.symbol_table.get_type(&Variable::new(variable))

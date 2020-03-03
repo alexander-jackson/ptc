@@ -25,7 +25,7 @@ impl Infer for Expression {
                                 elements: Box::new(a[0].get_type(context)),
                             };
                             let p = primary.generate(context);
-                            context.insert_inferred_type(&p, t);
+                            context.insert_shallow_inferred_type(&p, t);
                         }
                     }
                 }

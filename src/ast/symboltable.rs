@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use ast::VariableType;
 
-#[derive(Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Variable {
     name: String,
     defined: bool,
@@ -50,6 +50,33 @@ impl Scope {
         }
 
         self.variables.insert(variable, vtype);
+    }
+
+    /// Insert a variable with a related type into the symbol table at a shallower level than the
+    /// current scope.
+    pub fn insert_shallow_variable(
+        &mut self,
+        indices: &[usize],
+        variable: &Variable,
+        vtype: &VariableType,
+    ) -> bool {
+        if let Some((head, tail)) = indices.split_first() {
+            let found = self.subscopes[*head].insert_shallow_variable(tail, variable, vtype);
+
+            if found {
+                return true;
+            }
+        }
+
+        // Check whether the variable is in this scope
+        for key in self.variables.keys() {
+            if variable.name == key.name {
+                self.variables.insert(variable.clone(), vtype.clone());
+                return true;
+            }
+        }
+
+        false
     }
 
     /// Get the type of a variable in the symbol table if we know it.
@@ -163,6 +190,13 @@ impl SymbolTable {
     /// Insert an inferred variable type into the SymbolTable.
     pub fn insert_variable(&mut self, variable: Variable, vtype: VariableType) {
         self.scope.insert_variable(&self.active, variable, vtype);
+    }
+
+    /// Insert an inferred variable type into the SymbolTable at a shallower level than the current
+    /// scope.
+    pub fn insert_shallow_variable(&mut self, variable: Variable, vtype: VariableType) {
+        self.scope
+            .insert_shallow_variable(&self.active, &variable, &vtype);
     }
 
     /// Get the type of a variable if we have inferred it previously.
