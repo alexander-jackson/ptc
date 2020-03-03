@@ -210,10 +210,7 @@ impl Context {
     }
 
     /// Get the argument names of a given function after we have seen the function.
-    pub fn get_function_argument_names(
-        &self,
-        function_name: &str,
-    ) -> Option<&Vec<String>> {
+    pub fn get_function_argument_names(&self, function_name: &str) -> Option<&Vec<String>> {
         self.function_argument_names.get(function_name)
     }
 
@@ -255,12 +252,17 @@ impl Context {
 
         // function_return_types contains all functions we saw
         for (name, return_type) in self.function_return_types.iter() {
-            let (types, names) = (self.get_function_argument_types(name), self.get_function_argument_names(name));
+            let (types, names) = (
+                self.get_function_argument_types(name),
+                self.get_function_argument_names(name),
+            );
 
             let arguments = match (types, names) {
                 (Some(types), Some(names)) => {
                     // We have both types and names
-                    types.iter().zip(names.iter())
+                    types
+                        .iter()
+                        .zip(names.iter())
                         .map(|(t, n)| match t {
                             Some(t) => format!("{} {}", String::from(t.clone()), n),
                             None => format!("{} {}", String::from(VariableType::Void), n),
@@ -268,7 +270,7 @@ impl Context {
                         .collect::<Vec<String>>()
                         .join(", ")
                 }
-                _ => String::new()
+                _ => String::new(),
             };
 
             let rtype = match return_type {
@@ -288,7 +290,8 @@ impl Context {
     }
 
     pub fn generate_includes(&self) -> String {
-        self.includes.iter()
+        self.includes
+            .iter()
             .map(|i| format!(r#"#include "{}""#, i))
             .collect::<Vec<String>>()
             .join("'\n")

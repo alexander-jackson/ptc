@@ -109,8 +109,8 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
                 write_and_format_output_file(&source_filename, &generated)?;
                 write_and_format_output_file(&header_filename, &header_contents)?;
             }
-        },
-        None => eprintln!("Failed to get the output filename.")
+        }
+        None => eprintln!("Failed to get the output filename."),
     }
 
     Ok(())

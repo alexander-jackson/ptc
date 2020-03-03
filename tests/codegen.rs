@@ -82,4 +82,6 @@ generate! {
     previous_type_inference_used_in_function_body: "add_integers(1, 1.0)\n\ndef add_integers(x, y):\n    return x + y\n", "add_integers(1, 1); float add_integers(int x, float y) { return x + y; }\n",
     previous_inferred_type_overwritten: "add_integers(1, 0.5)\n\ndef add_integers(x, y: int):\n    return x + y\n", "add_integers(1, 0.5); int add_integers(int x, int y) { return x + y; }\n",
     unknown_types_ignored_for_typehint: "value_pi = pi()\nadd_pi(0.5, value_pi)\n\ndef add_pi(x: float, y: float):\n    return x + y\n", "int value_pi = pi(); add_pi(0.5, value_pi); float add_pi(float x, float y) { return x + y; }\n",
+    duck_typing_for_integer_lists: "a = []\na.append(0)\n", "#include \"list.h\"\nlist_int* a = list_int_new(); list_int_append(a, 0);\n",
+    duck_typing_for_float_expressions: "a = []\na.append(b / c)\n", "#include \"list.h\"\nlist_float* a = list_float_new(); list_float_append(a, b / c);\n",
 }

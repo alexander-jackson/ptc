@@ -14,7 +14,7 @@ impl Generate for Statement {
                         Some(g) => {
                             context.add_include("list.h");
                             g
-                        },
+                        }
                     };
 
                     // Check whether it is defined
