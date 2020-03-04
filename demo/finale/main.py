@@ -1,4 +1,4 @@
-from fixed_no_type_hints import calculate
+from fixed_coursework import calculate
 
 if __name__ == "__main__":
     value = calculate()

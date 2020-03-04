@@ -1,5 +1,6 @@
-#include "no_type_hints.h"
 #include <stdio.h>
+
+#include "coursework.h"
 
 int main(void) {
 	float value = calculate();
