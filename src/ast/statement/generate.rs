@@ -13,6 +13,13 @@ impl Generate for Statement {
                         None => expr.generate(context),
                         Some(g) => {
                             context.add_include("list.h");
+                            // Check whether this is a global list
+                            if context.in_global_scope() {
+                                if let Some(t) = context.get_type(&identifier) {
+                                    return format!("{} {};", String::from(t.clone()), &identifier);
+                                }
+                            }
+
                             g
                         }
                     };

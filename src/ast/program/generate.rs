@@ -1,16 +1,26 @@
 use ast::Program;
-use ast::{Context, Generate};
+use ast::{Context, Generate, VariableType};
 
 impl Generate for Program {
     fn generate(&self, context: &mut Context) -> String {
-        let code = self.statements.generate(context);
+        let code = format!("{}\n", self.statements.generate(context));
         // Must run 2nd, otherwise no includes exist yet
+        // Generate the global list initialiser
+        let gli = match context.generate_global_list_initialiser() {
+            Some(initialiser) => {
+                context.set_current_function(Some(String::from("initialise_global_lists")));
+                context.set_function_return_type(VariableType::Void);
+                format!("{}\n", initialiser)
+            }
+            None => String::from(""),
+        };
+
         let includes = context.generate_includes();
 
         if includes.is_empty() {
-            format!("{}\n", code)
+            format!("{}{}", code, gli)
         } else {
-            format!("{}\n{}\n", includes, code)
+            format!("{}\n{}{}", includes, code, gli)
         }
     }
 }

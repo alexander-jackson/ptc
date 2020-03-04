@@ -81,6 +81,7 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
 /// syntax trees, tokens and the generated output if needed.
 fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     let code: String = fs::read_to_string(&path)?;
+    let basename = get_output_filename(&path);
 
     if args.tokens {
         display_tokens(&code);
@@ -91,13 +92,11 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     ast.infer(&mut context);
     context.reset_position();
 
-    let generated = ast.generate(&mut context);
-    let header = context.generate_header_file();
-
-    let basename = get_output_filename(&path);
-
     match basename {
         Some(basename) => {
+            context.add_include(&format!("{}.h", basename));
+            let generated = ast.generate(&mut context);
+            let header = context.generate_header_file();
             let header_contents = add_if_guards(&basename, &header);
 
             if args.display {

@@ -301,7 +301,46 @@ impl Context {
             .iter()
             .map(|i| format!(r#"#include "{}""#, i))
             .collect::<Vec<String>>()
-            .join("'\n")
+            .join("\n")
+    }
+
+    pub fn generate_global_list_initialiser(&self) -> Option<String> {
+        let global_lists = self.symbol_table.get_global_lists();
+
+        if global_lists.is_empty() {
+            return None;
+        }
+
+        // For each list type, generate its relevant function
+        let initialisers = global_lists
+            .iter()
+            .map(|(name, vtype)| {
+                format!(
+                    "{} = {};",
+                    name,
+                    match vtype {
+                        VariableType::List { elements } => {
+                            match **elements {
+                                VariableType::Integer => "list_int_new()",
+                                VariableType::Float => "list_float_new()",
+                                _ => unreachable!(),
+                            }
+                        }
+                        _ => unreachable!(),
+                    }
+                )
+            })
+            .collect::<Vec<String>>()
+            .join(" ");
+
+        // Format the function for output
+        let return_type = "void";
+        let name = "initialise_global_lists";
+        Some(format!("{} {}() {{ {} }}", return_type, name, initialisers))
+    }
+
+    pub fn in_global_scope(&self) -> bool {
+        self.symbol_table.in_global_scope()
     }
 }
 

@@ -158,6 +158,19 @@ impl Scope {
             self.variables.insert(v, vtype);
         }
     }
+
+    pub fn get_global_lists(&self) -> Vec<(String, VariableType)> {
+        let mut lists: Vec<(String, VariableType)> = Vec::new();
+
+        // Get all the lists in this scope
+        for (key, value) in self.variables.iter() {
+            if let VariableType::List { .. } = value {
+                lists.push((key.name.clone(), value.clone()));
+            }
+        }
+
+        lists
+    }
 }
 
 #[derive(Debug)]
@@ -222,5 +235,13 @@ impl SymbolTable {
     /// State that we have now defined a variable in the output code.
     pub fn define_variable(&mut self, variable: &str) {
         self.scope.define_variable(&self.active, variable);
+    }
+
+    pub fn get_global_lists(&self) -> Vec<(String, VariableType)> {
+        self.scope.get_global_lists()
+    }
+
+    pub fn in_global_scope(&self) -> bool {
+        self.active.is_empty()
     }
 }
