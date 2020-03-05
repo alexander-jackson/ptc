@@ -33,6 +33,8 @@ lex! {
     identifier_with_leading_number: "2func", vec![Integer { value: 2 }, Identifier { name: String::from("func") }],
     operators: "+-*/%", vec![Plus, Minus, Multiply, Divide, Modulo],
     minus_ambiguity: "-->-=", vec![Minus, Arrow, MinusEquals],
+    legacy_divide_operators: "///", vec![Divide, Divide],
+    legacy_divide_equals: "/=//=", vec![DivideEquals, DivideEquals],
     literals: "1\n1.0", vec![Integer { value: 1 }, Newline, Float { value: 1.0 }],
     augmented_operators: "+=-=*=/=%=", vec![PlusEquals, MinusEquals, MultiplyEquals, DivideEquals, ModuloEquals],
     punctuation: "()[]:;,", vec![LPar, RPar, LSquare, RSquare, Colon, Semicolon, Comma],

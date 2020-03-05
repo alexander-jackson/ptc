@@ -240,7 +240,6 @@ where
             ('=', '=', Tok::Assign, Tok::Equal),
             ('+', '=', Tok::Plus, Tok::PlusEquals),
             ('*', '=', Tok::Multiply, Tok::MultiplyEquals),
-            ('/', '=', Tok::Divide, Tok::DivideEquals),
             ('%', '=', Tok::Modulo, Tok::ModuloEquals),
             ('<', '=', Tok::Less, Tok::LessOrEqual),
             ('>', '=', Tok::Greater, Tok::GreaterOrEqual),
@@ -271,6 +270,27 @@ where
                 self.push_token(Tok::Arrow);
             } else {
                 self.push_token(Tok::Minus);
+            }
+        }
+
+        // Deal with the monstrosity that is '//'
+        if self.current_char_equals('/') {
+            self.update_lookahead();
+
+            if self.current_char_equals('/') {
+                self.update_lookahead();
+
+                if self.current_char_equals('=') {
+                    self.update_lookahead();
+                    self.push_token(Tok::DivideEquals);
+                } else {
+                    self.push_token(Tok::Divide);
+                }
+            } else if self.current_char_equals('=') {
+                self.update_lookahead();
+                self.push_token(Tok::DivideEquals)
+            } else {
+                self.push_token(Tok::Divide);
             }
         }
     }
