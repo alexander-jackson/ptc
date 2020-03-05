@@ -72,6 +72,10 @@ impl Infer for Statement {
                         if let Identifier::Typed { typehint, .. } = ident {
                             let vtype = VariableType::from(typehint.clone());
 
+                            if let VariableType::List { .. } = vtype {
+                                context.add_include("list.h");
+                            }
+
                             context.set_function_argument_type(
                                 &function_name,
                                 index,

@@ -77,7 +77,7 @@ generate! {
     allow_specifying_void_return: "def add() -> None:\n    pass\n", "void add() {  }\n",
     disallow_overriding_void_return: "def add(x, y) -> None:\n    return y\n", "void add(unknown x, unknown y) { return y; }\n",
     allow_typehints_in_function_declarations: "def add(x: int, y: int) -> None:\n    pass\n", "void add(int x, int y) {  }\n",
-    allow_mixed_typehints_in_function_declarations: "def add(a: int, b: float, c: List[int], d: List[float]) -> None:\n    pass\n", "void add(int a, float b, list_int* c, list_float* d) {  }\n",
+    allow_mixed_typehints_in_function_declarations: "def add(a: int, b: float, c: List[int], d: List[float]) -> None:\n    pass\n", "#include \"list.h\"\nvoid add(int a, float b, list_int* c, list_float* d) {  }\n",
     use_typehints_in_function_body: "def add_integers(x: int, y: int):\n    return x + y\n\ndef add_mixed(x: int, y: float):\n    return x + y\n", "int add_integers(int x, int y) { return x + y; } float add_mixed(int x, float y) { return x + y; }\n",
     previous_type_inference_used_in_function_body: "add_integers(1, 1.0)\n\ndef add_integers(x, y):\n    return x + y\n", "add_integers(1, 1); float add_integers(int x, float y) { return x + y; }\n",
     previous_inferred_type_overwritten: "add_integers(1, 0.5)\n\ndef add_integers(x, y: int):\n    return x + y\n", "add_integers(1, 0.5); int add_integers(int x, int y) { return x + y; }\n",
@@ -87,6 +87,6 @@ generate! {
     shallow_duck_typing_for_literals: "a = []\n\ndef main():\n    initialise_global_lists()\n    a.append(0)\n", "#include \"list.h\"\nlist_int* a; void main() { initialise_global_lists(); list_int_append(a, 0); }\nvoid initialise_global_lists() { a = list_int_new(); }\n",
     shallow_duck_typing_for_variables: "a = []\n\ndef main():\n    initialise_global_lists()\n    b: int = 0\n    a.append(b)\n", "#include \"list.h\"\nlist_int* a; void main() { initialise_global_lists(); int b = 0; list_int_append(a, b); }\nvoid initialise_global_lists() { a = list_int_new(); }\n",
     shallow_duck_typing_for_expressions: "a = []\n\ndef main():\n    initialise_global_lists()\n    b = 10\n    c = 3\n    a.append(b / c)\n", "#include \"list.h\"\nlist_float* a; void main() { initialise_global_lists(); int b = 10; int c = 3; list_float_append(a, b / c); }\nvoid initialise_global_lists() { a = list_float_new(); }\n",
-    only_global_lists_are_initialised: "a = []\nb = []\n\ndef main():\n    c = []\n    initialise_global_lists()\n    a.append(0)\n    b.append(0)\n    c.append(0)\n", "#include \"list.h\"\nlist_int* a; list_int* b; void main() { list_int* c = list_int_new(); initialise_global_lists(); list_int_append(a, 0); list_int_append(b, 0); list_int_append(c, 0); }\nvoid initialise_global_lists() { a = list_int_new(); b = list_int_new(); }\n",
+    only_global_lists_are_initialised: "a = []\n\ndef main():\n    b = []\n    initialise_global_lists()\n    a.append(0)\n    b.append(0)\n", "#include \"list.h\"\nlist_int* a; void main() { list_int* b = list_int_new(); initialise_global_lists(); list_int_append(a, 0); list_int_append(b, 0); }\nvoid initialise_global_lists() { a = list_int_new(); }\n",
     duck_typing_len_infers_list: "def main():\n    a = []\n    b = len(a)\n", "#include \"list.h\"\nvoid main() { list_int* a = list_int_new(); int b = a->size; }\n",
 }
