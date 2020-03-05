@@ -30,6 +30,18 @@ impl Infer for Expression {
                     }
                 }
 
+                if let Expression::Identifier { name } = &**name {
+                    if name.get_identifier() == "len" {
+                        if let Some(a) = args {
+                            let t = VariableType::List {
+                                elements: Box::new(VariableType::Integer),
+                            };
+                            let p = a[0].generate(context);
+                            context.insert_shallow_inferred_type(&p, t);
+                        }
+                    }
+                }
+
                 if let Some(a) = args {
                     for (i, e) in a.iter().enumerate() {
                         let e_type = e.get_type(context);
