@@ -17,4 +17,4 @@ slow_benchmark:
 	hyperfine --warmup 10 'ptc fibonacci.py && gcc -O2 main.c fibonacci.c -o main && ./main' 'python3 main.py'
 
 clean:
-	rm -r fibonacci fibonacci.c fibonacci.h __pycache__/
+	rm -r main fibonacci.c fibonacci.h __pycache__/
