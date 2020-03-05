@@ -57,6 +57,11 @@ impl Infer for Statement {
 
                 if let Some(r) = ret {
                     let rtype = VariableType::from(r.clone());
+
+                    if let VariableType::List { .. } = rtype {
+                        context.add_include("list.h");
+                    }
+
                     context.set_function_return_type(rtype);
                 }
 

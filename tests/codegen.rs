@@ -72,7 +72,7 @@ generate! {
     ignore_del_on_non_lists: "a = 0.1\ndel a\n", "float a = 0.1; \n",
     del_becomes_free_on_lists: "def main():\n    x: List[int] = []\n    del x\n", "#include \"list.h\"\nvoid main() { list_int* x = list_int_new(); free(x); }\n",
     multiple_deletes_become_frees: "def main():\n    a: List[int] = []\n    b: List[int] = []\n    del a, b\n", "#include \"list.h\"\nvoid main() { list_int* a = list_int_new(); list_int* b = list_int_new(); free(a); free(b); }\n",
-    always_use_function_return_typehint: "def add(x, y) -> List[int]:\n    return 0\n", "list_int* add(unknown x, unknown y) { return 0; }\n",
+    always_use_function_return_typehint: "def add(x, y) -> List[int]:\n    return 0\n", "#include \"list.h\"\nlist_int* add(unknown x, unknown y) { return 0; }\n",
     use_typehint_even_without_return: "def add(x, y) -> int:\n    pass\n", "int add(unknown x, unknown y) {  }\n",
     allow_specifying_void_return: "def add() -> None:\n    pass\n", "void add() {  }\n",
     disallow_overriding_void_return: "def add(x, y) -> None:\n    return y\n", "void add(unknown x, unknown y) { return y; }\n",
