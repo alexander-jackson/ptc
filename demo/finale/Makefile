@@ -5,7 +5,7 @@ ptc:
 	ptc coursework.py
 
 cbuild:
-	gcc -O3 main.c coursework.c -o main
+	gcc -O2 main.c coursework.c -o main
 
 crun:
 	./main
