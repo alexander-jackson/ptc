@@ -3,7 +3,7 @@
 #include "fibonacci.h"
 
 int main(int argc, char *argv[]) {
-	int cases[3] = { 3, 7, 13 };
+	int cases[3] = { 3, 19, 41 };
 
 	for (int i = 0; i < 3; ++i) {
 		printf("fib(%d) = %d\n", cases[i], fibonacci(cases[i]));

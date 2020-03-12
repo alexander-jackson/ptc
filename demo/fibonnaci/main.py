@@ -1,7 +1,7 @@
 from fibonacci import fibonacci
 
 def main():
-    cases = [3, 7, 13]
+    cases = [3, 19, 41]
 
     for case in cases:
         print("fib({}) = {}".format(case, fibonacci(case)))
