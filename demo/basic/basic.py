@@ -10,12 +10,12 @@ def square_root(n):
 
 def solve_quadratic_positive(a, b, c):
     numerator = -b + square_root(b * b - 4 * a * c)
-    denominator = 2 * a
+    denominator: float = 2 * a
     return numerator / denominator
 
 def solve_quadratic_negative(a, b, c):
     numerator = -b - square_root(b * b - 4 * a * c)
-    denominator = 2 * a
+    denominator: float = 2 * a
     return numerator / denominator
 
 def calculate():
