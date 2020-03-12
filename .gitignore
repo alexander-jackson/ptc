@@ -8,3 +8,5 @@
 
 .clang-format
 clippy.rs
+
+__pycache__/
