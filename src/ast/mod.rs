@@ -22,7 +22,12 @@ use self::symboltable::Variable;
 
 pub type Suite = Vec<Statement>;
 
+/// Allows AST nodes to generate transpiled code for themselves.
+///
+/// Denotes that an AST node can produce equivalent C code given the currently known context for
+/// the program.
 pub trait Generate {
+    /// Generates a string representation of the current AST node in C.
     fn generate(&self, &mut Context) -> String;
 }
 
@@ -35,13 +40,22 @@ impl Generate for Suite {
     }
 }
 
+/// Variable types that `ptc` currently supports.
 #[derive(Clone, Debug, PartialEq)]
 pub enum VariableType {
+    /// A type we don't know about
     Unknown,
+    /// The integer type
     Integer,
+    /// The float type
     Float,
+    /// The void type, only used for function returns
     Void,
-    List { elements: Box<VariableType> },
+    /// A list of homogeneous types
+    List {
+        /// The type of each element in the list
+        elements: Box<VariableType>,
+    },
 }
 
 impl From<VariableType> for String {
@@ -81,7 +95,13 @@ impl From<String> for VariableType {
     }
 }
 
+/// Propagates type inference down the AST and allows for types to be inferred on the current
+/// object if information is known.
+///
+/// Nodes such as function declarations can infer the types of their arguments when they are
+/// reached and then propagate the inference into the body of the definition.
 pub trait Infer {
+    /// Performs the inferrence, taking the currently known context of the program.
     fn infer(&mut self, &mut Context);
 }
 
@@ -93,7 +113,23 @@ impl Infer for Suite {
     }
 }
 
+/// Denotes that an AST node has a type.
+///
+/// Nodes such as expressions have a type which might be able to be worked out from the operations
+/// performed within it. In statements such as assignments or returns, it is useful to be able to
+/// get the type of the argument to perform inference.
+///
+/// # Examples
+///
+/// ```
+/// use ptc::ast::{Context, DataType, Literal, VariableType};
+///
+/// let node = Literal::Float { value: 0.5 };
+/// let mut context = Context::new();
+/// assert_eq!(node.get_type(&mut context), VariableType::Float);
+/// ```
 pub trait DataType {
+    /// Gets the type of the current node, using the known context if needed.
     fn get_type(&self, &mut Context) -> VariableType;
 }
 

@@ -1,4 +1,5 @@
 #![allow(unused_parens)]
+#![warn(missing_docs)]
 
 #[macro_use]
 extern crate lalrpop_util;

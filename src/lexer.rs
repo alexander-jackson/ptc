@@ -5,52 +5,104 @@ use std::fmt;
 pub type Spanned<Tok, Loc, Error> = Result<(Loc, Tok, Loc), Error>;
 
 #[derive(Clone, Debug, PartialEq)]
+/// A token that can be output by the lexer and understood by the parser.
 pub enum Tok {
+    /// An indentation token
     Indent,
+    /// An unindent token
     Unindent,
-    Identifier { name: String },
+    /// An identifier token
+    Identifier {
+        /// The name of the identifier
+        name: String,
+    },
+    /// The `pass` keyword
     Pass,
+    /// The `if` keyword
     If,
+    /// The `else` keyword
     Else,
+    /// The `while` keyword
     While,
+    /// The `def` keyword
     Def,
+    /// The `return` keyword
     Return,
+    /// The `global` keyword
     Global,
+    /// The `del` keyword
     Del,
 
     // Operators
+    /// The `=` operator
     Assign,
+    /// The `+` operator
     Plus,
+    /// The `-` operator
     Minus,
+    /// The `*` operator
     Multiply,
+    /// The `/` operator
     Divide,
+    /// The `%` operator
     Modulo,
+    /// The `+=` operator
     PlusEquals,
+    /// The `-=` operator
     MinusEquals,
+    /// The `*=` operator
     MultiplyEquals,
+    /// The `/=` or `//=` operator
     DivideEquals,
+    /// The `%=` operator
     ModuloEquals,
+    /// The `or` operator
     LogicalOr,
+    /// The `and` operator
     LogicalAnd,
+    /// The `not` operator
     LogicalNot,
+    /// The `<` operator
     Less,
+    /// The `>` operator
     Greater,
+    /// The `<=` operator
     LessOrEqual,
+    /// The `>=` operator
     GreaterOrEqual,
+    /// The `==` operator
     Equal,
+    /// The `!=` operator
     NotEqual,
-
-    Integer { value: u32 },
-    Float { value: f32 },
+    /// An integer token
+    Integer {
+        /// The value of the integer
+        value: u32,
+    },
+    /// A float token
+    Float {
+        /// The value of the float
+        value: f32,
+    },
+    /// The `(` token
     LPar,
+    /// The `)` token
     RPar,
+    /// The `[` token
     LSquare,
+    /// The `]` token
     RSquare,
+    /// The `:` token
     Colon,
+    /// The `;` token
     Semicolon,
+    /// The `,` token
     Comma,
+    /// The `.` token
     Dot,
+    /// The `->` token
     Arrow,
+    /// The `\n` token
     Newline,
 }
 
