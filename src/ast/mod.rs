@@ -133,17 +133,33 @@ pub trait DataType {
     fn get_type(&self, &mut Context) -> VariableType;
 }
 
+/// A structure for storing information learnt about the program provided.
+///
+/// Stores a SymbolTable object, which allows for variables to have information stored about them,
+/// such as whether they have been initialised or not and what type they have.
+///
+/// Stores the current function name if we are inside one, the return types of functions, their
+/// argument names and types, and any external `#include`s that are needed.
 #[derive(Debug)]
 pub struct Context {
+    /// Stores the currently defined variables and deals with scoping rules
     symbol_table: SymbolTable,
+    /// The current function definition we are in
     current_function: Option<String>,
+    /// The return types of functions that we know
     function_return_types: HashMap<String, VariableType>,
+    /// The argument types of each parameter to a function
     function_argument_types: HashMap<String, Vec<Option<VariableType>>>,
+    /// The argument names of each parameter to a function
     function_argument_names: HashMap<String, Vec<String>>,
+    /// The files that should be `#include`d to the source file
     includes: HashSet<String>,
 }
 
 impl Context {
+    /// Creates a new Context.
+    ///
+    /// This assumes that nothing has been learnt about the program yet.
     pub fn new() -> Context {
         Context {
             symbol_table: SymbolTable::new(),
@@ -290,6 +306,7 @@ impl Context {
         self.function_argument_types.get(function_name)
     }
 
+    /// Generates the header file for the current source file.
     pub fn generate_header_file(&self) -> String {
         let mut prototypes: Vec<String> = Vec::new();
 
@@ -328,10 +345,12 @@ impl Context {
         prototypes.join("\n")
     }
 
+    /// Adds the name of a file that should be included in the output source.
     pub fn add_include(&mut self, include: &str) {
         self.includes.insert(include.to_string());
     }
 
+    /// Generates the include statements for the current file.
     pub fn generate_includes(&self) -> String {
         self.includes
             .iter()
@@ -340,6 +359,11 @@ impl Context {
             .join("\n")
     }
 
+    /// Generates the global list initialiser function.
+    ///
+    /// This is used so that globally defined lists in the Python source can be properly
+    /// initialised and used in the output C code. Lists in C cannot be initialised globally as the
+    /// function to initialise them is not `const`.
     pub fn generate_global_list_initialiser(&self) -> Option<String> {
         let global_lists = self.symbol_table.get_global_lists();
 
@@ -375,6 +399,7 @@ impl Context {
         Some(format!("{} {}() {{ {} }}", return_type, name, initialisers))
     }
 
+    /// Checks whether we are currently in the global scope of the symbol table.
     pub fn in_global_scope(&self) -> bool {
         self.symbol_table.in_global_scope()
     }
