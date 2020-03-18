@@ -400,6 +400,21 @@ impl Context {
     }
 
     /// Checks whether we are currently in the global scope of the symbol table.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ptc::ast::Context;
+    ///
+    /// let mut context = Context::new();
+    /// assert!(context.in_global_scope());
+    ///
+    /// context.push_scope();
+    /// assert!(!context.in_global_scope());
+    ///
+    /// context.pop_scope();
+    /// assert!(context.in_global_scope());
+    /// ```
     pub fn in_global_scope(&self) -> bool {
         self.symbol_table.in_global_scope()
     }
