@@ -1,3 +1,13 @@
+//! The Abstract Syntax Tree produced by the compiler.
+//!
+//! The AST represents the program syntax at a more abstract level, removing some of the finer
+//! details. The parser produces an AST when it is executed, and the AST understands things like
+//! type inference, expression types and code generation.
+//!
+//! Each of the AST nodes are stored in their own module. Each one may implement a different subset
+//! of the traits found in this module. They are all likely to use the `Context` struct, which
+//! allows for inference to be carried across from the `infer` call to the `generate` call.
+
 use std::collections::HashMap;
 use std::collections::HashSet;
 
@@ -20,6 +30,8 @@ pub use self::{
 use self::symboltable::SymbolTable;
 use self::symboltable::Variable;
 
+/// Suites are generally used as a name for any number of continuous statements in the Python
+/// grammar
 pub type Suite = Vec<Statement>;
 
 /// Allows AST nodes to generate transpiled code for themselves.

@@ -1,3 +1,8 @@
+//! Top level functions for the binary to use.
+//!
+//! The app contains functions related to parsing the arguments given to the program, dealing with
+//! those arguments and processing the files and data given to it using the core of the compiler.
+
 use std::env;
 use std::error::Error;
 use std::fs;
@@ -7,6 +12,7 @@ use std::process::Command;
 use crate::ast::{Context, Generate, Infer};
 use crate::{ast, lexer, parser};
 
+/// The arguments that can be passed to the program.
 pub struct Args {
     /// Whether the AST should be displayed, specified by --ast
     abstract_tree: bool,

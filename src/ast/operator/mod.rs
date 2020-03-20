@@ -1,3 +1,5 @@
+//! The valid operators that `ptc` understands.
+
 use ast::VariableType;
 
 mod generate;

@@ -1,11 +1,19 @@
+//! The lexer for `ptc`.
+//!
+//! Deals with the tokenisation of the input source file. Implements the maximal munch approach,
+//! where we should always read as much of the input as possible at each time. Tok contains all of
+//! the valid tokens for `ptc` and the parser will expect these as output.
+
 use std::collections::VecDeque;
 use std::error::Error;
 use std::fmt;
 
+/// Represents the output type for the lexer, which returns either a token with some positional
+/// information about where in the program we are or an error message.
 pub type Spanned<Tok, Loc, Error> = Result<(Loc, Tok, Loc), Error>;
 
-#[derive(Clone, Debug, PartialEq)]
 /// A token that can be output by the lexer and understood by the parser.
+#[derive(Clone, Debug, PartialEq)]
 pub enum Tok {
     /// An indentation token
     Indent,
@@ -106,7 +114,9 @@ pub enum Tok {
     Newline,
 }
 
+/// Represents any type of error that the lexer can encounter.
 pub enum LexicalError {
+    /// The input file contains both tabs and spaces as indentation
     MixedIndentation,
 }
 
@@ -163,13 +173,19 @@ impl Indentation {
     }
 }
 
+/// Stores the state of the lexer.
 pub struct Lexer<T: Iterator<Item = (usize, char)>> {
+    /// The input stream
     chars: T,
+    /// The current lookahead token if it exists
     lookahead: Option<(usize, char)>,
+    /// The queue of tokens/errors to be output
     queue: VecDeque<Result<Tok, LexicalError>>,
-    index: usize,
+    /// The current line number we are on
     line_number: usize,
+    /// Whether we have just read a newline token
     start_of_line: bool,
+    /// The current state of the program indentation
     indentation: Indentation,
 }
 
@@ -177,19 +193,18 @@ impl<T> Lexer<T>
 where
     T: Iterator<Item = (usize, char)>,
 {
+    /// Creates a new instance of the Lexer
     pub fn new(input: T) -> Self {
         let mut lexer = Lexer {
             chars: input,
             lookahead: None,
             queue: VecDeque::new(),
-            index: 0,
             line_number: 1,
             start_of_line: true,
             indentation: Indentation::new(),
         };
 
         lexer.update_lookahead();
-        lexer.index = 0;
         lexer
     }
 
@@ -463,7 +478,6 @@ where
     /// Updates the lexer lookahead.
     fn update_lookahead(&mut self) {
         self.lookahead = self.chars.next();
-        self.index += 1;
     }
 
     /// Checks whether the current lookahead character is equal to the argument. If lookahead is
