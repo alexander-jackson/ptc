@@ -5,5 +5,11 @@ mod infer;
 
 #[derive(Debug, PartialEq)]
 pub struct Program {
-    pub statements: Suite,
+    statements: Suite,
+}
+
+impl Program {
+    pub fn new(statements: Suite) -> Program {
+        Program { statements }
+    }
 }

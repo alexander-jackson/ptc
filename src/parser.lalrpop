@@ -6,9 +6,9 @@ use ast;
 grammar;
 
 pub Program: ast::Program = {
-    <lines:Line*> => ast::Program {
-        statements: Vec::from_iter(lines.into_iter().flatten())
-    },
+    <lines:Line*> => ast::Program::new(
+        Vec::from_iter(lines.into_iter().flatten())
+    ),
 };
 
 Line: ast::Suite = {
