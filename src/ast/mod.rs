@@ -44,6 +44,10 @@ pub trait Generate {
 }
 
 impl Generate for Suite {
+    /// Generates the code for a given Suite.
+    ///
+    /// Simply iterates through the statements in a Suite and generates each of them, concatenating
+    /// them with a space.
     fn generate(&self, context: &mut Context) -> String {
         self.iter()
             .map(|s| s.generate(context))
@@ -71,6 +75,11 @@ pub enum VariableType {
 }
 
 impl From<VariableType> for String {
+    /// Allows for the conversion of a VariableType to a String.
+    ///
+    /// Code generation regularly requires the conversion of internal `VariableType`s to `String`s.
+    /// This function allows for new types to be more easily added, as code generation will call
+    /// `String::from(v)` and get the string represenation.
     fn from(v: VariableType) -> String {
         match v {
             VariableType::Unknown => String::from("unknown"),
@@ -83,6 +92,10 @@ impl From<VariableType> for String {
 }
 
 impl From<String> for VariableType {
+    /// Allows for easier conversion of typehints to actual concrete types.
+    ///
+    /// Allowing a `from` implementation allows for an abstraction of the underlying conversions to
+    /// be done in here, especially with the contained Regex for List[...] types.
     fn from(s: String) -> VariableType {
         if s == "int" {
             return VariableType::Integer;
@@ -118,6 +131,7 @@ pub trait Infer {
 }
 
 impl Infer for Suite {
+    /// Infer on each of the statements in a Suite.
     fn infer(&mut self, context: &mut Context) {
         for stmt in self {
             stmt.infer(context);
