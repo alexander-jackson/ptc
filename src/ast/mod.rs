@@ -1,4 +1,4 @@
-//! The Abstract Syntax Tree produced by the compiler.
+//! An abstract syntax tree produced by the parser.
 //!
 //! The AST represents the program syntax at a more abstract level, removing some of the finer
 //! details. The parser produces an AST when it is executed, and the AST understands things like

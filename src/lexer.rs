@@ -1,15 +1,17 @@
-//! The lexer for `ptc`.
+//! A lexer for Python program inputs.
 //!
 //! Deals with the tokenisation of the input source file. Implements the maximal munch approach,
-//! where we should always read as much of the input as possible at each time. Tok contains all of
-//! the valid tokens for `ptc` and the parser will expect these as output.
+//! where we should always read as much of the input as possible at each time. `Tok` contains all
+//! of the valid tokens for `ptc` and the parser will expect these as output.
 
 use std::collections::VecDeque;
 use std::error::Error;
 use std::fmt;
 
-/// Represents the output type for the lexer, which returns either a token with some positional
-/// information about where in the program we are or an error message.
+/// Represents the output type for the lexer.
+///
+/// The lexer can output either a token with some positional information about where in the program
+/// we are or an error message.
 pub type Spanned<Tok, Loc, Error> = Result<(Loc, Tok, Loc), Error>;
 
 /// A token that can be output by the lexer and understood by the parser.
@@ -143,12 +145,19 @@ impl fmt::Debug for LexicalError {
     }
 }
 
+/// The characters that can be used for indentation.
 #[derive(Debug, PartialEq)]
 enum IndentationChar {
+    /// Space indented
     Space,
+    /// Tab indented
     Tab,
 }
 
+/// Tracks indentation related information for the program.
+///
+/// Tracks the stack of indentation sizes that have been used currently, the current level of
+/// indentation and the indentation character being used if one exists.
 struct Indentation {
     length: Vec<usize>,
     level: usize,
@@ -174,6 +183,10 @@ impl Indentation {
 }
 
 /// Stores the state of the lexer.
+///
+/// The lexer iterates over characters and their positions in the program. It returns either tokens
+/// from `Tok` or errors from `LexicalError`. It is used to turn the input program into tokens that
+/// the parser will understand.
 pub struct Lexer<T: Iterator<Item = (usize, char)>> {
     /// The input stream
     chars: T,
@@ -193,7 +206,16 @@ impl<T> Lexer<T>
 where
     T: Iterator<Item = (usize, char)>,
 {
-    /// Creates a new instance of the Lexer
+    /// Creates a new instance of the Lexer given an iterable stream of characters.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use ptc::lexer::Lexer;
+    ///
+    /// let input = "x = 1";
+    /// let lexer = Lexer::new(input.char_indices());
+    /// ```
     pub fn new(input: T) -> Self {
         let mut lexer = Lexer {
             chars: input,
@@ -209,6 +231,10 @@ where
     }
 
     /// Generic read function that reads from the source while a predicate `pred` holds.
+    ///
+    /// Simply reads from the source file while the predicate `pred` returns true. Returns the
+    /// string it has read. Can be used to read numbers: `read_while(|c| c.is_digit(10))` or
+    /// up until the next newline: `read_while(|c| c != '\n')`.
     fn read_while<F>(&mut self, mut pred: F) -> String
     where
         F: FnMut(char) -> bool,
@@ -227,8 +253,11 @@ where
         value
     }
 
-    /// Reads a string of characters from the source.
-    /// Determines whether it is a keyword and adds to the queue accordingly.
+    /// Reads a string of characters from the source that may be an identifier or a keyword.
+    ///
+    /// Read the next string of characters from the source, assuming that it has found an
+    /// identifier. Performs a match on the result, checking whether it has found a keyword, and
+    /// pushes the relevant token to the queue.
     fn read_identifier_or_keyword(&mut self) {
         let ident: String = self.read_while(|c| c.is_alphabetic() || c == '_' || c.is_numeric());
 
@@ -249,6 +278,10 @@ where
     }
 
     /// Reads a number specified in Base10 from the source.
+    ///
+    /// Initially reads while there are digits in the source. If it finishes on a '.' character, it
+    /// will read that, then any more numbers, assuming it is a float now. Otherwise, it will
+    /// assume it is an integer.
     fn read_number(&mut self) {
         // TODO: This crashes a lot, if <number> is too large
         //
@@ -271,7 +304,9 @@ where
     }
 
     /// Reads 'punctuation' from the source.
-    /// Starts with single characters and moves onto multichars.
+    ///
+    /// Initially tries to read single character tokens from the source. If it finds one, it will
+    /// push it to the queue and then return. Otherwise, it will try and read multichar tokens.
     fn read_punctuation(&mut self) {
         // We can immediately match the single character operators
         let single: Option<Tok> = match self.lookahead.map(|x| x.1) {
@@ -300,8 +335,10 @@ where
     }
 
     /// Attempts to read a multichar token from the source.
-    /// Sets up the multichars and calls `match_multichar_op` for each.
-    /// Deals with the single case of `!=` where `!` is not a valid token.
+    ///
+    /// Multichars are typically things like '=' and '==', where we want to perform maximal munch
+    /// and read as much as possible, even if a substring would be a valid token. It also deals
+    /// with some longer tokens, such as '//=' being able to be split into 3 tokens.
     fn read_multichar(&mut self) {
         let multichars: Vec<(char, char, Tok, Tok)> = vec![
             ('=', '=', Tok::Assign, Tok::Equal),
@@ -326,6 +363,7 @@ where
             }
         }
 
+        // Deal with the case of '-', '-=' and '->'
         if self.current_char_equals('-') {
             self.update_lookahead();
 
@@ -340,7 +378,7 @@ where
             }
         }
 
-        // Deal with the monstrosity that is '//'
+        // Deal with the monstrosity that is '/', '/=', '//' and '//='
         if self.current_char_equals('/') {
             self.update_lookahead();
 
@@ -364,8 +402,8 @@ where
 
     /// Generically matches any token that could be either 1 or 2 characters.
     ///
-    /// For example, this can be used to match + and += by specifying multichar = (+, =, Plus,
-    /// PlusEqual). Allows for much easier matching.
+    /// For example, this can be used to match `+` and `+=` by specifying multichar as `('+', '=', Plus,
+    /// PlusEqual)`. Allows for much easier matching.
     fn match_multichar_op(&mut self, multichar: (char, char, Tok, Tok)) {
         // Unpack the arguments
         let (c1, c2, t1, t2): (char, char, Tok, Tok) = multichar;
@@ -382,7 +420,10 @@ where
         }
     }
 
-    /// Reads a newline character from the source and updates internal variables.
+    /// Reads a newline character from the source.
+    ///
+    /// Reads a newline character from the source and updates the lookahead. Sets that we are now
+    /// at the start of a line and increments the line number.
     fn read_newline(&mut self) {
         self.push_token(Tok::Newline);
         self.update_lookahead();
@@ -391,6 +432,8 @@ where
         self.line_number += 1;
     }
 
+    /// Checks for mixed indentation in the source file.
+    ///
     /// Checks whether the current lookahead character and IndentationChar are conflicting and thus
     /// mixed indentation has been used in the file.
     fn check_for_mixed_indentation(&self) -> bool {
@@ -407,8 +450,10 @@ where
         false
     }
 
-    /// Reads the indentation size for the current line. Infers the indentation character if it is
-    /// unknown, otherwise just performs a simple match statement.
+    /// Reads the indentation size for the current line.
+    ///
+    /// Infers the indentation character if it is unknown, otherwise just performs a simple match
+    /// statement.
     fn read_indentation_size(&mut self) -> usize {
         if self.indentation.character.is_none() {
             if self.current_char_equals(' ') {
@@ -427,11 +472,14 @@ where
             };
         }
 
+        // We have no indentation character, so we must have not indented yet
         0
     }
 
     /// Reads the indentation for a new line and deals with previous indentation levels.
-    /// Updates the queue with new indents or unindents if needed.
+    ///
+    /// Checks the current position for mixed indentation, then checks for a new indentation level
+    /// or a return to a previous one.
     fn read_indentation(&mut self) {
         // Check for incorrect indentation characters
         if self.check_for_mixed_indentation() {
@@ -443,6 +491,7 @@ where
         let indents: usize = self.read_indentation_size();
         let current: usize = self.indentation.get_current_length();
 
+        // Check if this line is blank
         if self.current_char_equals('\n') {
             self.read_newline();
             self.read_indentation();
@@ -468,6 +517,10 @@ where
         }
     }
 
+    /// Reads a comment from the source file.
+    ///
+    /// Assumes the current token is a hash and reads everything up until the next newline
+    /// character, ignoring it and not outputting any tokens.
     fn read_comment(&mut self) {
         // Read the hash
         self.update_lookahead();
@@ -476,6 +529,8 @@ where
     }
 
     /// Updates the lexer lookahead.
+    ///
+    /// Moves the lexer position forwards one character and updates the lookahead character.
     fn update_lookahead(&mut self) {
         self.lookahead = self.chars.next();
     }
@@ -491,6 +546,11 @@ where
         false
     }
 
+    /// The entry point for lexing.
+    ///
+    /// Calls each of the lexing functions based on the current position in the source. Begins by
+    /// reading indentation or whitespace, then comments, then any other token that might be in the
+    /// source file.
     fn lex_source(&mut self) {
         if self.start_of_line {
             self.read_indentation();
