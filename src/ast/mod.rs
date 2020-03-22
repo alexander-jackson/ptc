@@ -74,19 +74,19 @@ pub enum VariableType {
     },
 }
 
-impl From<VariableType> for String {
+impl From<&VariableType> for String {
     /// Allows for the conversion of a VariableType to a String.
     ///
     /// Code generation regularly requires the conversion of internal `VariableType`s to `String`s.
     /// This function allows for new types to be more easily added, as code generation will call
     /// `String::from(v)` and get the string represenation.
-    fn from(v: VariableType) -> String {
+    fn from(v: &VariableType) -> String {
         match v {
             VariableType::Unknown => String::from("unknown"),
             VariableType::Integer => String::from("int"),
             VariableType::Float => String::from("float"),
             VariableType::Void => String::from("void"),
-            VariableType::List { elements } => format!("list_{}*", String::from(*elements)),
+            VariableType::List { elements } => format!("list_{}*", String::from(&**elements)),
         }
     }
 }
@@ -350,8 +350,8 @@ impl Context {
                         .iter()
                         .zip(names.iter())
                         .map(|(t, n)| match t {
-                            Some(t) => format!("{} {}", String::from(t.clone()), n),
-                            None => format!("{} {}", String::from(VariableType::Void), n),
+                            Some(t) => format!("{} {}", String::from(t), n),
+                            None => format!("{} {}", String::from(&VariableType::Void), n),
                         })
                         .collect::<Vec<String>>()
                         .join(", ")
@@ -360,8 +360,8 @@ impl Context {
             };
 
             let rtype = match return_type {
-                VariableType::Unknown => String::from(VariableType::Void),
-                _ => String::from(return_type.clone()),
+                VariableType::Unknown => String::from(&VariableType::Void),
+                _ => String::from(return_type),
             };
 
             let prototype = format!("{} {}({});", rtype, name, arguments);

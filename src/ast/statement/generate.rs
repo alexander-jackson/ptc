@@ -16,7 +16,7 @@ impl Generate for Statement {
                             // Check whether this is a global list
                             if context.in_global_scope() {
                                 if let Some(t) = context.get_type(&identifier) {
-                                    return format!("{} {};", String::from(t.clone()), &identifier);
+                                    return format!("{} {};", String::from(t), &identifier);
                                 }
                             }
 
@@ -31,7 +31,7 @@ impl Generate for Statement {
 
                     // Otherwise, we should define it if we have a type for it
                     if let Some(t) = context.get_type(&identifier) {
-                        let str_type = String::from(t.clone());
+                        let str_type = String::from(t);
                         context.define_variable(&identifier);
                         return format!("{} {} = {};", str_type, identifier, expr_gen);
                     }
@@ -139,7 +139,7 @@ impl Generate for Statement {
                 let datatype = match context.get_function_return_type(&name_gen) {
                     Some(v) => match v {
                         VariableType::Unknown => String::from("void"),
-                        _ => String::from(v.clone()),
+                        _ => String::from(v),
                     },
                     None => String::from(""),
                 };
@@ -152,7 +152,7 @@ impl Generate for Statement {
                         if let Some(v) = f_args {
                             for (t, a) in v.iter().zip(args.iter()) {
                                 let str_type = match t {
-                                    Some(vtype) => String::from(vtype.clone()),
+                                    Some(vtype) => String::from(vtype),
                                     None => String::from("unknown"),
                                 };
 
@@ -183,7 +183,7 @@ fn check_list_display(expr: &Expression, dtype: Option<&VariableType>) -> Option
     if let Expression::ListDisplay = expr {
         if let Some(t) = dtype {
             if let VariableType::List { elements } = t {
-                return Some(format!("list_{}_new()", String::from(*elements.clone())));
+                return Some(format!("list_{}_new()", String::from(&**elements)));
             }
         }
     }

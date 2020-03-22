@@ -35,7 +35,7 @@ impl Generate for Expression {
                         if let "append" = attribute.generate(context).as_ref() {
                             return format!(
                                 "list_{}_append({}, {})",
-                                String::from(*elements),
+                                String::from(&*elements),
                                 primary.generate(context),
                                 arg_str
                             );
