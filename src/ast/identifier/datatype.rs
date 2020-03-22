@@ -13,7 +13,7 @@ impl DataType for Identifier {
                 // We don't know what type the variable is
                 VariableType::Unknown
             }
-            Identifier::Typed { typehint, .. } => VariableType::from(String::from(typehint)),
+            Identifier::Typed { typehint, .. } => VariableType::from(typehint.as_str()),
         }
     }
 }

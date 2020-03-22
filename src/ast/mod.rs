@@ -91,12 +91,12 @@ impl From<VariableType> for String {
     }
 }
 
-impl From<String> for VariableType {
+impl From<&str> for VariableType {
     /// Allows for easier conversion of typehints to actual concrete types.
     ///
     /// Allowing a `from` implementation allows for an abstraction of the underlying conversions to
     /// be done in here, especially with the contained Regex for List[...] types.
-    fn from(s: String) -> VariableType {
+    fn from(s: &str) -> VariableType {
         if s == "int" {
             return VariableType::Integer;
         } else if s == "float" {
@@ -112,7 +112,7 @@ impl From<String> for VariableType {
             let inner = caps.get(1).unwrap().as_str();
 
             return VariableType::List {
-                elements: Box::new(VariableType::from(String::from(inner))),
+                elements: Box::new(VariableType::from(inner)),
             };
         }
 

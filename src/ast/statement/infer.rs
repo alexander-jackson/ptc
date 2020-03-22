@@ -56,7 +56,7 @@ impl Infer for Statement {
                 context.set_current_function(Some(function_name.clone()));
 
                 if let Some(r) = ret {
-                    let rtype = VariableType::from(r.clone());
+                    let rtype = VariableType::from(r.as_str());
 
                     if let VariableType::List { .. } = rtype {
                         context.add_include("list.h");
@@ -75,7 +75,7 @@ impl Infer for Statement {
                         );
 
                         if let Identifier::Typed { typehint, .. } = ident {
-                            let vtype = VariableType::from(typehint.clone());
+                            let vtype = VariableType::from(typehint.as_str());
 
                             if let VariableType::List { .. } = vtype {
                                 context.add_include("list.h");
