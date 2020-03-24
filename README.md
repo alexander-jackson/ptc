@@ -37,3 +37,16 @@ FLAGS:
 ARGS:
     <PATH(S)>           Paths of Python files to transpile
 ```
+
+## Tests
+
+Tests live in the `tests/` directory. Each file tests a different component of
+the compiler. You can run all the tests using the `cargo test` command. This
+will also run the doctests that are written for some of the methods.
+
+## Documentation
+
+The documentation for the compiler is written using `rustdoc`. You can build
+and open the documentation using `cargo doc --no-deps --document-private-items
+--open`. This will build the documentation for only the compiler, including the
+non-public marked sections, and open the resulting documentation in a browser.
