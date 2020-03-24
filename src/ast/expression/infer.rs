@@ -21,11 +21,13 @@ impl Infer for Expression {
                 if let Expression::AttributeRef { primary, attribute } = &**name {
                     if attribute.get_identifier() == "append" {
                         if let Some(a) = args {
-                            let t = VariableType::List {
-                                elements: Box::new(a[0].get_type(context)),
-                            };
-                            let p = primary.generate(context);
-                            context.insert_shallow_inferred_type(&p, t);
+                            if let Some(element_type) = a[0].get_type(context) {
+                                let t = VariableType::List {
+                                    elements: Some(Box::new(element_type)),
+                                };
+                                let p = primary.generate(context);
+                                context.insert_shallow_inferred_type(&p, t);
+                            }
                         }
                     }
                 }
@@ -34,7 +36,7 @@ impl Infer for Expression {
                     if name.get_identifier() == "len" {
                         if let Some(a) = args {
                             let t = VariableType::List {
-                                elements: Box::new(VariableType::Integer),
+                                elements: None,
                             };
                             let p = a[0].generate(context);
                             context.insert_shallow_inferred_type(&p, t);
@@ -44,8 +46,9 @@ impl Infer for Expression {
 
                 if let Some(a) = args {
                     for (i, e) in a.iter().enumerate() {
-                        let e_type = e.get_type(context);
-                        context.set_function_argument_type(&fname, i, e_type);
+                        if let Some(e_type) = e.get_type(context) {
+                            context.set_function_argument_type(&fname, i, e_type);
+                        }
                     }
                 }
             }

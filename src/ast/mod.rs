@@ -58,8 +58,6 @@ impl Generate for Suite {
 /// Variable types that `ptc` currently supports.
 #[derive(Clone, Debug, PartialEq)]
 pub enum VariableType {
-    /// A type we don't know about
-    Unknown,
     /// The integer type
     Integer,
     /// The float type
@@ -69,7 +67,7 @@ pub enum VariableType {
     /// A list of homogeneous types
     List {
         /// The type of each element in the list
-        elements: Box<VariableType>,
+        elements: Option<Box<VariableType>>,
     },
 }
 
@@ -81,11 +79,15 @@ impl From<&VariableType> for String {
     /// `String::from(v)` and get the string represenation.
     fn from(v: &VariableType) -> String {
         match v {
-            VariableType::Unknown => String::from("unknown"),
             VariableType::Integer => String::from("int"),
             VariableType::Float => String::from("float"),
             VariableType::Void => String::from("void"),
-            VariableType::List { elements } => format!("list_{}*", String::from(&**elements)),
+            VariableType::List { elements } => {
+                match elements {
+                    Some(t) => format!("list_{}*", String::from(&**t)),
+                    None => String::from("list_unknown*"),
+                }
+            }
         }
     }
 }
@@ -111,11 +113,11 @@ impl From<&str> for VariableType {
             let inner = caps.get(1).unwrap().as_str();
 
             return VariableType::List {
-                elements: Box::new(VariableType::from(inner)),
+                elements: Some(Box::new(VariableType::from(inner))),
             };
         }
 
-        VariableType::Unknown
+        unreachable!()
     }
 }
 
@@ -151,11 +153,11 @@ impl Infer for Suite {
 ///
 /// let node = Literal::Float { value: 0.5 };
 /// let mut context = Context::new();
-/// assert_eq!(node.get_type(&mut context), VariableType::Float);
+/// assert_eq!(node.get_type(&mut context), Some(VariableType::Float));
 /// ```
 pub trait DataType {
     /// Gets the type of the current node, using the known context if needed.
-    fn get_type(&self, &mut Context) -> VariableType;
+    fn get_type(&self, &mut Context) -> Option<VariableType>;
 }
 
 /// A structure for storing information learnt about the program provided.
@@ -172,7 +174,7 @@ pub struct Context {
     /// The current function definition we are in
     current_function: Option<String>,
     /// The return types of functions that we know
-    function_return_types: HashMap<String, VariableType>,
+    function_return_types: HashMap<String, Option<VariableType>>,
     /// The argument types of each parameter to a function
     function_argument_types: HashMap<String, Vec<Option<VariableType>>>,
     /// The argument names of each parameter to a function
@@ -245,7 +247,10 @@ impl Context {
     /// Set the current function that we are parsing and generating code for.
     pub fn set_current_function(&mut self, function_name: Option<String>) {
         self.current_function = function_name;
-        self.set_function_return_type(VariableType::Unknown);
+
+        if let Some(f) = &self.current_function {
+            self.function_return_types.insert(f.to_string(), None);
+        }
     }
 
     /// Set the return type for the current function.
@@ -254,16 +259,18 @@ impl Context {
             let current = self.get_function_return_type(f);
 
             if current.is_none() {
-                self.function_return_types.insert(f.to_string(), datatype);
-            } else if let Some(VariableType::Unknown) = current {
-                self.function_return_types.insert(f.to_string(), datatype);
+                self.function_return_types.insert(f.to_string(), Some(datatype));
             }
         }
     }
 
     /// Check whether we know the return type for a function call.
     pub fn get_function_return_type(&self, function_name: &str) -> Option<&VariableType> {
-        self.function_return_types.get(function_name)
+        if let Some(v) = self.function_return_types.get(function_name) {
+            v.as_ref()
+        } else {
+            None
+        }
     }
 
     /// Set the argument type of a given function based on the index it occurred at in the function
@@ -357,8 +364,8 @@ impl Context {
             };
 
             let rtype = match return_type {
-                VariableType::Unknown => String::from(&VariableType::Void),
-                _ => String::from(return_type),
+                Some(v) => String::from(v),
+                None => String::from(&VariableType::Void),
             };
 
             let prototype = format!("{} {}({});", rtype, name, arguments);
@@ -403,10 +410,13 @@ impl Context {
                     name,
                     match vtype {
                         VariableType::List { elements } => {
-                            match **elements {
-                                VariableType::Integer => "list_int_new()",
-                                VariableType::Float => "list_float_new()",
-                                _ => unreachable!(),
+                            match elements {
+                                Some(t) => match **t {
+                                    VariableType::Integer => "list_int_new()",
+                                    VariableType::Float => "list_float_new()",
+                                    _ => unreachable!(),
+                                }
+                                None => unreachable!(),
                             }
                         }
                         _ => unreachable!(),

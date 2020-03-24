@@ -36,7 +36,7 @@ impl Generate for Statement {
                         return format!("{} {} = {};", str_type, identifier, expr_gen);
                     }
 
-                    return format!("error {} = {};", identifier, expr_gen);
+                    return format!("unknown {} = {};", identifier, expr_gen);
                 }
 
                 let expr_gen = expr.generate(context);
@@ -137,11 +137,8 @@ impl Generate for Statement {
 
                 // If we know the datatype, add it here
                 let datatype = match context.get_function_return_type(&name_gen) {
-                    Some(v) => match v {
-                        VariableType::Unknown => String::from("void"),
-                        _ => String::from(v),
-                    },
-                    None => String::from(""),
+                    Some(v) => String::from(v),
+                    None => String::from(&VariableType::Void),
                 };
 
                 let arg_str = match args {
@@ -183,7 +180,14 @@ fn check_list_display(expr: &Expression, dtype: Option<&VariableType>) -> Option
     if let Expression::ListDisplay = expr {
         if let Some(t) = dtype {
             if let VariableType::List { elements } = t {
-                return Some(format!("list_{}_new()", String::from(&**elements)));
+                let expr_str = format!("list_{}_new()",
+                    match elements {
+                        Some(t) => String::from(&**t),
+                        None => String::from("unknown"),
+                    }
+                );
+
+                return Some(expr_str);
             }
         }
     }

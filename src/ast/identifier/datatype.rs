@@ -2,18 +2,18 @@ use ast::Identifier;
 use ast::{Context, DataType, VariableType};
 
 impl DataType for Identifier {
-    fn get_type(&self, context: &mut Context) -> VariableType {
+    fn get_type(&self, context: &mut Context) -> Option<VariableType> {
         match self {
             Identifier::Name { name, .. } => {
                 // See if we have found a type for the variable already
                 if let Some(t) = context.get_type(&name) {
-                    return t.clone();
+                    return Some(t.clone());
                 }
 
                 // We don't know what type the variable is
-                VariableType::Unknown
+                None
             }
-            Identifier::Typed { typehint, .. } => VariableType::from(typehint.as_str()),
+            Identifier::Typed { typehint, .. } => Some(VariableType::from(typehint.as_str())),
         }
     }
 }

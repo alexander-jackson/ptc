@@ -2,10 +2,10 @@ use ast::Literal;
 use ast::{Context, DataType, VariableType};
 
 impl DataType for Literal {
-    fn get_type(&self, _: &mut Context) -> VariableType {
+    fn get_type(&self, _: &mut Context) -> Option<VariableType> {
         match self {
-            Literal::Integer { .. } => VariableType::Integer,
-            Literal::Float { .. } => VariableType::Float,
+            Literal::Integer { .. } => Some(VariableType::Integer),
+            Literal::Float { .. } => Some(VariableType::Float),
         }
     }
 }
