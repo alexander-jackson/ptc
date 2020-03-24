@@ -2,24 +2,28 @@ use std::collections::HashMap;
 
 use ast::VariableType;
 
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub struct Variable {
-    name: String,
+/// Stores information about a variable in the symbol table.
+///
+/// Stores whether the variable has been defined yet and what type it has.
+#[derive(Debug)]
+pub struct VariableInformation {
     defined: bool,
+    vtype: VariableType,
 }
 
-impl Variable {
-    pub fn new(s: &str) -> Variable {
-        Variable {
-            name: String::from(s),
+impl VariableInformation {
+    /// Creates a new VariableInformation with a given datatype and assumes it is undefined.
+    pub fn with_type(vtype: VariableType) -> VariableInformation {
+        VariableInformation {
             defined: false,
+            vtype
         }
     }
 }
 
 #[derive(Debug)]
 pub struct Scope {
-    variables: HashMap<Variable, VariableType>,
+    variables: HashMap<String, VariableInformation>,
     subscopes: Vec<Scope>,
     explored: bool,
 }
@@ -44,12 +48,13 @@ impl Scope {
     }
 
     /// Insert a variable with a related type into the symbol table.
-    pub fn insert_variable(&mut self, indices: &[usize], variable: Variable, vtype: VariableType) {
+    pub fn insert_variable(&mut self, indices: &[usize], variable: &str, vtype: VariableType) {
         if let Some((head, tail)) = indices.split_first() {
             return self.subscopes[*head].insert_variable(tail, variable, vtype);
         }
 
-        self.variables.insert(variable, vtype);
+        let info = VariableInformation::with_type(vtype);
+        self.variables.insert(variable.to_string(), info);
     }
 
     /// Insert a variable with a related type into the symbol table at a shallower level than the
@@ -57,7 +62,7 @@ impl Scope {
     pub fn insert_shallow_variable(
         &mut self,
         indices: &[usize],
-        variable: &Variable,
+        variable: &str,
         vtype: &VariableType,
     ) -> bool {
         if let Some((head, tail)) = indices.split_first() {
@@ -69,18 +74,16 @@ impl Scope {
         }
 
         // Check whether the variable is in this scope
-        for key in self.variables.keys() {
-            if variable.name == key.name {
-                self.variables.insert(variable.clone(), vtype.clone());
-                return true;
-            }
+        if let Some(info) = self.variables.get_mut(variable) {
+            info.vtype = vtype.clone();
+            return true;
         }
 
         false
     }
 
     /// Get the type of a variable in the symbol table if we know it.
-    pub fn get_type(&self, indices: &[usize], variable: &Variable) -> Option<&VariableType> {
+    pub fn get_type(&self, indices: &[usize], variable: &str) -> Option<&VariableType> {
         if let Some((head, tail)) = indices.split_first() {
             let vtype = self.subscopes[*head].get_type(tail, variable);
 
@@ -93,9 +96,9 @@ impl Scope {
         //      We are the final scope
         //      The inner scopes returned nothing
         // Thus, check whether we contain <variable>
-        for (key, value) in self.variables.iter() {
-            if key.name == variable.name {
-                return Some(value);
+        for (name, info) in self.variables.iter() {
+            if name == variable {
+                return Some(&info.vtype);
             }
         }
 
@@ -135,8 +138,8 @@ impl Scope {
         }
 
         // Check if it is defined here
-        for key in self.variables.keys() {
-            if key.name == variable && key.defined {
+        for (name, info) in &self.variables {
+            if name == variable && info.defined {
                 return true;
             }
         }
@@ -150,12 +153,8 @@ impl Scope {
             return self.subscopes[*head].define_variable(tail, variable);
         }
 
-        // We are in the currently active scope
-        let mut v = Variable::new(variable);
-
-        if let Some(vtype) = self.variables.remove(&v) {
-            v.defined = true;
-            self.variables.insert(v, vtype);
+        if let Some(info) = self.variables.get_mut(variable) {
+            info.defined = true;
         }
     }
 
@@ -163,9 +162,9 @@ impl Scope {
         let mut lists: Vec<(String, VariableType)> = Vec::new();
 
         // Get all the lists in this scope
-        for (key, value) in self.variables.iter() {
-            if let VariableType::List { .. } = value {
-                lists.push((key.name.clone(), value.clone()));
+        for (name, info) in self.variables.iter() {
+            if let VariableType::List { .. } = info.vtype {
+                lists.push((name.clone(), info.vtype.clone()));
             }
         }
 
@@ -201,19 +200,18 @@ impl SymbolTable {
     }
 
     /// Insert an inferred variable type into the SymbolTable.
-    pub fn insert_variable(&mut self, variable: Variable, vtype: VariableType) {
+    pub fn insert_variable(&mut self, variable: &str, vtype: VariableType) {
         self.scope.insert_variable(&self.active, variable, vtype);
     }
 
     /// Insert an inferred variable type into the SymbolTable at a shallower level than the current
     /// scope.
-    pub fn insert_shallow_variable(&mut self, variable: Variable, vtype: VariableType) {
-        self.scope
-            .insert_shallow_variable(&self.active, &variable, &vtype);
+    pub fn insert_shallow_variable(&mut self, variable: &str, vtype: VariableType) {
+        self.scope.insert_shallow_variable(&self.active, variable, &vtype);
     }
 
     /// Get the type of a variable if we have inferred it previously.
-    pub fn get_type(&self, variable: &Variable) -> Option<&VariableType> {
+    pub fn get_type(&self, variable: &str) -> Option<&VariableType> {
         self.scope.get_type(&self.active, variable)
     }
 

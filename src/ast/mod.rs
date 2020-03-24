@@ -28,7 +28,6 @@ pub use self::{
 };
 
 use self::symboltable::SymbolTable;
-use self::symboltable::Variable;
 
 /// Suites are generally used as a name for any number of continuous statements in the Python
 /// grammar
@@ -209,20 +208,18 @@ impl Context {
 
     /// Insert the inferred type for a variable into the SymbolTable.
     pub fn insert_inferred_type(&mut self, variable: &str, inferred: VariableType) {
-        self.symbol_table
-            .insert_variable(Variable::new(variable), inferred);
+        self.symbol_table.insert_variable(variable, inferred);
     }
 
     /// Insert the inferred type for a variable into the SymbolTable at a shallower level than the
     /// current scope.
     pub fn insert_shallow_inferred_type(&mut self, variable: &str, inferred: VariableType) {
-        self.symbol_table
-            .insert_shallow_variable(Variable::new(variable), inferred);
+        self.symbol_table.insert_shallow_variable(variable, inferred);
     }
 
     /// Get the VariableType for a variable if it exists.
     pub fn get_type(&self, variable: &str) -> Option<&VariableType> {
-        self.symbol_table.get_type(&Variable::new(variable))
+        self.symbol_table.get_type(variable)
     }
 
     /// Check whether a variable has been defined in the SymbolTable currently.
