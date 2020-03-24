@@ -1,13 +1,19 @@
+//! Tracks variable names, states and types.
+//!
+//! Deals with the storage of variables, whether they have been defined and their types. Manages
+//! the scope of variables, and allows for types to be inferred across the syntax tree without the
+//! need to move around.
+
 use std::collections::HashMap;
 
 use ast::VariableType;
 
 /// Stores information about a variable in the symbol table.
-///
-/// Stores whether the variable has been defined yet and what type it has.
 #[derive(Debug)]
 pub struct VariableInformation {
+    /// Whether the variable has defined in output code yet
     defined: bool,
+    /// What type the variable has
     vtype: VariableType,
 }
 
@@ -21,14 +27,22 @@ impl VariableInformation {
     }
 }
 
+/// Stores a single scope layer with the variables defined within it.
 #[derive(Debug)]
 pub struct Scope {
+    /// The variables defined in this scope
     variables: HashMap<String, VariableInformation>,
+    /// The scopes created within this one
     subscopes: Vec<Scope>,
+    /// Whether this scope has been processed in the code generation yet
     explored: bool,
 }
 
 impl Scope {
+    /// Creates a new Scope.
+    ///
+    /// Initialises a new scope with an empty HashMap for Variables, no known subscopes and marks
+    /// it as unexplored thusfar.
     pub fn new() -> Scope {
         Scope {
             variables: HashMap::new(),
@@ -158,7 +172,8 @@ impl Scope {
         }
     }
 
-    pub fn get_global_lists(&self) -> Vec<(String, VariableType)> {
+    /// Gets the lists that are defined in this scope.
+    pub fn get_defined_lists(&self) -> Vec<(String, VariableType)> {
         let mut lists: Vec<(String, VariableType)> = Vec::new();
 
         // Get all the lists in this scope
@@ -172,13 +187,17 @@ impl Scope {
     }
 }
 
+/// Defines the SymbolTable used in the Context.
 #[derive(Debug)]
 pub struct SymbolTable {
+    /// The global scope, which all scopes descend from
     scope: Scope,
+    /// The index path to the scope we are currently in
     active: Vec<usize>,
 }
 
 impl SymbolTable {
+    /// Creates a new SymbolTable with an empty global scope.
     pub fn new() -> SymbolTable {
         SymbolTable {
             scope: Scope::new(),
@@ -235,10 +254,12 @@ impl SymbolTable {
         self.scope.define_variable(&self.active, variable);
     }
 
+    /// Gets the names of all global lists and their VariableTypes.
     pub fn get_global_lists(&self) -> Vec<(String, VariableType)> {
-        self.scope.get_global_lists()
+        self.scope.get_defined_lists()
     }
 
+    /// Checks whether we are in the global scope.
     pub fn in_global_scope(&self) -> bool {
         self.active.is_empty()
     }
