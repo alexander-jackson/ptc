@@ -14,20 +14,20 @@ use crate::{ast, lexer, parser};
 
 /// The arguments that can be passed to the program.
 pub struct Args {
-    /// Whether the AST should be displayed, specified by --ast
+    /// Whether the AST should be displayed, specified by `--ast`
     abstract_tree: bool,
-    /// Whether we should display tokens, specified by --tokens
+    /// Whether we should display tokens, specified by `--tokens`
     tokens: bool,
-    /// Whether we should display generated code, specified by --display
+    /// Whether we should display generated code, specified by `--display`
     display: bool,
-    /// Whether the help message should be displayed
+    /// Whether the help message should be displayed, specified by `-h`, `--help` or no arguments
     help: bool,
     /// All paths that the compiler should be run on
     paths: Vec<String>,
 }
 
 /// Display the help message for the compiler, typically upon running the program with no
-/// arguments or supplying the -h or --help flag
+/// arguments or supplying the `-h` or `--help` flag.
 fn display_help_message() {
     println!(
         r#"
@@ -49,8 +49,8 @@ ARGS:
     );
 }
 
-/// Parse the arguments into an Args struct that can then be used to determine what the user wants
-/// the program to do.
+/// Parse the arguments into an `Args` struct that can then be used to determine what the user
+/// wants the program to do.
 ///
 /// # Errors
 ///
@@ -68,7 +68,7 @@ pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
     })
 }
 
-/// Process the arguments given to the program from get_arguments(). Process each path in turn as
+/// Process the arguments given to the program from `get_arguments()`. Process each path in turn as
 /// normal.
 pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
     if args.help || args.paths.is_empty() {
@@ -135,7 +135,7 @@ fn display_tokens(program_code: &str) {
 }
 
 /// Get the output filename given the filename of the file we are currently processing. Gets the
-/// stem of the file and its basename
+/// stem of the file and its basename.
 fn get_output_filename(filename: &str) -> Option<String> {
     let path_struct = Path::new(&filename);
     let stem = path_struct.file_stem()?;
@@ -144,7 +144,7 @@ fn get_output_filename(filename: &str) -> Option<String> {
     Some(basename.to_string())
 }
 
-/// Check whether clang-format is installed on this system. Searches the path variable for a
+/// Check whether `clang-format` is installed on this system. Searches the path variable for a
 /// version of the program and returns true if it is found.
 fn clang_format_exists() -> bool {
     if let Some(paths) = env::var_os("PATH") {
@@ -158,7 +158,7 @@ fn clang_format_exists() -> bool {
     false
 }
 
-/// Write the output code to a file and optionally format it using clang-format.
+/// Write the output code to a file and optionally format it using `clang-format`.
 fn write_and_format_output_file(filename: &str, code: &str) -> Result<(), Box<dyn Error>> {
     fs::write(&filename, &code)?;
 
@@ -211,7 +211,7 @@ fn format_parser_error(
     }
 }
 
-/// Get the abstract syntax tree for some program code, displaying it if specified by the --ast
+/// Get the abstract syntax tree for some program code, displaying it if specified by the `--ast`
 /// flag on the command line.
 fn get_abstract_syntax_tree(code: &str, display: bool) -> Result<ast::Program, Box<dyn Error>> {
     let ast = parse(&code)?;
@@ -224,6 +224,7 @@ fn get_abstract_syntax_tree(code: &str, display: bool) -> Result<ast::Program, B
     Ok(ast)
 }
 
+/// Adds `#ifndef` guards to the header given the basename for the file.
 fn add_if_guards(basename: &str, header: &str) -> String {
     let uppercase = basename.to_uppercase();
 
