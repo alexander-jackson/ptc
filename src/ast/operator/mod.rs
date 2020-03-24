@@ -56,21 +56,32 @@ impl Operator {
     /// operand should be. If `Operand` is a `Divide`, it will always produce a
     /// `VariableType::Float`. If both `left` and `right` are equal, it will produce the same type
     /// as them. If either `left` or `right` are `VariableType::Float`, a `VariableType::Float` will
-    /// be output. If none of these are true, it will default to a `VariableType::Integer`.
-    pub fn resulting_type(&self, left: VariableType, right: VariableType) -> VariableType {
+    /// be output. Finally, it will check whether either side has a type, and return that,
+    /// returning None if neither has a type.
+    pub fn resulting_type(&self, left: Option<VariableType>, right: Option<VariableType>) -> Option<VariableType> {
         // If the operator is a divide, we probably want a float out of it
         if let Operator::Divide = self {
-            return VariableType::Float;
+            return Some(VariableType::Float);
         }
 
         if (left == right) {
             return left;
         }
 
-        if (left == VariableType::Float || right == VariableType::Float) {
-            return VariableType::Float;
+        if let Some(VariableType::Float) = left {
+            return Some(VariableType::Float);
         }
 
-        VariableType::Integer
+        if let Some(VariableType::Float) = right {
+            return Some(VariableType::Float);
+        }
+
+        return if left.is_some() {
+            left
+        } else if right.is_some() {
+            right
+        } else {
+            None
+        }
     }
 }

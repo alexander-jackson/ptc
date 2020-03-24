@@ -14,7 +14,9 @@ impl Infer for Statement {
                         Identifier::Typed { .. } => name.get_type(context),
                     };
 
-                    context.insert_inferred_type(&identifier, inferred);
+                    if let Some(t) = inferred {
+                        context.insert_inferred_type(&identifier, t);
+                    }
                 }
 
                 expr.infer(context);
@@ -41,8 +43,9 @@ impl Infer for Statement {
             Statement::ReturnStatement { expr } => {
                 // If the statement returns a value, get the type of it
                 if let Some(e) = expr {
-                    let datatype = e.get_type(context);
-                    context.set_function_return_type(datatype);
+                    if let Some(t) = e.get_type(context) {
+                        context.set_function_return_type(t);
+                    }
                 }
             }
             Statement::FunctionDecl {

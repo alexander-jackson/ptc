@@ -14,7 +14,7 @@ impl Generate for Expression {
                 format!("{}{}", op.generate(context), expr.generate(context))
             }
             Expression::ParenExpression { expr } => format!("({})", expr.generate(context)),
-            Expression::ListDisplay => String::from("list_int_new()"),
+            Expression::ListDisplay => unreachable!(),
             Expression::FunctionCall { name, args } => {
                 let arg_str = match args {
                     Some(s) => s
@@ -31,14 +31,16 @@ impl Generate for Expression {
 
                 // Check for <list>.append(<args>)
                 if let Expression::AttributeRef { primary, attribute } = &**name {
-                    if let VariableType::List { elements } = primary.get_type(context) {
+                    if let Some(VariableType::List { elements }) = primary.get_type(context) {
                         if let "append" = attribute.generate(context).as_ref() {
-                            return format!(
-                                "list_{}_append({}, {})",
-                                String::from(&*elements),
-                                primary.generate(context),
-                                arg_str
-                            );
+                            if let Some(elements) = elements {
+                                return format!(
+                                    "list_{}_append({}, {})",
+                                    String::from(&*elements),
+                                    primary.generate(context),
+                                    arg_str
+                                );
+                            }
                         }
                     }
                 }
