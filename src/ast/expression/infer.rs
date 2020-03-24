@@ -36,8 +36,7 @@ impl Infer for Expression {
                     if name.get_identifier() == "len" {
                         if let Some(a) = args {
                             let t = VariableType::List {
-                                // TODO: Change this to be None as we don't know the type //
-                                elements: Some(Box::new(VariableType::Integer)),
+                                elements: None,
                             };
                             let p = a[0].generate(context);
                             context.insert_shallow_inferred_type(&p, t);

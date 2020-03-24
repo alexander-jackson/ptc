@@ -180,9 +180,14 @@ fn check_list_display(expr: &Expression, dtype: Option<&VariableType>) -> Option
     if let Expression::ListDisplay = expr {
         if let Some(t) = dtype {
             if let VariableType::List { elements } = t {
-                if let Some(t) = elements {
-                    return Some(format!("list_{}_new()", String::from(&**t)));
-                }
+                let expr_str = format!("list_{}_new()",
+                    match elements {
+                        Some(t) => String::from(&**t),
+                        None => String::from("unknown"),
+                    }
+                );
+
+                return Some(expr_str);
             }
         }
     }
