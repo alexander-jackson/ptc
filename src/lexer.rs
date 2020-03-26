@@ -117,9 +117,15 @@ pub enum Tok {
 }
 
 /// Represents any type of error that the lexer can encounter.
+#[derive(Debug)]
 pub enum LexicalError {
-    /// The input file contains both tabs and spaces as indentation
-    MixedIndentation,
+    /// The input file contains both tabs and spaces as indentation.
+    MixedIndentation(usize),
+    /// The input file contains malformed indentation.
+    ///
+    /// This occurs when a line does not contain the same amount of indentation as something
+    /// previously in the stack.
+    InconsistentIndentation(usize),
 }
 
 impl Error for LexicalError {}
@@ -127,20 +133,16 @@ impl Error for LexicalError {}
 impl fmt::Display for LexicalError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            LexicalError::MixedIndentation => write!(
+            LexicalError::MixedIndentation(line) => write!(
                 f,
-                "Encountered mixed indentation in the file. Please use either tabs OR spaces."
+                "Encountered mixed indentation on line {}. Please use either tabs OR spaces.",
+                line,
             ),
-        }
-    }
-}
-
-impl fmt::Debug for LexicalError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            LexicalError::MixedIndentation => {
-                write!(f, "Encountered mixed indentation in the file. Please use either tabs or spaces exclusively.")
-            }
+            LexicalError::InconsistentIndentation(line) => write!(
+                f,
+                "Encountered malformed indentation on line {}. Please ensures statements are always correctly aligned.",
+                line
+            ),
         }
     }
 }
@@ -483,7 +485,7 @@ where
     fn read_indentation(&mut self) {
         // Check for incorrect indentation characters
         if self.check_for_mixed_indentation() {
-            self.push_error(LexicalError::MixedIndentation);
+            self.push_error(LexicalError::MixedIndentation(self.line_number));
             return;
         }
 
@@ -507,9 +509,17 @@ where
                 self.push_token(Tok::Indent);
             } else {
                 // See how far back we have gone
-                while self.indentation.pop_length() > indents {
+                let mut level = self.indentation.pop_length();
+
+                while level != indents {
                     self.indentation.level -= 1;
                     self.push_token(Tok::Unindent);
+                    level = self.indentation.pop_length();
+
+                    if level < indents {
+                        self.push_error(LexicalError::InconsistentIndentation(self.line_number));
+                        return;
+                    }
                 }
 
                 self.indentation.length.push(indents);
