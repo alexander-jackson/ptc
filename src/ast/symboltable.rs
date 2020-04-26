@@ -22,7 +22,7 @@ impl VariableInformation {
     pub fn with_type(vtype: VariableType) -> VariableInformation {
         VariableInformation {
             defined: false,
-            vtype
+            vtype,
         }
     }
 }
@@ -226,7 +226,8 @@ impl SymbolTable {
     /// Insert an inferred variable type into the SymbolTable at a shallower level than the current
     /// scope.
     pub fn insert_shallow_variable(&mut self, variable: &str, vtype: VariableType) {
-        self.scope.insert_shallow_variable(&self.active, variable, &vtype);
+        self.scope
+            .insert_shallow_variable(&self.active, variable, &vtype);
     }
 
     /// Get the type of a variable if we have inferred it previously.

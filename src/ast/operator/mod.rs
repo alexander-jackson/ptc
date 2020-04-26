@@ -58,7 +58,11 @@ impl Operator {
     /// as them. If either `left` or `right` are `VariableType::Float`, a `VariableType::Float` will
     /// be output. Finally, it will check whether either side has a type, and return that,
     /// returning None if neither has a type.
-    pub fn resulting_type(&self, left: Option<VariableType>, right: Option<VariableType>) -> Option<VariableType> {
+    pub fn resulting_type(
+        &self,
+        left: Option<VariableType>,
+        right: Option<VariableType>,
+    ) -> Option<VariableType> {
         // If the operator is a divide, we probably want a float out of it
         if let Operator::Divide = self {
             return Some(VariableType::Float);
@@ -82,6 +86,6 @@ impl Operator {
             right
         } else {
             None
-        }
+        };
     }
 }

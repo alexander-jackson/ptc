@@ -134,12 +134,19 @@ impl Generate for Statement {
                 name, args, body, ..
             } => {
                 let name_gen = name.generate(context);
+                let ret_type = context.get_function_return_type(&name_gen);
 
                 // If we know the datatype, add it here
-                let datatype = match context.get_function_return_type(&name_gen) {
+                let datatype = match ret_type {
                     Some(v) => String::from(v),
                     None => String::from(&VariableType::Void),
                 };
+
+                if let Some(VariableType::List { .. }) = ret_type {
+                    context.add_header_include("list.h");
+                }
+
+                let mut list_h = false;
 
                 let arg_str = match args {
                     Some(args) => {
@@ -153,6 +160,10 @@ impl Generate for Statement {
                                     None => String::from("unknown"),
                                 };
 
+                                if let Some(VariableType::List { .. }) = t {
+                                    list_h = true;
+                                }
+
                                 arguments.push(format!("{} {}", str_type, a.get_identifier()));
                             }
                         } else {
@@ -165,6 +176,10 @@ impl Generate for Statement {
                     }
                     None => String::from(""),
                 };
+
+                if list_h {
+                    context.add_header_include("list.h");
+                }
 
                 context.next_scope();
                 let body_gen = body.generate(context);
@@ -180,7 +195,8 @@ fn check_list_display(expr: &Expression, dtype: Option<&VariableType>) -> Option
     if let Expression::ListDisplay = expr {
         if let Some(t) = dtype {
             if let VariableType::List { elements } = t {
-                let expr_str = format!("list_{}_new()",
+                let expr_str = format!(
+                    "list_{}_new()",
                     match elements {
                         Some(t) => String::from(&**t),
                         None => String::from("unknown"),

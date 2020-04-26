@@ -82,12 +82,10 @@ impl From<&VariableType> for String {
             VariableType::Integer => String::from("int"),
             VariableType::Float => String::from("float"),
             VariableType::Void => String::from("void"),
-            VariableType::List { elements } => {
-                match elements {
-                    Some(t) => format!("list_{}*", String::from(&**t)),
-                    None => String::from("list_unknown*"),
-                }
-            }
+            VariableType::List { elements } => match elements {
+                Some(t) => format!("list_{}*", String::from(&**t)),
+                None => String::from("list_unknown*"),
+            },
         }
     }
 }
@@ -181,6 +179,8 @@ pub struct Context {
     function_argument_names: HashMap<String, Vec<String>>,
     /// The files that should be `#include`d to the source file
     includes: HashSet<String>,
+    /// The files that should be `#include`d to the header file
+    header_includes: HashSet<String>,
 }
 
 impl Context {
@@ -195,6 +195,7 @@ impl Context {
             function_argument_types: HashMap::new(),
             function_argument_names: HashMap::new(),
             includes: HashSet::new(),
+            header_includes: HashSet::new(),
         }
     }
 
@@ -216,7 +217,8 @@ impl Context {
     /// Insert the inferred type for a variable into the SymbolTable at a shallower level than the
     /// current scope.
     pub fn insert_shallow_inferred_type(&mut self, variable: &str, inferred: VariableType) {
-        self.symbol_table.insert_shallow_variable(variable, inferred);
+        self.symbol_table
+            .insert_shallow_variable(variable, inferred);
     }
 
     /// Get the VariableType for a variable if it exists.
@@ -259,7 +261,8 @@ impl Context {
             let current = self.get_function_return_type(f);
 
             if current.is_none() {
-                self.function_return_types.insert(f.to_string(), Some(datatype));
+                self.function_return_types
+                    .insert(f.to_string(), Some(datatype));
             }
         }
     }
@@ -338,7 +341,11 @@ impl Context {
 
     /// Generates the header file for the current source file.
     pub fn generate_header_file(&self) -> String {
-        let mut prototypes: Vec<String> = Vec::new();
+        let mut header_lines: Vec<String> = Vec::new();
+
+        for include in &self.header_includes {
+            header_lines.push(format!(r#"#include "{}""#, include));
+        }
 
         // function_return_types contains all functions we saw
         for (name, return_type) in self.function_return_types.iter() {
@@ -369,15 +376,20 @@ impl Context {
             };
 
             let prototype = format!("{} {}({});", rtype, name, arguments);
-            prototypes.push(prototype);
+            header_lines.push(prototype);
         }
 
-        prototypes.join("\n")
+        header_lines.join("\n")
     }
 
     /// Adds the name of a file that should be included in the output source.
     pub fn add_include(&mut self, include: &str) {
         self.includes.insert(include.to_string());
+    }
+
+    /// Adds the name of a file that should be included in the output header.
+    pub fn add_header_include(&mut self, include: &str) {
+        self.header_includes.insert(include.to_string());
     }
 
     /// Generates the include statements for the current file.
@@ -415,7 +427,7 @@ impl Context {
                                     VariableType::Integer => "list_int_new()",
                                     VariableType::Float => "list_float_new()",
                                     _ => unreachable!(),
-                                }
+                                },
                                 None => unreachable!(),
                             }
                         }
