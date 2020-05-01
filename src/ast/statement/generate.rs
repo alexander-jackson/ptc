@@ -79,6 +79,7 @@ impl Generate for Statement {
 
                     if let Some(VariableType::List { .. }) = context.get_type(&identifier) {
                         strs.push(format!("free({});", identifier));
+                        context.add_include("stdlib.h");
                     }
                 }
 

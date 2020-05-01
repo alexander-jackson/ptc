@@ -343,7 +343,10 @@ impl Context {
     pub fn generate_header_file(&self) -> String {
         let mut header_lines: Vec<String> = Vec::new();
 
-        for include in &self.header_includes {
+        let sorted = &mut self.header_includes.iter().collect::<Vec<&String>>();
+        sorted.sort();
+
+        for include in sorted {
             header_lines.push(format!(r#"#include "{}""#, include));
         }
 
@@ -394,7 +397,10 @@ impl Context {
 
     /// Generates the include statements for the current file.
     pub fn generate_includes(&self) -> String {
-        self.includes
+        let sorted = &mut self.includes.iter().collect::<Vec<&String>>();
+        sorted.sort();
+
+        sorted
             .iter()
             .map(|i| format!(r#"#include "{}""#, i))
             .collect::<Vec<String>>()
