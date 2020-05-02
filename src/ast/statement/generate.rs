@@ -77,9 +77,13 @@ impl Generate for Statement {
                 for ident in targets {
                     let identifier = ident.get_identifier();
 
-                    if let Some(VariableType::List { .. }) = context.get_type(&identifier) {
-                        strs.push(format!("free({});", identifier));
-                        context.add_include("stdlib.h");
+                    if let Some(VariableType::List { elements }) = context.get_type(&identifier) {
+                        if elements.is_none() {
+                            continue;
+                        }
+
+                        let e = String::from(&**elements.as_ref().unwrap());
+                        strs.push(format!("list_{}_free({});", e, identifier));
                     }
                 }
 
