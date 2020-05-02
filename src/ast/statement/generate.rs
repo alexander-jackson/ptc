@@ -71,24 +71,26 @@ impl Generate for Statement {
             }
             Statement::Expression { expr } => format!("{};", expr.generate(context)),
             Statement::Pass => String::from(""),
-            Statement::DeleteStatement { targets } => {
-                let mut strs: Vec<String> = Vec::new();
+            Statement::DeleteStatement { targets } => targets
+                .iter()
+                .filter_map(|t| {
+                    let ident = t.get_identifier();
 
-                for ident in targets {
-                    let identifier = ident.get_identifier();
-
-                    if let Some(VariableType::List { elements }) = context.get_type(&identifier) {
-                        if elements.is_none() {
-                            continue;
+                    // If the identifier is a list with known element types
+                    if let Some(VariableType::List { elements }) = context.get_type(&ident) {
+                        match elements {
+                            Some(e) => {
+                                // Add the relevant free
+                                Some(format!("list_{}_free({});", String::from(e), ident))
+                            }
+                            None => None,
                         }
-
-                        let e = String::from(&**elements.as_ref().unwrap());
-                        strs.push(format!("list_{}_free({});", e, identifier));
+                    } else {
+                        None
                     }
-                }
-
-                strs.join(" ")
-            }
+                })
+                .collect::<Vec<String>>()
+                .join(" "),
             Statement::IfStatement {
                 expr,
                 suite,
@@ -203,7 +205,7 @@ fn check_list_display(expr: &Expression, dtype: Option<&VariableType>) -> Option
                 let expr_str = format!(
                     "list_{}_new()",
                     match elements {
-                        Some(t) => String::from(&**t),
+                        Some(t) => String::from(t),
                         None => String::from("unknown"),
                     }
                 );

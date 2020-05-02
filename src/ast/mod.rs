@@ -83,10 +83,16 @@ impl From<&VariableType> for String {
             VariableType::Float => String::from("float"),
             VariableType::Void => String::from("void"),
             VariableType::List { elements } => match elements {
-                Some(t) => format!("list_{}*", String::from(&**t)),
+                Some(t) => format!("list_{}*", String::from(t)),
                 None => String::from("list_unknown*"),
             },
         }
+    }
+}
+
+impl From<&Box<VariableType>> for String {
+    fn from(v: &Box<VariableType>) -> String {
+        String::from(&**v)
     }
 }
 
