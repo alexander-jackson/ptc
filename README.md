@@ -15,6 +15,9 @@ cd ptc/
 cargo install --path .
 ```
 
+Alternatively, you can build and run the compiler using the `cargo run --
+{ARGS}` command.
+
 ## Usage
 
 The compiler can be used as follows:
@@ -43,6 +46,9 @@ ARGS:
 Tests live in the `tests/` directory. Each file tests a different component of
 the compiler. You can run all the tests using the `cargo test` command. This
 will also run the doctests that are written for some of the methods.
+
+Fuzzing can be performed by using the `cargo fuzz run ptc` command to stress
+test the lexer for any unexpected `panic!()`s.
 
 ## Documentation
 
