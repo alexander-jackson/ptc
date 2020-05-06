@@ -91,6 +91,11 @@ impl From<&VariableType> for String {
 }
 
 impl From<&Box<VariableType>> for String {
+    /// Allows for the conversion of a &Box<VariableType> to a String.
+    ///
+    /// When dealing with the `VariableType::List { elements }` enum type, frequently a reference
+    /// is given to the inner `elements`. Converting to a String requires using the above version
+    /// and thus using this notation to do so. Instead, this can be used.
     fn from(v: &Box<VariableType>) -> String {
         String::from(&**v)
     }
@@ -266,6 +271,9 @@ impl Context {
         if let Some(f) = &self.current_function {
             let current = self.get_function_return_type(f);
 
+            // If we don't already know the function return type
+            // This causes us to ignore any inference after the first
+            // For def func() -> TYPE this makes sense as we should always use TYPE
             if current.is_none() {
                 self.function_return_types
                     .insert(f.to_string(), Some(datatype));
@@ -275,10 +283,9 @@ impl Context {
 
     /// Check whether we know the return type for a function call.
     pub fn get_function_return_type(&self, function_name: &str) -> Option<&VariableType> {
-        if let Some(v) = self.function_return_types.get(function_name) {
-            v.as_ref()
-        } else {
-            None
+        match self.function_return_types.get(function_name) {
+            Some(v) => v.as_ref(),
+            None => None,
         }
     }
 
@@ -349,23 +356,27 @@ impl Context {
     pub fn generate_header_file(&self) -> String {
         let mut header_lines: Vec<String> = Vec::new();
 
+        // Sort the #include files for consistency
         let sorted = &mut self.header_includes.iter().collect::<Vec<&String>>();
         sorted.sort();
 
+        // Add all the #include files to the header file
         for include in sorted {
             header_lines.push(format!(r#"#include "{}""#, include));
         }
 
-        // function_return_types contains all functions we saw
+        // Iterate the names and return types of all the functions we saw defined
         for (name, return_type) in self.function_return_types.iter() {
+            // Get the argument types and names if possible
             let (types, names) = (
                 self.get_function_argument_types(name),
                 self.get_function_argument_names(name),
             );
 
             let arguments = match (types, names) {
+                // If we have both the names and arguments
                 (Some(types), Some(names)) => {
-                    // We have both types and names
+                    // We have both types and names, join them with commas
                     types
                         .iter()
                         .zip(names.iter())
@@ -379,15 +390,18 @@ impl Context {
                 _ => String::new(),
             };
 
+            // Check whether we have a return type, assuming void otherwise
             let rtype = match return_type {
                 Some(v) => String::from(v),
                 None => String::from(&VariableType::Void),
             };
 
+            // Format this function and add it to the file
             let prototype = format!("{} {}({});", rtype, name, arguments);
             header_lines.push(prototype);
         }
 
+        // Join all the lines with newlines
         header_lines.join("\n")
     }
 
@@ -403,6 +417,7 @@ impl Context {
 
     /// Generates the include statements for the current file.
     pub fn generate_includes(&self) -> String {
+        // Sorts the includes for consistency
         let sorted = &mut self.includes.iter().collect::<Vec<&String>>();
         sorted.sort();
 
@@ -419,34 +434,31 @@ impl Context {
     /// initialised and used in the output C code. Lists in C cannot be initialised globally as the
     /// function to initialise them is not `const`.
     pub fn generate_global_list_initialiser(&self) -> Option<String> {
+        // Get all the globally defined lists
         let global_lists = self.symbol_table.get_global_lists();
 
+        // If none were defined, we do not need this function
         if global_lists.is_empty() {
             return None;
         }
 
+        // Gets the appropriate version of list_*_new for a variable type
+        let get_list_new = |v| match v {
+            VariableType::List { elements } => match elements {
+                Some(t) => match *t {
+                    VariableType::Integer => "list_int_new()",
+                    VariableType::Float => "list_float_new()",
+                    _ => unreachable!(),
+                },
+                None => "list_unknown_new()",
+            },
+            _ => unreachable!(),
+        };
+
         // For each list type, generate its relevant function
         let initialisers = global_lists
             .iter()
-            .map(|(name, vtype)| {
-                format!(
-                    "{} = {};",
-                    name,
-                    match vtype {
-                        VariableType::List { elements } => {
-                            match elements {
-                                Some(t) => match **t {
-                                    VariableType::Integer => "list_int_new()",
-                                    VariableType::Float => "list_float_new()",
-                                    _ => unreachable!(),
-                                },
-                                None => unreachable!(),
-                            }
-                        }
-                        _ => unreachable!(),
-                    }
-                )
-            })
+            .map(|(name, vtype)| format!("{} = {};", name, get_list_new(vtype.clone())))
             .collect::<Vec<String>>()
             .join(" ");
 
