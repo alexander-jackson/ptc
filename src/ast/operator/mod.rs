@@ -72,6 +72,7 @@ impl Operator {
             return left;
         }
 
+        // If either are float, ensure we don't lose precision
         if let Some(VariableType::Float) = left {
             return Some(VariableType::Float);
         }
@@ -80,6 +81,7 @@ impl Operator {
             return Some(VariableType::Float);
         }
 
+        // If we know the type of either, use that
         if left.is_some() {
             return left;
         } else if right.is_some() {

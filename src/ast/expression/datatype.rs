@@ -1,7 +1,10 @@
+//! Implements the `DataType` trait for `Expression`.
+
 use ast::Expression;
 use ast::{Context, DataType, Generate, Operator, VariableType};
 
 impl DataType for Expression {
+    /// Allows attempted calculations of `VariableType`s for an `Expression`.
     fn get_type(&self, context: &mut Context) -> Option<VariableType> {
         match self {
             Expression::BinaryOperation { left, op, right } => {
@@ -21,20 +24,25 @@ impl DataType for Expression {
             Expression::FunctionCall { name, .. } => {
                 if let Expression::Identifier { name } = &**name {
                     let identifier = name.generate(context);
+
+                    // If we know the return type of the function, insert it here
                     if let Some(t) = context.get_function_return_type(&identifier) {
                         return Some(t.clone());
                     }
 
+                    // `len` is built-in and should return an integer
                     if identifier == "len" {
                         return Some(VariableType::Integer);
                     }
                 }
 
+                // If it's not an identifier, we are out of luck
                 None
             }
             Expression::Subscription { primary, .. } => {
                 let primary_gen = primary.generate(context);
 
+                // If we are doing `list[..]`, we can use the element type of `list`
                 if let Some(t) = context.get_type(&primary_gen) {
                     if let VariableType::List { elements } = t {
                         if let Some(elements) = elements {

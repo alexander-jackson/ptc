@@ -1,3 +1,5 @@
+//! Implements the `Generate` trait for `Statement`.
+
 use ast::Statement;
 use ast::{Context, Expression, Generate, VariableType};
 
@@ -9,6 +11,8 @@ impl Generate for Statement {
                 if let Expression::Identifier { name } = target {
                     let identifier: String = name.get_identifier();
                     let dtype = context.get_type(&identifier);
+
+                    // Generate a list display if that's what the RHS is
                     let expr_gen = match check_list_display(&expr, dtype) {
                         None => expr.generate(context),
                         Some(g) => {
@@ -41,14 +45,16 @@ impl Generate for Statement {
 
                 let expr_gen = expr.generate(context);
 
-                // Check for a subscription
+                // Check for a subscription on the left-hand side
                 if let Expression::Subscription { primary, expr } = target {
                     let p_ident = primary.generate(context);
                     let index = expr.generate(context);
                     return format!("{}->data[{}] = {};", p_ident, index, expr_gen);
                 }
 
-                String::from("unimplemented")
+                unreachable!(
+                    "Found an instance of Statement::Assign that didn't generate correctly."
+                );
             }
             Statement::AugmentedAssign { target, op, expr } => {
                 let op_gen = op.generate(context);
@@ -67,7 +73,9 @@ impl Generate for Statement {
                     return format!("{}->data[{}] {} {};", primary_gen, index, op_gen, expr_gen);
                 }
 
-                String::from("unimplemented")
+                unreachable!(
+                    "Found an instance of Statement::AugmentedAssign that didn't generate correctly."
+                );
             }
             Statement::Expression { expr } => format!("{};", expr.generate(context)),
             Statement::DeleteStatement { targets } => targets
@@ -123,23 +131,15 @@ impl Generate for Statement {
 
                 format!("while ({}) {{ {} }}", expr_gen, suite_gen)
             }
-            Statement::ReturnStatement { expr } => {
-                // Deal with the Option<Expression> by generating if it exists
-                let ret = expr
-                    .as_ref()
-                    .map_or_else(|| String::from(""), |e| e.generate(context));
-
-                if ret.is_empty() {
-                    return String::from("return;");
-                }
-
-                format!("return {};", ret)
-            }
+            Statement::ReturnStatement { expr } => match expr {
+                Some(e) => format!("return {};", e.generate(context)),
+                None => String::from("return;"),
+            },
             Statement::GlobalStatement { .. } | Statement::Pass => String::new(),
             Statement::FunctionDecl {
                 name, args, body, ..
             } => {
-                let name_gen = name.generate(context);
+                let name_gen = name.get_identifier();
                 let ret_type = context.get_function_return_type(&name_gen);
 
                 // If we know the datatype, add it here
@@ -148,18 +148,20 @@ impl Generate for Statement {
                     None => String::from(&VariableType::Void),
                 };
 
-                if let Some(VariableType::List { .. }) = ret_type {
-                    context.add_header_include("list.h");
-                }
-
+                // Get around the borrow checker quickly
                 let mut list_h = false;
 
+                if let Some(VariableType::List { .. }) = ret_type {
+                    list_h = true;
+                }
+
+                // Get the arg string if we have one
                 let arg_str = match args {
                     Some(args) => {
                         let mut arguments: Vec<String> = Vec::new();
-                        let f_args = context.get_function_argument_types(&name_gen);
 
-                        if let Some(v) = f_args {
+                        // Get the inferred argument types
+                        if let Some(v) = context.get_function_argument_types(&name_gen) {
                             for (t, a) in v.iter().zip(args.iter()) {
                                 let str_type = match t {
                                     Some(vtype) => String::from(vtype),
@@ -174,13 +176,13 @@ impl Generate for Statement {
                             }
                         } else {
                             for a in args.iter() {
-                                arguments.push(format!("unknown {}", a.generate(context)));
+                                arguments.push(format!("unknown {}", a.get_identifier()));
                             }
                         }
 
                         arguments.join(", ")
                     }
-                    None => String::from(""),
+                    None => String::new(),
                 };
 
                 if list_h {

@@ -1,7 +1,10 @@
+//! Implements the `Generate` trait for `Expression`.
+
 use ast::Expression;
 use ast::{Context, DataType, Generate, VariableType};
 
 impl Generate for Expression {
+    /// Produces the C code for a given `Expression`.
     fn generate(&self, context: &mut Context) -> String {
         match self {
             Expression::BinaryOperation { left, op, right } => format!(
@@ -14,8 +17,9 @@ impl Generate for Expression {
                 format!("{}{}", op.generate(context), expr.generate(context))
             }
             Expression::ParenExpression { expr } => format!("({})", expr.generate(context)),
-            Expression::ListDisplay => unreachable!(),
+            Expression::ListDisplay => unreachable!("This is handled at the Statement level."),
             Expression::FunctionCall { name, args } => {
+                // Generate the arguments if they exist
                 let arg_str = match args {
                     Some(s) => s
                         .iter()
@@ -25,14 +29,15 @@ impl Generate for Expression {
                     None => String::new(),
                 };
 
+                // Check if this is the `len` function
                 if let Some(s) = check_builtin(name, &arg_str) {
                     return s;
                 }
 
                 // Check for <list>.append(<args>)
                 if let Expression::AttributeRef { primary, attribute } = &**name {
-                    if let Some(VariableType::List { elements }) = primary.get_type(context) {
-                        if let "append" = attribute.generate(context).as_ref() {
+                    if let "append" = attribute.generate(context).as_ref() {
+                        if let Some(VariableType::List { elements }) = primary.get_type(context) {
                             if let Some(elements) = elements {
                                 return format!(
                                     "list_{}_append({}, {})",
@@ -45,6 +50,7 @@ impl Generate for Expression {
                     }
                 }
 
+                // This is a normal function call, so just format it
                 format!("{}({})", name.generate(context), arg_str)
             }
             Expression::AttributeRef { .. } => String::from(""),
@@ -66,6 +72,7 @@ impl Generate for Expression {
     }
 }
 
+/// Checks if the name of the function is a built-in and handles it accordingly.
 fn check_builtin(name: &Expression, args: &str) -> Option<String> {
     if let Expression::Identifier { name } = name {
         if let "len" = name.get_identifier().as_ref() {

@@ -2,6 +2,7 @@ use ast::Operator;
 use ast::{Context, Generate};
 
 impl Generate for Operator {
+    /// Generates the string representation for an `Operator`.
     fn generate(&self, _: &mut Context) -> String {
         match self {
             Operator::LogicalOr => String::from("||"),

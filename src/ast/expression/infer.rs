@@ -1,7 +1,10 @@
+//! Implements the `Infer` trait for `Expression`.
+
 use ast::Expression;
 use ast::{Context, DataType, Generate, Infer, VariableType};
 
 impl Infer for Expression {
+    /// Allows type inference to propagate correctly down the AST.
     fn infer(&mut self, context: &mut Context) {
         match self {
             Expression::BinaryOperation { left, right, .. } => {
@@ -31,16 +34,21 @@ impl Infer for Expression {
                     }
                 }
 
+                // Check for usage of the `len` function
                 if let Expression::Identifier { name } = &**name {
                     if name.get_identifier() == "len" {
                         if let Some(a) = args {
+                            // `len(name)` allows us to infer that `name` is a list
                             let t = VariableType::List { elements: None };
                             let p = a[0].generate(context);
+                            // As the list may not be in the current scope, insert where it is
                             context.insert_shallow_inferred_type(&p, &t);
                         }
                     }
                 }
 
+                // Iterate the arguments and see if we know the types for them
+                // This allows for `func(1, 2)` to infer that `func` takes 2 integers
                 if let Some(a) = args {
                     for (i, e) in a.iter().enumerate() {
                         if let Some(e_type) = e.get_type(context) {

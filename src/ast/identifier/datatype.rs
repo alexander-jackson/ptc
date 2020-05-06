@@ -1,17 +1,17 @@
+//! Implements the `DataType` trait for `Identifier`.
+//!
+//! This allows identifiers to have their types guessed using the known context of the program.
+
 use ast::Identifier;
 use ast::{Context, DataType, VariableType};
 
 impl DataType for Identifier {
+    /// Gets the datatype for the identifier if known.
     fn get_type(&self, context: &mut Context) -> Option<VariableType> {
         match self {
             Identifier::Name { name, .. } => {
-                // See if we have found a type for the variable already
-                if let Some(t) = context.get_type(&name) {
-                    return Some(t.clone());
-                }
-
-                // We don't know what type the variable is
-                None
+                // See if we know what type it is already
+                context.get_type(&name).cloned()
             }
             Identifier::Typed { typehint, .. } => Some(VariableType::from(typehint.as_str())),
         }
