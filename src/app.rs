@@ -247,6 +247,9 @@ fn get_abstract_syntax_tree(code: &str, display: bool) -> Result<ast::Program, B
 }
 
 /// Adds `#ifndef` guards to the header given the basename for the file.
+///
+/// Given the basename for a file, for example `test`, and a header file containing `void main();`,
+/// this will wrap the header using `#ifndef` to ensure it can only be included once.
 fn add_if_guards(basename: &str, header: &str) -> String {
     let uppercase = basename.to_uppercase();
 
