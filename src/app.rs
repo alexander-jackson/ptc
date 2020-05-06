@@ -71,11 +71,13 @@ pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
 /// Process the arguments given to the program from `get_arguments()`. Process each path in turn as
 /// normal.
 pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
+    // If the user provided -h, --help or left no paths to process
     if args.help || args.paths.is_empty() {
         display_help_message();
         return Ok(());
     }
 
+    // Iterate through all paths given and process them
     for path in &args.paths {
         process_path(&path, &args)?;
     }
@@ -86,22 +88,32 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
 /// Process a single path to a file. Generates code if required, as well as displaying abstract
 /// syntax trees, tokens and the generated output if needed.
 fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
+    // Read contents of file and get the basename of the filepath
     let code: String = fs::read_to_string(&path)?;
     let basename = get_output_filename(&path);
 
+    // If they asked for the tokens, just dump the tokens out
     if args.tokens {
         display_tokens(&code);
     }
 
+    // Parse the file to get the AST, optionally displaying
     let mut ast = get_abstract_syntax_tree(&code, args.abstract_tree)?;
+
+    // Infer as many types as we can in a single pass and return to the start
     let mut context = Context::new();
     ast.infer(&mut context);
     context.reset_position();
 
+    // When given a filename with non-UTF8 chars this could fail
     match basename {
         Some(basename) => {
+            // Add the header as an include
             context.add_include(&format!("{}.h", basename));
+            // Generate the resulting C
             let generated = ast.generate(&mut context);
+
+            // Format the header file
             let header = context.generate_header_file();
             let header_contents = add_if_guards(&basename, &header);
 
@@ -162,6 +174,7 @@ fn clang_format_exists() -> bool {
 fn write_and_format_output_file(filename: &str, code: &str) -> Result<(), Box<dyn Error>> {
     fs::write(&filename, &code)?;
 
+    // Format the code using clang-format if possible
     if clang_format_exists() {
         let mut command = Command::new("clang-format");
         command.arg("-i");
