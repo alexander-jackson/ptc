@@ -161,12 +161,18 @@ enum IndentationChar {
 /// Tracks the stack of indentation sizes that have been used currently, the current level of
 /// indentation and the indentation character being used if one exists.
 struct Indentation {
+    /// The stack of indentation we have read so far
     length: Vec<usize>,
+    /// The current level of indentation, distinct from length, this tracks the number of times we
+    /// have indented regardless of character used. For example, reading indentation with 4 spaces
+    /// and then indentation with 2 spaces would result in (length = 6, level = 2)
     level: usize,
+    /// The indentation character used for this file (if known)
     character: Option<IndentationChar>,
 }
 
 impl Indentation {
+    /// Initialises the indentation at the start of the program.
     pub fn new() -> Indentation {
         Indentation {
             length: vec![0],
@@ -175,10 +181,12 @@ impl Indentation {
         }
     }
 
+    /// Gets the top of the stack of indentation
     pub fn get_current_length(&self) -> usize {
         self.length[self.length.len() - 1]
     }
 
+    /// Pops a level off the stack and returns it
     pub fn pop_length(&mut self) -> usize {
         self.length.pop().unwrap()
     }
@@ -293,6 +301,7 @@ where
         // than that //
         let mut number: String = self.read_while(|c| c.is_digit(10));
 
+        // If we end on a '.', try and read a float
         if self.current_char_equals('.') {
             number.push('.');
             self.update_lookahead();
@@ -326,6 +335,7 @@ where
             None => None,
         };
 
+        // If we matched something before, push it and return
         if let Some(tok) = single {
             self.push_token(tok);
             self.update_lookahead();
