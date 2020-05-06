@@ -70,7 +70,6 @@ impl Generate for Statement {
                 String::from("unimplemented")
             }
             Statement::Expression { expr } => format!("{};", expr.generate(context)),
-            Statement::Pass => String::from(""),
             Statement::DeleteStatement { targets } => targets
                 .iter()
                 .filter_map(|t| {
@@ -136,7 +135,7 @@ impl Generate for Statement {
 
                 format!("return {};", ret)
             }
-            Statement::GlobalStatement { .. } => String::from(""),
+            Statement::GlobalStatement { .. } | Statement::Pass => String::new(),
             Statement::FunctionDecl {
                 name, args, body, ..
             } => {

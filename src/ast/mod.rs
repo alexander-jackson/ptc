@@ -171,8 +171,8 @@ pub trait DataType {
 
 /// A structure for storing information learnt about the program provided.
 ///
-/// Stores a SymbolTable object, which allows for variables to have information stored about them,
-/// such as whether they have been initialised or not and what type they have.
+/// Stores a `SymbolTable` object, which allows for variables to have information stored about
+/// them, such as whether they have been initialised or not and what type they have.
 ///
 /// Stores the current function name if we are inside one, the return types of functions, their
 /// argument names and types, and any external `#include`s that are needed.
@@ -210,26 +210,26 @@ impl Context {
         }
     }
 
-    /// Push a new scope into the SymbolTable.
+    /// Push a new scope into the `SymbolTable`.
     pub fn push_scope(&mut self) {
         self.symbol_table.push_scope();
     }
 
-    /// Pop a scope from the SymbolTable.
+    /// Pop a scope from the `SymbolTable`.
     pub fn pop_scope(&mut self) {
         self.symbol_table.pop_scope();
     }
 
-    /// Insert the inferred type for a variable into the SymbolTable.
+    /// Insert the inferred type for a variable into the `SymbolTable`.
     pub fn insert_inferred_type(&mut self, variable: &str, inferred: VariableType) {
         self.symbol_table.insert_variable(variable, inferred);
     }
 
-    /// Insert the inferred type for a variable into the SymbolTable at a shallower level than the
-    /// current scope.
-    pub fn insert_shallow_inferred_type(&mut self, variable: &str, inferred: VariableType) {
+    /// Insert the inferred type for a variable into the `SymbolTable` at a shallower level than
+    /// the current scope.
+    pub fn insert_shallow_inferred_type(&mut self, variable: &str, inferred: &VariableType) {
         self.symbol_table
-            .insert_shallow_variable(variable, inferred);
+            .insert_shallow_variable(variable, &inferred);
     }
 
     /// Get the VariableType for a variable if it exists.
@@ -237,12 +237,12 @@ impl Context {
         self.symbol_table.get_type(variable)
     }
 
-    /// Check whether a variable has been defined in the SymbolTable currently.
+    /// Check whether a variable has been defined in the `SymbolTable` currently.
     pub fn variable_defined(&self, variable: &str) -> bool {
         self.symbol_table.variable_defined(variable)
     }
 
-    /// Reset the position of the SymbolTable.
+    /// Reset the position of the `SymbolTable`.
     pub fn reset_position(&mut self) {
         self.symbol_table.reset_position();
     }
@@ -297,20 +297,17 @@ impl Context {
         pos: usize,
         datatype: VariableType,
     ) {
-        match self.function_argument_types.get_mut(function_name) {
-            Some(v) => {
-                // Make sure we resize the vector so it definitely has this index
-                v.resize(pos + 1, None);
-                v[pos] = Some(datatype);
-            }
-            None => {
-                // Create a vector with enough space
-                let mut v: Vec<Option<VariableType>> = Vec::new();
-                v.resize(pos + 1, None);
-                v[pos] = Some(datatype);
-                self.function_argument_types
-                    .insert(String::from(function_name), v);
-            }
+        if let Some(v) = self.function_argument_types.get_mut(function_name) {
+            // Make sure we resize the vector so it definitely has this index
+            v.resize(pos + 1, None);
+            v[pos] = Some(datatype);
+        } else {
+            // Create a vector with enough space
+            let mut v: Vec<Option<VariableType>> = Vec::new();
+            v.resize(pos + 1, None);
+            v[pos] = Some(datatype);
+            self.function_argument_types
+                .insert(String::from(function_name), v);
         }
     }
 
@@ -327,20 +324,17 @@ impl Context {
         pos: usize,
         argument_name: &str,
     ) {
-        match self.function_argument_names.get_mut(function_name) {
-            Some(v) => {
-                // Make sure we resize the vector so it definitely has this index
-                v.resize(pos + 1, String::new());
-                v[pos] = argument_name.to_string();
-            }
-            None => {
-                // Create a vector with enough space
-                let mut v: Vec<String> = Vec::new();
-                v.resize(pos + 1, String::new());
-                v[pos] = argument_name.to_string();
-                self.function_argument_names
-                    .insert(String::from(function_name), v);
-            }
+        if let Some(v) = self.function_argument_names.get_mut(function_name) {
+            // Make sure we resize the vector so it definitely has this index
+            v.resize(pos + 1, String::new());
+            v[pos] = argument_name.to_string();
+        } else {
+            // Create a vector with enough space
+            let mut v: Vec<String> = Vec::new();
+            v.resize(pos + 1, String::new());
+            v[pos] = argument_name.to_string();
+            self.function_argument_names
+                .insert(String::from(function_name), v);
         }
     }
 
@@ -366,7 +360,7 @@ impl Context {
         }
 
         // Iterate the names and return types of all the functions we saw defined
-        for (name, return_type) in self.function_return_types.iter() {
+        for (name, return_type) in &self.function_return_types {
             // Get the argument types and names if possible
             let (types, names) = (
                 self.get_function_argument_types(name),

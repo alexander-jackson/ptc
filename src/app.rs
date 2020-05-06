@@ -70,6 +70,11 @@ pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
 
 /// Process the arguments given to the program from `get_arguments()`. Process each path in turn as
 /// normal.
+///
+/// # Errors
+///
+/// Errors can be caused if any of the paths being processed cause an error. These propagate up
+/// from `process_path`
 pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
     // If the user provided -h, --help or left no paths to process
     if args.help || args.paths.is_empty() {
@@ -106,28 +111,27 @@ fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
     context.reset_position();
 
     // When given a filename with non-UTF8 chars this could fail
-    match basename {
-        Some(basename) => {
-            // Add the header as an include
-            context.add_include(&format!("{}.h", basename));
-            // Generate the resulting C
-            let generated = ast.generate(&mut context);
+    if let Some(basename) = basename {
+        // Add the header as an include
+        context.add_include(&format!("{}.h", basename));
+        // Generate the resulting C
+        let generated = ast.generate(&mut context);
 
-            // Format the header file
-            let header = context.generate_header_file();
-            let header_contents = add_if_guards(&basename, &header);
+        // Format the header file
+        let header = context.generate_header_file();
+        let header_contents = add_if_guards(&basename, &header);
 
-            if args.display {
-                print!("Header:\n{}\n\nSource:\n{}", &header_contents, &generated);
-            } else {
-                let source_filename = format!("{}.c", basename);
-                let header_filename = format!("{}.h", basename);
+        if args.display {
+            print!("Header:\n{}\n\nSource:\n{}", &header_contents, &generated);
+        } else {
+            let source_filename = format!("{}.c", basename);
+            let header_filename = format!("{}.h", basename);
 
-                write_and_format_output_file(&source_filename, &generated)?;
-                write_and_format_output_file(&header_filename, &header_contents)?;
-            }
+            write_and_format_output_file(&source_filename, &generated)?;
+            write_and_format_output_file(&header_filename, &header_contents)?;
         }
-        None => eprintln!("Failed to get the output filename."),
+    } else {
+        eprintln!("Failed to get the output filename.");
     }
 
     Ok(())
@@ -192,6 +196,11 @@ fn write_and_format_output_file(filename: &str, code: &str) -> Result<(), Box<dy
 
 /// Parse program code specified by the argument and return the abstract syntax tree representation
 /// if it passes, otherwise a string representation of the error that caused the issue.
+///
+/// # Errors
+///
+/// Errors can be caused on a malformed program input, at which point the parser will return an
+/// error message which will then be formatted and propagated here.
 pub fn parse(input: &str) -> Result<ast::Program, String> {
     let lex_input = input.char_indices();
     let lexer = lexer::Lexer::new(lex_input);

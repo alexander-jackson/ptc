@@ -80,12 +80,12 @@ impl Operator {
             return Some(VariableType::Float);
         }
 
-        return if left.is_some() {
-            left
+        if left.is_some() {
+            return left;
         } else if right.is_some() {
-            right
-        } else {
-            None
-        };
+            return right;
+        }
+
+        None
     }
 }

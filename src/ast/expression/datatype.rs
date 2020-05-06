@@ -10,8 +10,7 @@ impl DataType for Expression {
                 op.resulting_type(ltype, rtype)
             }
             Expression::UnaryOperation { op, expr } => match op {
-                Operator::Plus => expr.get_type(context),
-                Operator::Minus => expr.get_type(context),
+                Operator::Plus | Operator::Minus => expr.get_type(context),
                 Operator::LogicalNot => Some(VariableType::Integer),
                 _ => unreachable!(),
             },

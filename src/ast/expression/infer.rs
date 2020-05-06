@@ -8,10 +8,9 @@ impl Infer for Expression {
                 left.infer(context);
                 right.infer(context);
             }
-            Expression::UnaryOperation { expr, .. } => {
-                expr.infer(context);
-            }
-            Expression::ParenExpression { expr, .. } => {
+            Expression::UnaryOperation { expr, .. }
+            | Expression::ParenExpression { expr, .. }
+            | Expression::Subscription { expr, .. } => {
                 expr.infer(context);
             }
             Expression::FunctionCall { name, args } => {
@@ -26,7 +25,7 @@ impl Infer for Expression {
                                     elements: Some(Box::new(element_type)),
                                 };
                                 let p = primary.generate(context);
-                                context.insert_shallow_inferred_type(&p, t);
+                                context.insert_shallow_inferred_type(&p, &t);
                             }
                         }
                     }
@@ -37,7 +36,7 @@ impl Infer for Expression {
                         if let Some(a) = args {
                             let t = VariableType::List { elements: None };
                             let p = a[0].generate(context);
-                            context.insert_shallow_inferred_type(&p, t);
+                            context.insert_shallow_inferred_type(&p, &t);
                         }
                     }
                 }
@@ -49,9 +48,6 @@ impl Infer for Expression {
                         }
                     }
                 }
-            }
-            Expression::Subscription { expr, .. } => {
-                expr.infer(context);
             }
             _ => (),
         }

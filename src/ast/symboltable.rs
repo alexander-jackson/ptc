@@ -18,7 +18,7 @@ pub struct VariableInformation {
 }
 
 impl VariableInformation {
-    /// Creates a new VariableInformation with a given datatype and assumes it is undefined.
+    /// Creates a new `VariableInformation` with a given datatype and assumes it is undefined.
     pub fn with_type(vtype: VariableType) -> VariableInformation {
         VariableInformation {
             defined: false,
@@ -41,7 +41,7 @@ pub struct Scope {
 impl Scope {
     /// Creates a new Scope.
     ///
-    /// Initialises a new scope with an empty HashMap for Variables, no known subscopes and marks
+    /// Initialises a new scope with an empty `HashMap` for Variables, no known subscopes and marks
     /// it as unexplored thusfar.
     pub fn new() -> Scope {
         Scope {
@@ -110,7 +110,7 @@ impl Scope {
         //      We are the final scope
         //      The inner scopes returned nothing
         // Thus, check whether we contain <variable>
-        for (name, info) in self.variables.iter() {
+        for (name, info) in &self.variables {
             if name == variable {
                 return Some(&info.vtype);
             }
@@ -129,18 +129,16 @@ impl Scope {
         //
         // If there is an available subscope, move into it
         // Otherwise, backtrack
-
-        match self.subscopes.iter().position(|s| !s.explored) {
-            Some(p) => indices.push(p),
-            None => {
-                indices.pop();
-                self.explored = true;
-            }
+        if let Some(p) = self.subscopes.iter().position(|s| !s.explored) {
+            indices.push(p);
+        } else {
+            indices.pop();
+            self.explored = true;
         }
     }
 
     /// Check whether a variable has been defined yet in the generated code. This will only return
-    /// true if a call to define_variable() has been made in a previous scope or the current one.
+    /// true if a call to `define_variable`() has been made in a previous scope or the current one.
     pub fn variable_defined(&self, indices: &[usize], variable: &str) -> bool {
         if let Some((head, tail)) = indices.split_first() {
             // Check whether it is defined in a scope closer to our current position
@@ -177,7 +175,7 @@ impl Scope {
         let mut lists: Vec<(String, VariableType)> = Vec::new();
 
         // Get all the lists in this scope
-        for (name, info) in self.variables.iter() {
+        for (name, info) in &self.variables {
             if let VariableType::List { .. } = info.vtype {
                 lists.push((name.clone(), info.vtype.clone()));
             }
@@ -187,7 +185,7 @@ impl Scope {
     }
 }
 
-/// Defines the SymbolTable used in the Context.
+/// Defines the `SymbolTable` used in the Context.
 #[derive(Debug)]
 pub struct SymbolTable {
     /// The global scope, which all scopes descend from
@@ -197,7 +195,7 @@ pub struct SymbolTable {
 }
 
 impl SymbolTable {
-    /// Creates a new SymbolTable with an empty global scope.
+    /// Creates a new `SymbolTable` with an empty global scope.
     pub fn new() -> SymbolTable {
         SymbolTable {
             scope: Scope::new(),
@@ -218,14 +216,14 @@ impl SymbolTable {
         self.active.pop();
     }
 
-    /// Insert an inferred variable type into the SymbolTable.
+    /// Insert an inferred variable type into the `SymbolTable`.
     pub fn insert_variable(&mut self, variable: &str, vtype: VariableType) {
         self.scope.insert_variable(&self.active, variable, vtype);
     }
 
-    /// Insert an inferred variable type into the SymbolTable at a shallower level than the current
-    /// scope.
-    pub fn insert_shallow_variable(&mut self, variable: &str, vtype: VariableType) {
+    /// Insert an inferred variable type into the `SymbolTable` at a shallower level than the
+    /// current scope.
+    pub fn insert_shallow_variable(&mut self, variable: &str, vtype: &VariableType) {
         self.scope
             .insert_shallow_variable(&self.active, variable, &vtype);
     }
@@ -255,7 +253,7 @@ impl SymbolTable {
         self.scope.define_variable(&self.active, variable);
     }
 
-    /// Gets the names of all global lists and their VariableTypes.
+    /// Gets the names of all global lists and their `VariableType`s.
     pub fn get_global_lists(&self) -> Vec<(String, VariableType)> {
         self.scope.get_defined_lists()
     }

@@ -446,8 +446,8 @@ where
 
     /// Checks for mixed indentation in the source file.
     ///
-    /// Checks whether the current lookahead character and IndentationChar are conflicting and thus
-    /// mixed indentation has been used in the file.
+    /// Checks whether the current lookahead character and `IndentationChar` are conflicting and
+    /// thus mixed indentation has been used in the file.
     fn check_for_mixed_indentation(&self) -> bool {
         if let Some(i) = &self.indentation.character {
             if i == &IndentationChar::Space && self.current_char_equals('\t') {
