@@ -67,6 +67,11 @@ impl Context {
     /// Insert the inferred type for a variable into the `SymbolTable` at a shallower level than
     /// the current scope.
     pub fn insert_shallow_inferred_type(&mut self, variable: &str, inferred: &VariableType) {
+        // If we already have a "stronger" type inferred, ignore this one
+        if let Some(VariableType::List { elements: Some(_) }) = self.get_type(variable) {
+            return;
+        }
+
         self.symbol_table
             .insert_shallow_variable(variable, &inferred);
     }

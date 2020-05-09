@@ -66,7 +66,7 @@ generate! {
     function_argument_type_inference: "def process(data, index):\n    pass\n\ndef main():\n    integers: List[int] = []\n    i = 0.1\n    process(integers, i)\n", "#include \"list.h\"\nvoid process(list_int* data, float index) {  } void main() { list_int* integers = list_int_new(); float i = 0.1; process(integers, i); }\n",
     list_subscription_assign: "def main():\n    x: List[float] = []\n    x[0] = 0\n", "#include \"list.h\"\nvoid main() { list_float* x = list_float_new(); x->data[0] = 0; }\n",
     list_subscription_augmented_assign: "def main():\n    x: List[float] = []\n    x[0] += 0\n", "#include \"list.h\"\nvoid main() { list_float* x = list_float_new(); x->data[0] += 0; }\n",
-    built_in_len_function: "def main():\n    x: List[int] = []\n    len(x)\n", "#include \"list.h\"\nvoid main() { list_unknown* x = list_unknown_new(); x->size; }\n",
+    built_in_len_function: "def main():\n    x: List[int] = []\n    len(x)\n", "#include \"list.h\"\nvoid main() { list_int* x = list_int_new(); x->size; }\n",
     binary_expression_type_inference: "a = 0.1\nb = 0.1\nc = a + b\n\nx = 0\ny = 0.1\nz = x + y\n\nd = 0\ne = 0\nf = d + e\n", "float a = 0.1; float b = 0.1; float c = a + b; int x = 0; float y = 0.1; float z = x + y; int d = 0; int e = 0; int f = d + e;\n",
     division_expression_type_inference: "x = 1 / 2\n", "float x = 1 / 2;\n",
     ignore_del_on_non_lists: "a = 0.1\ndel a\n", "float a = 0.1; \n",
