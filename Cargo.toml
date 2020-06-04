@@ -5,9 +5,9 @@ authors = ["Alexander Jackson <alexanderjackson@protonmail.com"]
 build = "build.rs"
 
 [build-dependencies.lalrpop]
-version = "0.17.2"
+version = "0.19"
 
 [dependencies]
-lalrpop-util = "0.17.2"
+lalrpop-util = "0.19"
 regex = "1"
 pico-args = "0.3.0"
