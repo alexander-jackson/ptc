@@ -20,8 +20,8 @@ mod variable_type;
 
 pub use self::{
     context::Context, expression::Expression, identifier::Identifier, literal::Literal,
-    operator::Operator, program::Program, statement::Statement, symboltable::SymbolTable,
-    variable_type::VariableType,
+    operator::Operator, program::Program, statement::Branch, statement::Statement,
+    symboltable::SymbolTable, variable_type::VariableType,
 };
 
 /// Suites are generally used as a name for any number of continuous statements in the Python

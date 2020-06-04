@@ -15,8 +15,25 @@ use ast::{Expression, Identifier, Operator, Suite};
 mod generate;
 mod infer;
 
+/// An effective branch instruction, which checks whether a condition holds and executes some
+/// statements if it does.
+#[derive(Debug)]
+pub struct Branch {
+    /// The condition to check.
+    pub condition: Expression,
+    /// The code to execute if true.
+    pub block: Suite,
+}
+
+impl Branch {
+    /// Creates a new Branch struct containing an expression and a list of statements.
+    pub fn new(condition: Expression, block: Suite) -> Branch {
+        Branch { condition, block }
+    }
+}
+
 /// A Statement used in the Python code.
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub enum Statement {
     /// An assignment, such as `x = 0`
     Assign {
@@ -48,19 +65,17 @@ pub enum Statement {
     },
     /// The `if` statement
     IfStatement {
-        /// The expression to check
-        expr: Expression,
-        /// The statements to execute if it is true
-        suite: Suite,
-        /// An Suite to execute if it is false, basically an else statement
+        /// The condition and statements
+        initial: Branch,
+        /// An optional collection of elif statements
+        elif: Vec<Branch>,
+        /// A Suite to execute if it is false, basically an else statement
         optional: Option<Suite>,
     },
     /// The `while` statement
     WhileStatement {
-        /// The expression to check
-        expr: Expression,
-        /// The statements to execute while it is true
-        suite: Suite,
+        /// The condition and statements
+        branch: Branch,
     },
     /// The `return` statement
     ReturnStatement {

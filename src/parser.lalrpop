@@ -103,10 +103,11 @@ GlobalStatement: ast::Statement = {
 };
 
 IfStatement: ast::Statement = {
-    "if" <expr: Expression> ":" <suite: Suite> <optional: ("else" ":" Suite)?> =>
+    "if" <expr: Expression> ":" <suite: Suite> <elif: ("elif" Expression ":" Suite)*> <optional: ("else" ":" Suite)?> =>
         ast::Statement::IfStatement {
-            expr: expr,
-            suite: suite,
+            initial: ast::Branch::new(expr, suite),
+            // TODO: Make this not use into_iter as it requires a clone //
+            elif: elif.into_iter().map(|e| ast::Branch::new(e.1, e.3)).collect(),
             optional: optional.map(|o| o.2),
         },
 };
@@ -114,8 +115,7 @@ IfStatement: ast::Statement = {
 WhileStatement: ast::Statement = {
     "while" <expr: Expression> ":" <suite: Suite> =>
         ast::Statement::WhileStatement {
-            expr: expr,
-            suite: suite,
+            branch: ast::Branch::new(expr, suite),
         },
 };
 
@@ -361,6 +361,7 @@ extern {
         "identifier" => lexer::Tok::Identifier { name: <String> },
         "pass" => lexer::Tok::Pass,
         "if" => lexer::Tok::If,
+        "elif" => lexer::Tok::Elif,
         "else" => lexer::Tok::Else,
         "while" => lexer::Tok::While,
         "def" => lexer::Tok::Def,

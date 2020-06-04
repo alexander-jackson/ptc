@@ -30,6 +30,8 @@ pub enum Tok {
     Pass,
     /// The `if` keyword
     If,
+    /// The `elif` keyword
+    Elif,
     /// The `else` keyword
     Else,
     /// The `while` keyword
@@ -274,6 +276,7 @@ where
         self.push_token(match ident.as_ref() {
             "pass" => Tok::Pass,
             "if" => Tok::If,
+            "elif" => Tok::Elif,
             "else" => Tok::Else,
             "while" => Tok::While,
             "def" => Tok::Def,

@@ -12,7 +12,7 @@ mod infer;
 /// The statements contained in the whole program.
 ///
 /// The top level of the AST, storing everything inside it.
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct Program {
     /// The statements in the program
     statements: Suite,

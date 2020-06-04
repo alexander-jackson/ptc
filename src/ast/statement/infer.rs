@@ -27,12 +27,21 @@ impl Infer for Statement {
             }
             Statement::Expression { expr } => expr.infer(context),
             Statement::IfStatement {
-                suite, optional, ..
+                initial,
+                elif,
+                optional,
+                ..
             } => {
                 // Push a scope into the Context and infer on the `if` statement contents
                 context.push_scope();
-                suite.infer(context);
+                initial.block.infer(context);
                 context.pop_scope();
+
+                for e in elif {
+                    context.push_scope();
+                    e.block.infer(context);
+                    context.pop_scope();
+                }
 
                 if let Some(s) = optional {
                     // Push a scope into the Context and infer on the `else` statement contents
@@ -41,10 +50,10 @@ impl Infer for Statement {
                     context.pop_scope();
                 }
             }
-            Statement::WhileStatement { suite, .. } => {
+            Statement::WhileStatement { branch } => {
                 // Push a scope into the Context and infer on the `while` statement contents
                 context.push_scope();
-                suite.infer(context);
+                branch.block.infer(context);
                 context.pop_scope();
             }
             Statement::ReturnStatement { expr } => {

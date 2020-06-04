@@ -99,15 +99,29 @@ impl Generate for Statement {
                 .collect::<Vec<String>>()
                 .join(" "),
             Statement::IfStatement {
-                expr,
-                suite,
+                initial,
+                elif,
                 optional,
             } => {
-                let expr_gen = expr.generate(context);
+                let expr_gen = initial.condition.generate(context);
 
                 context.next_scope();
-                let suite_gen = suite.generate(context);
+                let suite_gen = initial.block.generate(context);
                 context.next_scope();
+
+                let if_gen = format!("if ({}) {{ {} }}", expr_gen, suite_gen);
+
+                let elif_gen = elif
+                    .iter()
+                    .map(|(branch)| {
+                        format!(
+                            " else if ({}) {{ {} }}",
+                            branch.condition.generate(context),
+                            branch.block.generate(context)
+                        )
+                    })
+                    .collect::<Vec<String>>()
+                    .join(" ");
 
                 // If there is an else statement, make sure we generate it too
                 let optional_gen = match optional.as_ref() {
@@ -120,13 +134,13 @@ impl Generate for Statement {
                     None => String::from(""),
                 };
 
-                format!("if ({}) {{ {} }}{}", expr_gen, suite_gen, optional_gen)
+                format!("{}{}{}", if_gen, elif_gen, optional_gen)
             }
-            Statement::WhileStatement { expr, suite } => {
-                let expr_gen = expr.generate(context);
+            Statement::WhileStatement { branch } => {
+                let expr_gen = branch.condition.generate(context);
 
                 context.next_scope();
-                let suite_gen = suite.generate(context);
+                let suite_gen = branch.block.generate(context);
                 context.next_scope();
 
                 format!("while ({}) {{ {} }}", expr_gen, suite_gen)
