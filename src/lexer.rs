@@ -150,7 +150,7 @@ impl fmt::Display for LexicalError {
 }
 
 /// The characters that can be used for indentation.
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 enum IndentationChar {
     /// Space indented
     Space,
@@ -453,11 +453,11 @@ where
     /// thus mixed indentation has been used in the file.
     fn check_for_mixed_indentation(&self) -> bool {
         if let Some(i) = &self.indentation.character {
-            if i == &IndentationChar::Space && self.current_char_equals('\t') {
+            if *i == IndentationChar::Space && self.current_char_equals('\t') {
                 return true;
             }
 
-            if i == &IndentationChar::Tab && self.current_char_equals(' ') {
+            if *i == IndentationChar::Tab && self.current_char_equals(' ') {
                 return true;
             }
         }
