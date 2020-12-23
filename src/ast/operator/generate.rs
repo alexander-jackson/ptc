@@ -1,5 +1,4 @@
-use ast::Operator;
-use ast::{Context, Generate};
+use crate::ast::{Context, Generate, Operator};
 
 impl Generate for Operator {
     /// Generates the string representation for an `Operator`.

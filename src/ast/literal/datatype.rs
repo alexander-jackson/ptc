@@ -1,5 +1,4 @@
-use ast::Literal;
-use ast::{Context, DataType, VariableType};
+use crate::ast::{Context, DataType, Literal, VariableType};
 
 impl DataType for Literal {
     fn get_type(&self, _: &mut Context) -> Option<VariableType> {

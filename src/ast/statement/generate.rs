@@ -1,7 +1,6 @@
 //! Implements the `Generate` trait for `Statement`.
 
-use ast::Statement;
-use ast::{Context, Expression, Generate, VariableType};
+use crate::ast::{Context, Expression, Generate, Statement, VariableType};
 
 impl Generate for Statement {
     fn generate(&self, context: &mut Context) -> String {

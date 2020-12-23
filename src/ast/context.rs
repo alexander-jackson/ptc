@@ -6,7 +6,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use ast::{SymbolTable, VariableType};
+use crate::ast::{SymbolTable, VariableType};
 
 /// A structure for storing information learnt about the program provided.
 ///
@@ -15,7 +15,7 @@ use ast::{SymbolTable, VariableType};
 ///
 /// Stores the current function name if we are inside one, the return types of functions, their
 /// argument names and types, and any external `#include`s that are needed.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Context {
     /// Stores the currently defined variables and deals with scoping rules
     symbol_table: SymbolTable,
@@ -38,15 +38,7 @@ impl Context {
     ///
     /// This assumes that nothing has been learnt about the program yet.
     pub fn new() -> Context {
-        Context {
-            symbol_table: SymbolTable::new(),
-            current_function: None,
-            function_return_types: HashMap::new(),
-            function_argument_types: HashMap::new(),
-            function_argument_names: HashMap::new(),
-            includes: HashSet::new(),
-            header_includes: HashSet::new(),
-        }
+        Default::default()
     }
 
     /// Push a new scope into the `SymbolTable`.
@@ -324,11 +316,5 @@ impl Context {
     /// ```
     pub fn in_global_scope(&self) -> bool {
         self.symbol_table.in_global_scope()
-    }
-}
-
-impl Default for Context {
-    fn default() -> Context {
-        Context::new()
     }
 }

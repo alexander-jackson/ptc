@@ -1,5 +1,4 @@
-use ast::Program;
-use ast::{Context, Infer};
+use crate::ast::{Context, Infer, Program};
 
 impl Infer for Program {
     fn infer(&mut self, context: &mut Context) {

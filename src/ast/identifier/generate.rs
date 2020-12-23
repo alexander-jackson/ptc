@@ -1,7 +1,6 @@
 //! Implements the `Generate` trait for `Identifier`.
 
-use ast::Identifier;
-use ast::{Context, Generate};
+use crate::ast::{Context, Generate, Identifier};
 
 impl Generate for Identifier {
     /// Generates the string representation for the `Identifier`.

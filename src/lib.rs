@@ -4,7 +4,8 @@
 
 #[macro_use]
 extern crate lalrpop_util;
-extern crate regex;
+#[macro_use]
+extern crate lazy_static;
 
 pub mod app;
 

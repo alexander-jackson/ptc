@@ -309,7 +309,7 @@ where
             number.push('.');
             self.update_lookahead();
             number.push_str(&self.read_while(|c| c.is_digit(10)));
-            let value: f32 = number.parse().unwrap_or_else(|_| std::f32::MAX);
+            let value: f32 = number.parse().unwrap_or(std::f32::MAX);
             return self.push_token(Tok::Float { value });
         }
 

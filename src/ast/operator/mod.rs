@@ -1,6 +1,6 @@
 //! The valid operators that `ptc` understands.
 
-use ast::VariableType;
+use crate::ast::VariableType;
 
 mod generate;
 

@@ -7,7 +7,7 @@
 //! type inference calls, such as for duck typing or finding what parameters are passed to a
 //! function.
 
-use ast::{Identifier, Literal, Operator};
+use crate::ast::{Identifier, Literal, Operator};
 
 mod datatype;
 mod generate;

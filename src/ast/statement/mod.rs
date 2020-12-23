@@ -10,7 +10,7 @@
 //! Statements can propagate inference as well, through the bodies of compound statements in
 //! expression statements.
 
-use ast::{Expression, Identifier, Operator, Suite};
+use crate::ast::{Expression, Identifier, Operator, Suite};
 
 mod generate;
 mod infer;

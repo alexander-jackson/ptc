@@ -1,5 +1,4 @@
-use ast::Literal;
-use ast::{Context, Generate};
+use crate::ast::{Context, Generate, Literal};
 
 impl Generate for Literal {
     fn generate(&self, _t: &mut Context) -> String {

@@ -58,18 +58,18 @@ impl From<&str> for VariableType {
     /// Allowing a `from` implementation allows for an abstraction of the underlying conversions to
     /// be done in here, especially with the contained Regex for List[...] types.
     fn from(s: &str) -> VariableType {
-        if s == "int" {
-            return VariableType::Integer;
-        } else if s == "float" {
-            return VariableType::Float;
-        } else if s == "None" {
-            // Used for function return typehints
-            return VariableType::Void;
+        match s {
+            "int" => return VariableType::Integer,
+            "float" => return VariableType::Float,
+            "None" => return VariableType::Void,
+            _ => (),
         }
 
-        let re = Regex::new(r"^List\[(.*)\]$").unwrap();
+        lazy_static! {
+            static ref RE: Regex = Regex::new(r"^List\[(.*)\]$").unwrap();
+        }
 
-        if let Some(caps) = re.captures(&s) {
+        if let Some(caps) = RE.captures(&s) {
             let inner = caps.get(1).unwrap().as_str();
 
             return VariableType::List {
