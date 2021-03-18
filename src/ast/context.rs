@@ -119,10 +119,9 @@ impl Context {
 
     /// Check whether we know the return type for a function call.
     pub fn get_function_return_type(&self, function_name: &str) -> Option<&VariableType> {
-        match self.function_return_types.get(function_name) {
-            Some(v) => v.as_ref(),
-            None => None,
-        }
+        self.function_return_types
+            .get(function_name)
+            .and_then(Option::as_ref)
     }
 
     /// Set the argument type of a given function based on the index it occurred at in the function
@@ -133,18 +132,13 @@ impl Context {
         pos: usize,
         datatype: VariableType,
     ) {
-        if let Some(v) = self.function_argument_types.get_mut(function_name) {
-            // Make sure we resize the vector so it definitely has this index
-            v.resize(pos + 1, None);
-            v[pos] = Some(datatype);
-        } else {
-            // Create a vector with enough space
-            let mut v: Vec<Option<VariableType>> = Vec::new();
-            v.resize(pos + 1, None);
-            v[pos] = Some(datatype);
-            self.function_argument_types
-                .insert(String::from(function_name), v);
-        }
+        let entry = self
+            .function_argument_types
+            .entry(String::from(function_name))
+            .or_default();
+
+        entry.resize_with(pos + 1, Default::default);
+        entry[pos] = Some(datatype);
     }
 
     /// Get the argument names of a given function after we have seen the function.
@@ -160,18 +154,13 @@ impl Context {
         pos: usize,
         argument_name: &str,
     ) {
-        if let Some(v) = self.function_argument_names.get_mut(function_name) {
-            // Make sure we resize the vector so it definitely has this index
-            v.resize(pos + 1, String::new());
-            v[pos] = argument_name.to_string();
-        } else {
-            // Create a vector with enough space
-            let mut v: Vec<String> = Vec::new();
-            v.resize(pos + 1, String::new());
-            v[pos] = argument_name.to_string();
-            self.function_argument_names
-                .insert(String::from(function_name), v);
-        }
+        let entry = self
+            .function_argument_names
+            .entry(String::from(function_name))
+            .or_default();
+
+        entry.resize_with(pos + 1, Default::default);
+        entry[pos] = argument_name.to_string();
     }
 
     /// Get the argument types of a given function after we have inferred them previously.
@@ -187,7 +176,7 @@ impl Context {
         let mut header_lines: Vec<String> = Vec::new();
 
         // Sort the #include files for consistency
-        let sorted = &mut self.header_includes.iter().collect::<Vec<&String>>();
+        let mut sorted = self.header_includes.iter().collect::<Vec<&String>>();
         sorted.sort();
 
         // Add all the #include files to the header file
@@ -221,10 +210,10 @@ impl Context {
             };
 
             // Check whether we have a return type, assuming void otherwise
-            let rtype = match return_type {
-                Some(v) => String::from(v),
-                None => String::from(&VariableType::Void),
-            };
+            let rtype = return_type
+                .as_ref()
+                .map(String::from)
+                .unwrap_or_else(|| String::from(&VariableType::Void));
 
             // Format this function and add it to the file
             let prototype = format!("{} {}({});", rtype, name, arguments);
@@ -248,7 +237,7 @@ impl Context {
     /// Generates the include statements for the current file.
     pub fn generate_includes(&self) -> String {
         // Sorts the includes for consistency
-        let sorted = &mut self.includes.iter().collect::<Vec<&String>>();
+        let mut sorted = self.includes.iter().collect::<Vec<&String>>();
         sorted.sort();
 
         sorted

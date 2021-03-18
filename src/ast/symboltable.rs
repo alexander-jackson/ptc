@@ -97,8 +97,8 @@ impl Scope {
         if let Some((head, tail)) = indices.split_first() {
             let vtype = self.subscopes[*head].get_type(tail, variable);
 
-            if let Some(v) = vtype {
-                return Some(v);
+            if vtype.is_some() {
+                return vtype;
             }
         }
 
@@ -106,10 +106,8 @@ impl Scope {
         //      We are the final scope
         //      The inner scopes returned nothing
         // Thus, check whether we contain <variable>
-        for (name, info) in &self.variables {
-            if name == variable {
-                return Some(&info.vtype);
-            }
+        if let Some(info) = self.variables.get(variable) {
+            return Some(&info.vtype);
         }
 
         None
@@ -146,10 +144,8 @@ impl Scope {
         }
 
         // Check if it is defined here
-        for (name, info) in &self.variables {
-            if name == variable && info.defined {
-                return true;
-            }
+        if let Some(info) = self.variables.get(variable) {
+            return info.defined;
         }
 
         false
