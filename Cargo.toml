@@ -5,11 +5,11 @@ authors = ["Alexander Jackson <alexanderjackson@protonmail.com"]
 edition = "2018"
 build = "build.rs"
 
-[build-dependencies.lalrpop]
-version = "0.19"
+[build-dependencies]
+lalrpop = "0.19.5"
 
 [dependencies]
-lalrpop-util = "0.19"
-regex = "1.4.2"
-pico-args = "0.3.0"
+lalrpop-util = "0.19.5"
+regex = "1.4.3"
+pico-args = "0.4.0"
 lazy_static = "1.4.0"
