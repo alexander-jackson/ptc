@@ -7,7 +7,7 @@
 use regex::Regex;
 
 /// Variable types that `ptc` currently supports.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum VariableType {
     /// The integer type
     Integer,
@@ -78,5 +78,33 @@ impl From<&str> for VariableType {
         }
 
         unreachable!()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::ast::VariableType;
+
+    #[test]
+    fn variable_type_from_str_parses_correctly() {
+        assert_eq!(VariableType::from("int"), VariableType::Integer);
+        assert_eq!(VariableType::from("float"), VariableType::Float);
+        assert_eq!(VariableType::from("None"), VariableType::Void);
+
+        assert_eq!(
+            VariableType::from("List[float]"),
+            VariableType::List {
+                elements: Some(Box::new(VariableType::Float)),
+            }
+        );
+
+        assert_eq!(
+            VariableType::from("List[List[int]]"),
+            VariableType::List {
+                elements: Some(Box::new(VariableType::List {
+                    elements: Some(Box::new(VariableType::Integer))
+                })),
+            }
+        );
     }
 }

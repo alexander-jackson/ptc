@@ -9,7 +9,7 @@ use std::collections::HashMap;
 use crate::ast::VariableType;
 
 /// Stores information about a variable in the symbol table.
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct VariableInformation {
     /// Whether the variable has defined in output code yet
     defined: bool,
@@ -28,7 +28,7 @@ impl VariableInformation {
 }
 
 /// Stores a single scope layer with the variables defined within it.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Eq, PartialEq)]
 pub struct Scope {
     /// The variables defined in this scope
     variables: HashMap<String, VariableInformation>,
@@ -164,16 +164,16 @@ impl Scope {
 
     /// Gets the lists that are defined in this scope.
     pub fn get_defined_lists(&self) -> Vec<(String, VariableType)> {
-        let mut lists: Vec<(String, VariableType)> = Vec::new();
-
-        // Get all the lists in this scope
-        for (name, info) in &self.variables {
-            if let VariableType::List { .. } = info.vtype {
-                lists.push((name.clone(), info.vtype.clone()));
-            }
-        }
-
-        lists
+        self.variables
+            .iter()
+            .filter_map(|(name, info)| {
+                if let VariableType::List { .. } = info.vtype {
+                    Some((name.clone(), info.vtype.clone()))
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 }
 
@@ -250,5 +250,54 @@ impl SymbolTable {
     /// Checks whether we are in the global scope.
     pub fn in_global_scope(&self) -> bool {
         self.active.is_empty()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::ast::symboltable::Scope;
+
+    #[test]
+    fn scopes_are_pushed_correctly() {
+        let mut scope = Scope::new();
+        let indices = [];
+
+        let index = scope.push_scope(&indices);
+
+        assert_eq!(index, 0);
+    }
+
+    #[test]
+    fn deeper_scopes_are_pushed_correctly() {
+        let mut scope = Scope::new();
+
+        scope.push_scope(&[]);
+        scope.push_scope(&[]);
+
+        scope.push_scope(&[1]);
+        scope.push_scope(&[1]);
+
+        let index = scope.push_scope(&[1, 0]);
+
+        assert_eq!(index, 0);
+
+        let expected = Scope {
+            subscopes: vec![
+                Scope::new(),
+                Scope {
+                    subscopes: vec![
+                        Scope {
+                            subscopes: vec![Scope::new()],
+                            ..Default::default()
+                        },
+                        Scope::new(),
+                    ],
+                    ..Default::default()
+                },
+            ],
+            ..Default::default()
+        };
+
+        assert_eq!(scope, expected);
     }
 }
