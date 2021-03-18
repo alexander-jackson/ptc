@@ -84,13 +84,9 @@ impl Generate for Statement {
 
                     // If the identifier is a list with known element types
                     if let Some(VariableType::List { elements }) = context.get_type(&ident) {
-                        match elements {
-                            Some(e) => {
-                                // Add the relevant free
-                                Some(format!("list_{}_free({});", String::from(e), ident))
-                            }
-                            None => None,
-                        }
+                        elements
+                            .as_ref()
+                            .map(|e| format!("list_{}_free({});", String::from(e), ident))
                     } else {
                         None
                     }
@@ -214,18 +210,16 @@ impl Generate for Statement {
 
 fn check_list_display(expr: &Expression, dtype: Option<&VariableType>) -> Option<String> {
     if let Expression::ListDisplay = expr {
-        if let Some(t) = dtype {
-            if let VariableType::List { elements } = t {
-                let expr_str = format!(
-                    "list_{}_new()",
-                    match elements {
-                        Some(t) => String::from(t),
-                        None => String::from("unknown"),
-                    }
-                );
+        if let Some(VariableType::List { elements }) = dtype {
+            let expr_str = format!(
+                "list_{}_new()",
+                elements
+                    .as_ref()
+                    .map(String::from)
+                    .unwrap_or_else(|| String::from("unknown"))
+            );
 
-                return Some(expr_str);
-            }
+            return Some(expr_str);
         }
     }
 

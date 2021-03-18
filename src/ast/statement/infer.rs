@@ -55,12 +55,10 @@ impl Infer for Statement {
                 branch.block.infer(context);
                 context.pop_scope();
             }
-            Statement::ReturnStatement { expr } => {
+            Statement::ReturnStatement { expr: Some(expr) } => {
                 // If the statement returns a value, get the type of it
-                if let Some(e) = expr {
-                    if let Some(t) = e.get_type(context) {
-                        context.set_function_return_type(t);
-                    }
+                if let Some(t) = expr.get_type(context) {
+                    context.set_function_return_type(t);
                 }
             }
             Statement::FunctionDecl {

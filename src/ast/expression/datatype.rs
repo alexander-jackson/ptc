@@ -42,12 +42,11 @@ impl DataType for Expression {
                 let primary_gen = primary.generate(context);
 
                 // If we are doing `list[..]`, we can use the element type of `list`
-                if let Some(t) = context.get_type(&primary_gen) {
-                    if let VariableType::List { elements } = t {
-                        if let Some(elements) = elements {
-                            return Some(*elements.clone());
-                        }
-                    }
+                if let Some(VariableType::List {
+                    elements: Some(elements),
+                }) = context.get_type(&primary_gen)
+                {
+                    return Some(*elements.clone());
                 }
 
                 None

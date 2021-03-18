@@ -36,15 +36,16 @@ impl Generate for Expression {
                 // Check for <list>.append(<args>)
                 if let Expression::AttributeRef { primary, attribute } = &**name {
                     if let "append" = attribute.generate(context).as_ref() {
-                        if let Some(VariableType::List { elements }) = primary.get_type(context) {
-                            if let Some(elements) = elements {
-                                return format!(
-                                    "list_{}_append({}, {})",
-                                    String::from(&*elements),
-                                    primary.generate(context),
-                                    arg_str
-                                );
-                            }
+                        if let Some(VariableType::List {
+                            elements: Some(elements),
+                        }) = primary.get_type(context)
+                        {
+                            return format!(
+                                "list_{}_append({}, {})",
+                                String::from(&*elements),
+                                primary.generate(context),
+                                arg_str
+                            );
                         }
                     }
                 }
@@ -57,13 +58,11 @@ impl Generate for Expression {
                 let primary_gen = primary.generate(context);
                 let expr_gen = expr.generate(context);
 
-                if let Some(t) = context.get_type(&primary_gen) {
-                    if let VariableType::List { .. } = t {
-                        return format!("{}->data[{}]", primary_gen, expr_gen);
-                    }
+                if let Some(VariableType::List { .. }) = context.get_type(&primary_gen) {
+                    return format!("{}->data[{}]", primary_gen, expr_gen);
                 }
 
-                String::from("")
+                String::new()
             }
             Expression::Identifier { name } => name.generate(context),
             Expression::Literal { value } => value.generate(context),
