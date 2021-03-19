@@ -59,12 +59,12 @@ pub enum Statement {
     /// The `pass` keyword
     Pass,
     /// The `del` keyword, along with its arguments
-    DeleteStatement {
+    Delete {
         /// The elements to delete
         targets: Vec<Identifier>,
     },
     /// The `if` statement
-    IfStatement {
+    If {
         /// The condition and statements
         initial: Branch,
         /// An optional collection of elif statements
@@ -73,17 +73,17 @@ pub enum Statement {
         optional: Option<Suite>,
     },
     /// The `while` statement
-    WhileStatement {
+    While {
         /// The condition and statements
         branch: Branch,
     },
     /// The `return` statement
-    ReturnStatement {
+    Return {
         /// An optional expression to return the value of
         expr: Option<Expression>,
     },
     /// The `global` statement
-    GlobalStatement {
+    Global {
         /// The identifier to declare globally
         ident: Identifier,
     },

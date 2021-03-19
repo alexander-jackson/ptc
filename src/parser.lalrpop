@@ -88,23 +88,23 @@ DeleteStatement: ast::Statement = {
     "del" <head: Identifier> <tail: ("," Identifier)*> => {
         let mut idents = vec![head];
         idents.extend(tail.into_iter().map(|e| e.1));
-        ast::Statement::DeleteStatement { targets: idents }
+        ast::Statement::Delete { targets: idents }
     }
 };
 
 ReturnStatement: ast::Statement = {
     "return" <expr: Expression?> =>
-        ast::Statement::ReturnStatement { expr: expr },
+        ast::Statement::Return { expr: expr },
 };
 
 GlobalStatement: ast::Statement = {
     "global" <ident: Identifier> =>
-        ast::Statement::GlobalStatement { ident: ident },
+        ast::Statement::Global { ident: ident },
 };
 
 IfStatement: ast::Statement = {
     "if" <expr: Expression> ":" <suite: Suite> <elif: ("elif" Expression ":" Suite)*> <optional: ("else" ":" Suite)?> =>
-        ast::Statement::IfStatement {
+        ast::Statement::If {
             initial: ast::Branch::new(expr, suite),
             // TODO: Make this not use into_iter as it requires a clone //
             elif: elif.into_iter().map(|e| ast::Branch::new(e.1, e.3)).collect(),
@@ -114,7 +114,7 @@ IfStatement: ast::Statement = {
 
 WhileStatement: ast::Statement = {
     "while" <expr: Expression> ":" <suite: Suite> =>
-        ast::Statement::WhileStatement {
+        ast::Statement::While {
             branch: ast::Branch::new(expr, suite),
         },
 };
@@ -344,7 +344,7 @@ Enclosure: ast::Expression = {
 
 ParenthForm: ast::Expression = {
     "(" <expr: Expression> ")" =>
-        ast::Expression::ParenExpression { expr: Box::new(expr) },
+        ast::Expression::Parenthesised { expr: Box::new(expr) },
 };
 
 ListDisplay: ast::Expression = {

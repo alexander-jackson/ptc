@@ -76,7 +76,7 @@ pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
 ///
 /// Errors can be caused if any of the paths being processed cause an error. These propagate up
 /// from `process_path`
-pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
+pub fn process_args(args: &Args) -> Result<(), Box<dyn Error>> {
     // If the user provided -h, --help or left no paths to process
     if args.help || args.paths.is_empty() {
         display_help_message();

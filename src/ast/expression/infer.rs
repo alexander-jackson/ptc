@@ -11,7 +11,7 @@ impl Infer for Expression {
                 right.infer(context);
             }
             Expression::UnaryOperation { expr, .. }
-            | Expression::ParenExpression { expr, .. }
+            | Expression::Parenthesised { expr, .. }
             | Expression::Subscription { expr, .. } => {
                 expr.infer(context);
             }

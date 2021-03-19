@@ -33,7 +33,7 @@ pub enum Expression {
         expr: Box<Expression>,
     },
     /// A parenthesised expression, such as `(-3)`.
-    ParenExpression {
+    Parenthesised {
         /// The expression inside the parenthesis
         expr: Box<Expression>,
     },

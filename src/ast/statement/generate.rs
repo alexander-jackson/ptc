@@ -77,7 +77,7 @@ impl Generate for Statement {
                 );
             }
             Statement::Expression { expr } => format!("{};", expr.generate(context)),
-            Statement::DeleteStatement { targets } => targets
+            Statement::Delete { targets } => targets
                 .iter()
                 .filter_map(|t| {
                     let ident = t.get_identifier();
@@ -93,7 +93,7 @@ impl Generate for Statement {
                 })
                 .collect::<Vec<String>>()
                 .join(" "),
-            Statement::IfStatement {
+            Statement::If {
                 initial,
                 elif,
                 optional,
@@ -118,20 +118,20 @@ impl Generate for Statement {
                     .collect::<Vec<String>>()
                     .join(" ");
 
-                // If there is an else statement, make sure we generate it too
-                let optional_gen = match optional.as_ref() {
-                    Some(s) => {
+                let optional_gen = optional
+                    .as_ref()
+                    .map(|s| {
                         context.next_scope();
                         let optional_gen = s.generate(context);
                         context.next_scope();
                         format!(" else {{ {} }}", &optional_gen)
-                    }
-                    None => String::from(""),
-                };
+                    })
+                    .unwrap_or_default();
 
+                // If there is an else statement, make sure we generate it too
                 format!("{}{}{}", if_gen, elif_gen, optional_gen)
             }
-            Statement::WhileStatement { branch } => {
+            Statement::While { branch } => {
                 let expr_gen = branch.condition.generate(context);
 
                 context.next_scope();
@@ -140,11 +140,11 @@ impl Generate for Statement {
 
                 format!("while ({}) {{ {} }}", expr_gen, suite_gen)
             }
-            Statement::ReturnStatement { expr } => match expr {
-                Some(e) => format!("return {};", e.generate(context)),
-                None => String::from("return;"),
-            },
-            Statement::GlobalStatement { .. } | Statement::Pass => String::new(),
+            Statement::Return { expr } => expr.as_ref().map_or_else(
+                || String::from("return;"),
+                |e| format!("return {};", e.generate(context)),
+            ),
+            Statement::Global { .. } | Statement::Pass => String::new(),
             Statement::FunctionDecl {
                 name, args, body, ..
             } => {
@@ -165,8 +165,9 @@ impl Generate for Statement {
                 }
 
                 // Get the arg string if we have one
-                let arg_str = match args {
-                    Some(args) => {
+                let arg_str = args
+                    .as_ref()
+                    .map(|args| {
                         let mut arguments: Vec<String> = Vec::new();
 
                         // Get the inferred argument types
@@ -190,9 +191,8 @@ impl Generate for Statement {
                         }
 
                         arguments.join(", ")
-                    }
-                    None => String::new(),
-                };
+                    })
+                    .unwrap_or_default();
 
                 if list_h {
                     context.add_header_include("list.h");
@@ -215,8 +215,7 @@ fn check_list_display(expr: &Expression, dtype: Option<&VariableType>) -> Option
                 "list_{}_new()",
                 elements
                     .as_ref()
-                    .map(String::from)
-                    .unwrap_or_else(|| String::from("unknown"))
+                    .map_or_else(|| String::from("unknown"), String::from)
             );
 
             return Some(expr_str);

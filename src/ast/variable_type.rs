@@ -23,7 +23,7 @@ pub enum VariableType {
 }
 
 impl From<&VariableType> for String {
-    /// Allows for the conversion of a VariableType to a String.
+    /// Allows for the conversion of a [`VariableType`] to a String.
     ///
     /// Code generation regularly requires the conversion of internal `VariableType`s to `String`s.
     /// This function allows for new types to be more easily added, as code generation will call

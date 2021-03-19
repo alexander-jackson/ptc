@@ -12,4 +12,4 @@ pub mod app;
 pub mod ast;
 pub mod lexer;
 
-lalrpop_mod!(pub parser);
+lalrpop_mod!(#[allow(clippy::all, clippy::pedantic)] pub parser);

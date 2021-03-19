@@ -38,7 +38,7 @@ impl Context {
     ///
     /// This assumes that nothing has been learnt about the program yet.
     pub fn new() -> Context {
-        Default::default()
+        Context::default()
     }
 
     /// Push a new scope into the `SymbolTable`.
@@ -68,17 +68,17 @@ impl Context {
             .insert_shallow_variable(variable, &inferred);
     }
 
-    /// Get the VariableType for a variable if it exists.
+    /// Get the [`VariableType`] for a variable if it exists.
     pub fn get_type(&self, variable: &str) -> Option<&VariableType> {
         self.symbol_table.get_type(variable)
     }
 
-    /// Check whether a variable has been defined in the `SymbolTable` currently.
+    /// Check whether a variable has been defined in the [`SymbolTable`] currently.
     pub fn variable_defined(&self, variable: &str) -> bool {
         self.symbol_table.variable_defined(variable)
     }
 
-    /// Reset the position of the `SymbolTable`.
+    /// Reset the position of the [`SymbolTable`].
     pub fn reset_position(&mut self) {
         self.symbol_table.reset_position();
     }
@@ -212,8 +212,7 @@ impl Context {
             // Check whether we have a return type, assuming void otherwise
             let rtype = return_type
                 .as_ref()
-                .map(String::from)
-                .unwrap_or_else(|| String::from(&VariableType::Void));
+                .map_or_else(|| String::from(&VariableType::Void), String::from);
 
             // Format this function and add it to the file
             let prototype = format!("{} {}({});", rtype, name, arguments);

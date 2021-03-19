@@ -44,7 +44,7 @@ impl Scope {
     /// Initialises a new scope with an empty `HashMap` for Variables, no known subscopes and marks
     /// it as unexplored thusfar.
     pub fn new() -> Scope {
-        Default::default()
+        Scope::default()
     }
 
     /// Push a new scope into the symbol table, returning the new index that it was inserted into.
@@ -189,7 +189,7 @@ pub struct SymbolTable {
 impl SymbolTable {
     /// Creates a new `SymbolTable` with an empty global scope.
     pub fn new() -> SymbolTable {
-        Default::default()
+        SymbolTable::default()
     }
 
     /// Push a new scope into the currently active one. This implies we are going into a new level

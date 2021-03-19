@@ -25,7 +25,7 @@ impl Infer for Statement {
                 expr.infer(context);
             }
             Statement::Expression { expr } => expr.infer(context),
-            Statement::IfStatement {
+            Statement::If {
                 initial,
                 elif,
                 optional,
@@ -49,13 +49,13 @@ impl Infer for Statement {
                     context.pop_scope();
                 }
             }
-            Statement::WhileStatement { branch } => {
+            Statement::While { branch } => {
                 // Push a scope into the Context and infer on the `while` statement contents
                 context.push_scope();
                 branch.block.infer(context);
                 context.pop_scope();
             }
-            Statement::ReturnStatement { expr: Some(expr) } => {
+            Statement::Return { expr: Some(expr) } => {
                 // If the statement returns a value, get the type of it
                 if let Some(t) = expr.get_type(context) {
                     context.set_function_return_type(t);

@@ -15,7 +15,7 @@ impl Generate for Expression {
             Expression::UnaryOperation { op, expr } => {
                 format!("{}{}", op.generate(context), expr.generate(context))
             }
-            Expression::ParenExpression { expr } => format!("({})", expr.generate(context)),
+            Expression::Parenthesised { expr } => format!("({})", expr.generate(context)),
             Expression::ListDisplay => unreachable!("This is handled at the Statement level."),
             Expression::FunctionCall { name, args } => {
                 // Generate the arguments if they exist

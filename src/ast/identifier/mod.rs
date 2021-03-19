@@ -53,8 +53,7 @@ impl Identifier {
     /// Gets the name of the Identifier by cloning it
     pub fn get_identifier(&self) -> String {
         match self {
-            Identifier::Name { name } => name.clone(),
-            Identifier::Typed { name, .. } => name.clone(),
+            Identifier::Name { name } | Identifier::Typed { name, .. } => name.clone(),
         }
     }
 }

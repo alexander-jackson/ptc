@@ -16,7 +16,7 @@ impl DataType for Expression {
                 Operator::LogicalNot => Some(VariableType::Integer),
                 _ => unreachable!(),
             },
-            Expression::ParenExpression { expr } => expr.get_type(context),
+            Expression::Parenthesised { expr } => expr.get_type(context),
             Expression::ListDisplay => Some(VariableType::List { elements: None }),
             Expression::Literal { value } => value.get_type(context),
             Expression::Identifier { name } => name.get_type(context),
