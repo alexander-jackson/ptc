@@ -8,7 +8,7 @@ impl Infer for Statement {
             Statement::Assign { target, expr } => {
                 // If the target is a variable, we can infer the type of it
                 if let Expression::Identifier { name } = target {
-                    let identifier: String = name.get_identifier();
+                    let identifier = name.get_identifier();
 
                     // If we have a type hint, use that, otherwise infer using the expression
                     let inferred = match name {
@@ -69,7 +69,7 @@ impl Infer for Statement {
             } => {
                 context.push_scope();
                 let function_name = name.get_identifier();
-                context.set_current_function(Some(function_name.clone()));
+                context.set_current_function(function_name.to_owned());
 
                 // If the return type is type hinted, insert this information
                 if let Some(r) = ret {
@@ -111,24 +111,21 @@ impl Infer for Statement {
 
                     // If we know some types already from previous usage, load these
                     let ftypes = context.get_function_argument_types(&function_name);
-                    // Get around the borrow checker here
-                    let mut insertions: Vec<(String, VariableType)> = Vec::new();
 
-                    // Load all the inferred types that we know so far
-                    // These are either inferred or typehints
-                    if let Some(types) = ftypes {
-                        // Iterate the types and argument names
-                        for (dtype, arg) in types.iter().zip(arguments.iter()) {
-                            // If we have a type for this argument
-                            if let Some(t) = dtype {
-                                let identifier = arg.get_identifier();
-                                insertions.push((identifier, t.clone()));
-                            }
+                    let insertions: Option<Vec<_>> = ftypes.map(|types| {
+                        types
+                            .iter()
+                            .zip(arguments.iter())
+                            .filter_map(|(dtype, arg)| {
+                                dtype.as_ref().map(|t| (arg.get_identifier(), t.clone()))
+                            })
+                            .collect()
+                    });
+
+                    if let Some(insertions) = insertions {
+                        for (name, dtype) in insertions {
+                            context.insert_inferred_type(&name, dtype);
                         }
-                    }
-
-                    for (name, dtype) in insertions {
-                        context.insert_inferred_type(&name, dtype);
                     }
                 }
 

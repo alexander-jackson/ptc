@@ -106,11 +106,7 @@ impl Scope {
         //      We are the final scope
         //      The inner scopes returned nothing
         // Thus, check whether we contain <variable>
-        if let Some(info) = self.variables.get(variable) {
-            return Some(&info.vtype);
-        }
-
-        None
+        self.variables.get(variable).map(|info| &info.vtype)
     }
 
     /// Move us into the next scope in the depth first traversal of the scope tree.
@@ -144,11 +140,10 @@ impl Scope {
         }
 
         // Check if it is defined here
-        if let Some(info) = self.variables.get(variable) {
-            return info.defined;
-        }
-
-        false
+        self.variables
+            .get(variable)
+            .map(|info| info.defined)
+            .unwrap_or_default()
     }
 
     /// Define a variable in the currently active scope if it exists within it.
@@ -163,15 +158,11 @@ impl Scope {
     }
 
     /// Gets the lists that are defined in this scope.
-    pub fn get_defined_lists(&self) -> Vec<(String, VariableType)> {
+    pub fn get_defined_lists(&self) -> Vec<(&String, &VariableType)> {
         self.variables
             .iter()
             .filter_map(|(name, info)| {
-                if let VariableType::List { .. } = info.vtype {
-                    Some((name.clone(), info.vtype.clone()))
-                } else {
-                    None
-                }
+                matches!(info.vtype, VariableType::List { .. }).then(|| (name, &info.vtype))
             })
             .collect()
     }
@@ -243,7 +234,7 @@ impl SymbolTable {
     }
 
     /// Gets the names of all global lists and their `VariableType`s.
-    pub fn get_global_lists(&self) -> Vec<(String, VariableType)> {
+    pub fn get_global_lists(&self) -> Vec<(&String, &VariableType)> {
         self.scope.get_defined_lists()
     }
 

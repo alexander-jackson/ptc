@@ -1,5 +1,7 @@
 //! Implements the `Generate` trait for `Expression`.
 
+use itertools::Itertools;
+
 use crate::ast::{Context, DataType, Expression, Generate, VariableType};
 
 impl Generate for Expression {
@@ -20,11 +22,7 @@ impl Generate for Expression {
             Expression::FunctionCall { name, args } => {
                 // Generate the arguments if they exist
                 let arg_str = match args {
-                    Some(s) => s
-                        .iter()
-                        .map(|a| a.generate(context))
-                        .collect::<Vec<String>>()
-                        .join(", "),
+                    Some(s) => s.iter().map(|a| a.generate(context)).join(", "),
                     None => String::new(),
                 };
 
@@ -42,7 +40,7 @@ impl Generate for Expression {
                         {
                             return format!(
                                 "list_{}_append({}, {})",
-                                String::from(&*elements),
+                                elements,
                                 primary.generate(context),
                                 arg_str
                             );

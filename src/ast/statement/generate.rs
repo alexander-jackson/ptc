@@ -1,5 +1,7 @@
 //! Implements the `Generate` trait for `Statement`.
 
+use itertools::Itertools;
+
 use crate::ast::{Context, Expression, Generate, Statement, VariableType};
 
 impl Generate for Statement {
@@ -8,7 +10,7 @@ impl Generate for Statement {
             Statement::Assign { target, expr } => {
                 // If the LHS is a pure identifier
                 if let Expression::Identifier { name } = target {
-                    let identifier: String = name.get_identifier();
+                    let identifier = name.get_identifier();
                     let dtype = context.get_type(&identifier);
 
                     // Generate a list display if that's what the RHS is
@@ -19,7 +21,7 @@ impl Generate for Statement {
                             // Check whether this is a global list
                             if context.in_global_scope() {
                                 if let Some(t) = context.get_type(&identifier) {
-                                    return format!("{} {};", String::from(t), &identifier);
+                                    return format!("{} {};", t, &identifier);
                                 }
                             }
 
@@ -34,9 +36,9 @@ impl Generate for Statement {
 
                     // Otherwise, we should define it if we have a type for it
                     if let Some(t) = context.get_type(&identifier) {
-                        let str_type = String::from(t);
+                        let generated = format!("{} {} = {};", t, identifier, expr_gen);
                         context.define_variable(&identifier);
-                        return format!("{} {} = {};", str_type, identifier, expr_gen);
+                        return generated;
                     }
 
                     return format!("unknown {} = {};", identifier, expr_gen);
@@ -86,12 +88,11 @@ impl Generate for Statement {
                     if let Some(VariableType::List { elements }) = context.get_type(&ident) {
                         elements
                             .as_ref()
-                            .map(|e| format!("list_{}_free({});", String::from(e), ident))
+                            .map(|e| format!("list_{}_free({});", e.to_string(), ident))
                     } else {
                         None
                     }
                 })
-                .collect::<Vec<String>>()
                 .join(" "),
             Statement::If {
                 initial,
@@ -115,7 +116,6 @@ impl Generate for Statement {
                             branch.block.generate(context)
                         )
                     })
-                    .collect::<Vec<String>>()
                     .join(" ");
 
                 let optional_gen = optional
@@ -152,17 +152,12 @@ impl Generate for Statement {
                 let ret_type = context.get_function_return_type(&name_gen);
 
                 // If we know the datatype, add it here
-                let datatype = match ret_type {
-                    Some(v) => String::from(v),
-                    None => String::from(&VariableType::Void),
-                };
+                let datatype = ret_type
+                    .map(ToString::to_string)
+                    .unwrap_or_else(|| ToString::to_string(&VariableType::Void));
 
                 // Get around the borrow checker quickly
-                let mut list_h = false;
-
-                if let Some(VariableType::List { .. }) = ret_type {
-                    list_h = true;
-                }
+                let mut list_h = matches!(ret_type, Some(VariableType::List { .. }));
 
                 // Get the arg string if we have one
                 let arg_str = args
@@ -174,7 +169,7 @@ impl Generate for Statement {
                         if let Some(v) = context.get_function_argument_types(&name_gen) {
                             for (t, a) in v.iter().zip(args.iter()) {
                                 let str_type = match t {
-                                    Some(vtype) => String::from(vtype),
+                                    Some(vtype) => vtype.to_string(),
                                     None => String::from("unknown"),
                                 };
 
@@ -215,7 +210,7 @@ fn check_list_display(expr: &Expression, dtype: Option<&VariableType>) -> Option
                 "list_{}_new()",
                 elements
                     .as_ref()
-                    .map_or_else(|| String::from("unknown"), String::from)
+                    .map_or_else(|| String::from("unknown"), ToString::to_string)
             );
 
             return Some(expr_str);

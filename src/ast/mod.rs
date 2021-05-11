@@ -8,6 +8,8 @@
 //! of the traits found in this module. They are all likely to use the `Context` struct, which
 //! allows for inference to be carried across from the `infer` call to the `generate` call.
 
+use itertools::Itertools;
+
 mod context;
 mod expression;
 mod identifier;
@@ -43,10 +45,7 @@ impl Generate for Suite {
     /// Simply iterates through the statements in a Suite and generates each of them, concatenating
     /// them with a space.
     fn generate(&self, context: &mut Context) -> String {
-        self.iter()
-            .map(|s| s.generate(context))
-            .collect::<Vec<String>>()
-            .join(" ")
+        self.iter().map(|s| s.generate(context)).join(" ")
     }
 }
 

@@ -4,6 +4,8 @@
 //! throughout the code. For example, after stating `x = 1`, `x` will have a stored type of
 //! `VariableType::Integer` whenever it is mentioned.
 
+use std::fmt;
+
 use regex::Regex;
 
 /// Variable types that `ptc` currently supports.
@@ -22,33 +24,17 @@ pub enum VariableType {
     },
 }
 
-impl From<&VariableType> for String {
-    /// Allows for the conversion of a [`VariableType`] to a String.
-    ///
-    /// Code generation regularly requires the conversion of internal `VariableType`s to `String`s.
-    /// This function allows for new types to be more easily added, as code generation will call
-    /// `String::from(v)` and get the string represenation.
-    fn from(v: &VariableType) -> String {
-        match v {
-            VariableType::Integer => String::from("int"),
-            VariableType::Float => String::from("float"),
-            VariableType::Void => String::from("void"),
+impl fmt::Display for VariableType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            VariableType::Integer => write!(f, "int"),
+            VariableType::Float => write!(f, "float"),
+            VariableType::Void => write!(f, "void"),
             VariableType::List { elements } => match elements {
-                Some(t) => format!("list_{}*", String::from(t)),
-                None => String::from("list_unknown*"),
+                Some(t) => write!(f, "list_{}*", t),
+                None => write!(f, "list_unknown*"),
             },
         }
-    }
-}
-
-impl From<&Box<VariableType>> for String {
-    /// Allows for the conversion of a &Box<VariableType> to a String.
-    ///
-    /// When dealing with the `VariableType::List { elements }` enum type, frequently a reference
-    /// is given to the inner `elements`. Converting to a String requires using the above version
-    /// and thus using this notation to do so. Instead, this can be used.
-    fn from(v: &Box<VariableType>) -> String {
-        String::from(&**v)
     }
 }
 

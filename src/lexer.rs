@@ -185,7 +185,7 @@ impl Indentation {
 
     /// Gets the top of the stack of indentation
     pub fn get_current_length(&self) -> usize {
-        self.length[self.length.len() - 1]
+        *self.length.last().unwrap()
     }
 
     /// Pops a level off the stack and returns it
@@ -309,11 +309,11 @@ where
             number.push('.');
             self.update_lookahead();
             number.push_str(&self.read_while(|c| c.is_digit(10)));
-            let value: f32 = number.parse().unwrap_or(std::f32::MAX);
+            let value: f32 = number.parse().unwrap_or(f32::MAX);
             return self.push_token(Tok::Float { value });
         }
 
-        let value: u32 = number.parse().unwrap_or_else(|_| u32::max_value());
+        let value: u32 = number.parse().unwrap_or(u32::MAX);
         self.push_token(Tok::Integer { value });
     }
 
@@ -562,11 +562,7 @@ where
     /// not none, it will do the comparison and return the result, otherwise it will obviously
     /// return false.
     fn current_char_equals(&self, c: char) -> bool {
-        if let Some(l) = self.lookahead.map(|x| x.1) {
-            return c == l;
-        }
-
-        false
+        matches!(self.lookahead.map(|x| x.1), Some(l) if c == l)
     }
 
     /// The entry point for lexing.
@@ -648,5 +644,38 @@ where
             Some(Err(e)) => self.emit_error(e),
             None => None,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn read_while_is_correct() {
+        let input = "name = 1";
+        let mut lexer = Lexer::new(input.char_indices());
+
+        let name = lexer.read_while(char::is_alphabetic);
+        assert_eq!(name, "name");
+    }
+
+    #[test]
+    fn current_char_is_correctly_compared() {
+        let input = "name = 1";
+        let lexer = Lexer::new(input.char_indices());
+
+        assert!(lexer.current_char_equals('n'));
+        assert!(!lexer.current_char_equals('a'));
+    }
+
+    #[test]
+    fn comments_are_read_correctly() {
+        let input = "# name = 1\nvar = 2";
+        let mut lexer = Lexer::new(input.char_indices());
+
+        lexer.read_comment();
+
+        assert!(lexer.current_char_equals('\n'));
     }
 }

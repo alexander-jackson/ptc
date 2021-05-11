@@ -6,6 +6,8 @@
 
 use std::collections::{HashMap, HashSet};
 
+use itertools::Itertools;
+
 use crate::ast::{SymbolTable, VariableType};
 
 /// A structure for storing information learnt about the program provided.
@@ -94,8 +96,8 @@ impl Context {
     }
 
     /// Set the current function that we are parsing and generating code for.
-    pub fn set_current_function(&mut self, function_name: Option<String>) {
-        self.current_function = function_name;
+    pub fn set_current_function(&mut self, function_name: impl Into<Option<String>>) {
+        self.current_function = function_name.into();
 
         if let Some(f) = &self.current_function {
             self.function_return_types.insert(f.to_string(), None);
@@ -192,27 +194,25 @@ impl Context {
                 self.get_function_argument_names(name),
             );
 
-            let arguments = match (types, names) {
-                // If we have both the names and arguments
-                (Some(types), Some(names)) => {
-                    // We have both types and names, join them with commas
+            let arguments = types
+                .zip(names)
+                .map(|(types, names)| {
                     types
                         .iter()
-                        .zip(names.iter())
-                        .map(|(t, n)| match t {
-                            Some(t) => format!("{} {}", String::from(t), n),
-                            None => format!("{} {}", String::from(&VariableType::Void), n),
+                        .map(|t| {
+                            t.as_ref()
+                                .map_or_else(|| VariableType::Void.to_string(), ToString::to_string)
                         })
-                        .collect::<Vec<String>>()
+                        .zip(names.iter())
+                        .map(|(t, n)| format!("{} {}", t, n))
                         .join(", ")
-                }
-                _ => String::new(),
-            };
+                })
+                .unwrap_or_default();
 
             // Check whether we have a return type, assuming void otherwise
             let rtype = return_type
                 .as_ref()
-                .map_or_else(|| String::from(&VariableType::Void), String::from);
+                .map_or_else(|| VariableType::Void.to_string(), ToString::to_string);
 
             // Format this function and add it to the file
             let prototype = format!("{} {}({});", rtype, name, arguments);
@@ -242,7 +242,6 @@ impl Context {
         sorted
             .iter()
             .map(|i| format!(r#"#include "{}""#, i))
-            .collect::<Vec<String>>()
             .join("\n")
     }
 
@@ -261,9 +260,9 @@ impl Context {
         }
 
         // Gets the appropriate version of list_*_new for a variable type
-        let get_list_new = |v| match v {
+        let get_list_new = |v: &VariableType| match v {
             VariableType::List { elements } => match elements {
-                Some(t) => match *t {
+                Some(t) => match **t {
                     VariableType::Integer => "list_int_new()",
                     VariableType::Float => "list_float_new()",
                     _ => unreachable!(),
@@ -276,8 +275,7 @@ impl Context {
         // For each list type, generate its relevant function
         let initialisers = global_lists
             .iter()
-            .map(|(name, vtype)| format!("{} = {};", name, get_list_new(vtype.clone())))
-            .collect::<Vec<String>>()
+            .map(|(name, vtype)| format!("{} = {};", name, get_list_new(vtype)))
             .join(" ");
 
         // Format the function for output

@@ -1,7 +1,5 @@
 use std::iter::FromIterator;
 
-extern crate ptc;
-
 use ptc::lexer::Tok::*;
 use ptc::lexer::*;
 
@@ -36,7 +34,7 @@ lex! {
     identifier_with_number: "func2", vec![ident("func2")],
     identifier_with_underscore: "common_divisor", vec![ident("common_divisor")],
     identifier_with_leading_underscore: "__init__", vec![ident("__init__")],
-    identifier_with_leading_number: "2func", vec![Integer { value: 2 }, Identifier { name: String::from("func") }],
+    identifier_with_leading_number: "2func", vec![Integer { value: 2 }, ident("func")],
     operators: "+-*/%", vec![Plus, Minus, Multiply, Divide, Modulo],
     minus_ambiguity: "-->-=", vec![Minus, Arrow, MinusEquals],
     legacy_divide_operators: "///", vec![Divide, Divide],

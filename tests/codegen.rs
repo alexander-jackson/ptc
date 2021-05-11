@@ -1,5 +1,3 @@
-extern crate ptc;
-
 use ptc::ast::{Context, Generate, Infer};
 
 fn get_output(input: &str) -> String {
@@ -20,7 +18,7 @@ macro_rules! generate {
             #[test]
             fn $name() {
                 let input: &str = $input;
-                let output: &str = &get_output(input);
+                let output = get_output(input);
                 let expected: &str = $expected;
                 assert_eq!(output, expected);
             }

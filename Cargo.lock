@@ -299,6 +299,7 @@ checksum = "925383efa346730478fb4838dbe9137d2a47675ad789c546d150a6e1dd4ab31c"
 name = "ptc"
 version = "0.1.0"
 dependencies = [
+ "itertools",
  "lalrpop",
  "lalrpop-util",
  "lazy_static",

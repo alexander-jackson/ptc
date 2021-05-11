@@ -51,9 +51,9 @@ pub enum Identifier {
 
 impl Identifier {
     /// Gets the name of the Identifier by cloning it
-    pub fn get_identifier(&self) -> String {
+    pub fn get_identifier(&self) -> &str {
         match self {
-            Identifier::Name { name } | Identifier::Typed { name, .. } => name.clone(),
+            Identifier::Name { name } | Identifier::Typed { name, .. } => name,
         }
     }
 }
