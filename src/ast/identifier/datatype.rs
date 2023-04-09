@@ -2,8 +2,8 @@
 //!
 //! This allows identifiers to have their types guessed using the known context of the program.
 
-use ast::Identifier;
-use ast::{Context, DataType, VariableType};
+use crate::ast::Identifier;
+use crate::ast::{Context, DataType, VariableType};
 
 impl DataType for Identifier {
     /// Gets the datatype for the identifier if known.

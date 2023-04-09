@@ -1,5 +1,5 @@
-use ast::Program;
-use ast::{Context, Generate, VariableType};
+use crate::ast::Program;
+use crate::ast::{Context, Generate, VariableType};
 
 impl Generate for Program {
     fn generate(&self, context: &mut Context) -> String {

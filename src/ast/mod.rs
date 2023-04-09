@@ -34,7 +34,7 @@ pub type Suite = Vec<Statement>;
 /// the program.
 pub trait Generate {
     /// Generates a string representation of the current AST node in C.
-    fn generate(&self, &mut Context) -> String;
+    fn generate(&self, _: &mut Context) -> String;
 }
 
 impl Generate for Suite {
@@ -57,7 +57,7 @@ impl Generate for Suite {
 /// reached and then propagate the inference into the body of the definition.
 pub trait Infer {
     /// Performs the inferrence, taking the currently known context of the program.
-    fn infer(&mut self, &mut Context);
+    fn infer(&mut self, _: &mut Context);
 }
 
 impl Infer for Suite {
@@ -86,5 +86,5 @@ impl Infer for Suite {
 /// ```
 pub trait DataType {
     /// Gets the type of the current node, using the known context if needed.
-    fn get_type(&self, &mut Context) -> Option<VariableType>;
+    fn get_type(&self, _: &mut Context) -> Option<VariableType>;
 }

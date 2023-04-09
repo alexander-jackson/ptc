@@ -1,7 +1,7 @@
 //! Implements the `Generate` trait for `Expression`.
 
-use ast::Expression;
-use ast::{Context, DataType, Generate, VariableType};
+use crate::ast::Expression;
+use crate::ast::{Context, DataType, Generate, VariableType};
 
 impl Generate for Expression {
     /// Produces the C code for a given `Expression`.

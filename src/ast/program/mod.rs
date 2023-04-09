@@ -4,7 +4,7 @@
 //! program `ptc` was given. It is used as a top-level abstraction, and simply allows for the
 //! `infer` and `generate` calls to be propagated throughout the program.
 
-use ast::Suite;
+use crate::ast::Suite;
 
 mod generate;
 mod infer;

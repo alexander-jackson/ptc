@@ -6,7 +6,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use ast::{SymbolTable, VariableType};
+use crate::ast::{SymbolTable, VariableType};
 
 /// A structure for storing information learnt about the program provided.
 ///

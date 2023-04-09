@@ -1,7 +1,7 @@
 //! Implements the `DataType` trait for `Expression`.
 
-use ast::Expression;
-use ast::{Context, DataType, Generate, Operator, VariableType};
+use crate::ast::Expression;
+use crate::ast::{Context, DataType, Generate, Operator, VariableType};
 
 impl DataType for Expression {
     /// Allows attempted calculations of `VariableType`s for an `Expression`.

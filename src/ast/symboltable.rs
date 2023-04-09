@@ -6,7 +6,7 @@
 
 use std::collections::HashMap;
 
-use ast::VariableType;
+use crate::ast::VariableType;
 
 /// Stores information about a variable in the symbol table.
 #[derive(Debug)]

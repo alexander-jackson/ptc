@@ -1,7 +1,7 @@
 //! Implements the `Infer` trait for `Statement`.
 
-use ast::Statement;
-use ast::{Context, DataType, Expression, Identifier, Infer, VariableType};
+use crate::ast::Statement;
+use crate::ast::{Context, DataType, Expression, Identifier, Infer, VariableType};
 
 impl Infer for Statement {
     fn infer(&mut self, context: &mut Context) {
