@@ -5,6 +5,7 @@
 
 use std::env;
 use std::error::Error;
+use std::ffi::{OsStr, OsString};
 use std::fs;
 use std::path::Path;
 use std::process::Command;
@@ -23,7 +24,7 @@ pub struct Args {
     /// Whether the help message should be displayed, specified by `-h`, `--help` or no arguments
     help: bool,
     /// All paths that the compiler should be run on
-    paths: Vec<String>,
+    paths: Vec<OsString>,
 }
 
 /// Display the help message for the compiler, typically upon running the program with no
@@ -64,7 +65,7 @@ pub fn get_arguments() -> Result<Args, Box<dyn Error>> {
         tokens: args.contains("--tokens"),
         display: args.contains("--display"),
         help: args.contains(["-h", "--help"]),
-        paths: args.free()?,
+        paths: args.finish(),
     })
 }
 
@@ -92,7 +93,7 @@ pub fn process_args(args: Args) -> Result<(), Box<dyn Error>> {
 
 /// Process a single path to a file. Generates code if required, as well as displaying abstract
 /// syntax trees, tokens and the generated output if needed.
-fn process_path(path: &str, args: &Args) -> Result<(), Box<dyn Error>> {
+fn process_path(path: &OsStr, args: &Args) -> Result<(), Box<dyn Error>> {
     // Read contents of file and get the basename of the filepath
     let code: String = fs::read_to_string(&path)?;
     let basename = get_output_filename(&path);
@@ -152,7 +153,7 @@ fn display_tokens(program_code: &str) {
 
 /// Get the output filename given the filename of the file we are currently processing. Gets the
 /// stem of the file and its basename.
-fn get_output_filename(filename: &str) -> Option<String> {
+fn get_output_filename(filename: &OsStr) -> Option<String> {
     let path_struct = Path::new(&filename);
     let stem = path_struct.file_stem()?;
     let basename = stem.to_str()?;

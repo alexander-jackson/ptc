@@ -3,11 +3,12 @@ name = "ptc"
 version = "0.1.0"
 authors = ["Alexander Jackson <alexanderjackson@protonmail.com"]
 build = "build.rs"
+edition = "2021"
 
 [build-dependencies.lalrpop]
-version = "0.17.2"
+version = "0.19.9"
 
 [dependencies]
-lalrpop-util = "0.17.2"
-regex = "1"
-pico-args = "0.3.0"
+lalrpop-util = "0.19.9"
+regex = "1.7.3"
+pico-args = "0.5.0"

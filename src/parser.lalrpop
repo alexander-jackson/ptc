@@ -1,7 +1,7 @@
 use std::iter::FromIterator;
 
-use lexer;
-use ast;
+use crate::lexer;
+use crate::ast;
 
 grammar;
 
