@@ -6,9 +6,9 @@ build = "build.rs"
 edition = "2021"
 
 [build-dependencies.lalrpop]
-version = "0.19.9"
+version = "0.20.0"
 
 [dependencies]
-lalrpop-util = "0.19.9"
-regex = "1.7.3"
+lalrpop-util = "0.20.0"
+regex = "1.10.2"
 pico-args = "0.5.0"
