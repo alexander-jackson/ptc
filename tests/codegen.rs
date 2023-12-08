@@ -7,7 +7,7 @@ fn get_output(input: &str) -> String {
     let lexer = ptc::lexer::Lexer::new(input.char_indices());
     let mut ast = parser.parse(lexer).unwrap();
 
-    let mut context = Context::new();
+    let mut context = Context::default();
     ast.infer(&mut context);
 
     context.reset_position();

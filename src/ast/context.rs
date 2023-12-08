@@ -15,7 +15,7 @@ use crate::ast::{SymbolTable, VariableType};
 ///
 /// Stores the current function name if we are inside one, the return types of functions, their
 /// argument names and types, and any external `#include`s that are needed.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Context {
     /// Stores the currently defined variables and deals with scoping rules
     symbol_table: SymbolTable,
@@ -34,21 +34,6 @@ pub struct Context {
 }
 
 impl Context {
-    /// Creates a new Context.
-    ///
-    /// This assumes that nothing has been learnt about the program yet.
-    pub fn new() -> Context {
-        Context {
-            symbol_table: SymbolTable::new(),
-            current_function: None,
-            function_return_types: HashMap::new(),
-            function_argument_types: HashMap::new(),
-            function_argument_names: HashMap::new(),
-            includes: HashSet::new(),
-            header_includes: HashSet::new(),
-        }
-    }
-
     /// Push a new scope into the `SymbolTable`.
     pub fn push_scope(&mut self) {
         self.symbol_table.push_scope();
@@ -313,7 +298,7 @@ impl Context {
     /// ```
     /// use ptc::ast::Context;
     ///
-    /// let mut context = Context::new();
+    /// let mut context = Context::default();
     /// assert!(context.in_global_scope());
     ///
     /// context.push_scope();
@@ -324,11 +309,5 @@ impl Context {
     /// ```
     pub fn in_global_scope(&self) -> bool {
         self.symbol_table.in_global_scope()
-    }
-}
-
-impl Default for Context {
-    fn default() -> Context {
-        Context::new()
     }
 }

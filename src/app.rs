@@ -107,7 +107,7 @@ fn process_path(path: &OsStr, args: &Args) -> Result<(), Box<dyn Error>> {
     let mut ast = get_abstract_syntax_tree(&code, args.abstract_tree)?;
 
     // Infer as many types as we can in a single pass and return to the start
-    let mut context = Context::new();
+    let mut context = Context::default();
     ast.infer(&mut context);
     context.reset_position();
 

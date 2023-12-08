@@ -28,7 +28,7 @@ impl VariableInformation {
 }
 
 /// Stores a single scope layer with the variables defined within it.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Scope {
     /// The variables defined in this scope
     variables: HashMap<String, VariableInformation>,
@@ -39,25 +39,13 @@ pub struct Scope {
 }
 
 impl Scope {
-    /// Creates a new Scope.
-    ///
-    /// Initialises a new scope with an empty `HashMap` for Variables, no known subscopes and marks
-    /// it as unexplored thusfar.
-    pub fn new() -> Scope {
-        Scope {
-            variables: HashMap::new(),
-            subscopes: Vec::new(),
-            explored: false,
-        }
-    }
-
     /// Push a new scope into the symbol table, returning the new index that it was inserted into.
     pub fn push_scope(&mut self, indices: &[usize]) -> usize {
         if let Some((head, tail)) = indices.split_first() {
             return self.subscopes[*head].push_scope(tail);
         }
 
-        self.subscopes.push(Scope::new());
+        self.subscopes.push(Scope::default());
         self.subscopes.len() - 1
     }
 
@@ -186,7 +174,7 @@ impl Scope {
 }
 
 /// Defines the `SymbolTable` used in the Context.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct SymbolTable {
     /// The global scope, which all scopes descend from
     scope: Scope,
@@ -195,14 +183,6 @@ pub struct SymbolTable {
 }
 
 impl SymbolTable {
-    /// Creates a new `SymbolTable` with an empty global scope.
-    pub fn new() -> SymbolTable {
-        SymbolTable {
-            scope: Scope::new(),
-            active: Vec::new(),
-        }
-    }
-
     /// Push a new scope into the currently active one. This implies we are going into a new level
     /// of nesting, such as a function definition, if statement or while statement.
     pub fn push_scope(&mut self) {

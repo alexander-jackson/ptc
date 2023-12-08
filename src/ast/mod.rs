@@ -81,7 +81,7 @@ impl Infer for Suite {
 /// use ptc::ast::{Context, DataType, Literal, VariableType};
 ///
 /// let node = Literal::Float { value: 0.5 };
-/// let mut context = Context::new();
+/// let mut context = Context::default();
 /// assert_eq!(node.get_type(&mut context), Some(VariableType::Float));
 /// ```
 pub trait DataType {
